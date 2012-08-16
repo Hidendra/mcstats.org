@@ -13,21 +13,22 @@ RSYNC="rsync -avzq --progress"
 # nginx load balancer
 REMOTE_HOST="root@mcstats.org"
 
+if [ -d "www" ]; then
+	cd www/
+else
+	cd ../www/
+fi
+
 if [ "$REALM" == "live" ]; then
-	REMOTE_HOST="root@mcstats.org"
-    REMOTE_LOCATION="/var/www/servers/"
+    REMOTE_HOST="root@mcstats.org"
+    REMOTE_LOCATION="/data/www/"
 elif [ "$REALM" == "dev" ]; then
 	REMOTE_HOST="root@192.168.1.50"
 	REMOTE_LOCATION="/data/www/"
 else
     REMOTE_HOST="root@10.10.1.50"
-    REMOTE_LOCATION="/data/www/"
-fi
-
-if [ -d "www" ]; then
-	cd www/
-else
-	cd ../www/
+    REMOTE_LOCATION="/data/www/test.mcstats.org/"
+    cd mcstats.org
 fi
 
 echo -e "Realm: \033[0;32m$REALM\033[00m"
