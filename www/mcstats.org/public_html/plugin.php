@@ -82,9 +82,25 @@ if (strstr($authors, ' ') !== FALSE || strstr($authors, ',') !== FALSE)
     $author_prepend = '(s)';
 }
 
+// Ranking
+$rank = $plugin->getRank();
+
+// unknown rank
+if ($rank == '')
+{
+    $rank = '<i>Unknown</i>';
+}
+
+// bolden the rank if they're in the top-10
+if (is_numeric($rank) && $rank <= 10)
+{
+    $rank = '<b>' . $rank . '</b>';
+}
+
 echo '
                     <table class="table table-striped">
                         <tbody>
+                            <tr> <td> Rank </td> <td> ' . $rank . ' </td> </tr>
                             <tr> <td> Name </td> <td> ' . $pluginName . ' </td> </tr>
                             <tr> <td> Author' . $author_prepend .' </td> <td> ' . $authors . ' </td> </tr>
                             <tr> <td> Date added </td> <td> ' . date('F m, Y', $plugin->getCreated()) . ' </td> </tr>
