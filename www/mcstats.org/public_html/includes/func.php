@@ -12,7 +12,7 @@ require 'Graph.class.php';
 require 'highroller/HighRoller.php';
 require 'highroller/HighRollerSeriesData.php';
 require 'highroller/HighRollerSplineChart.php';
-require 'highroller/HighRollerAreaChart.php';
+require 'highroller/HighRollerAreaSplineChart.php';
 require 'highroller/HighRollerColumnChart.php';
 require 'highroller/HighRollerPieChart.php';
 

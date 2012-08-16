@@ -238,7 +238,7 @@ class Graph
 
             case GraphType::Area:
             case GraphType::Percentage_Area:
-                $chart = new HighRollerAreaChart();
+                $chart = new HighRollerAreaSplineChart();
                 break;
 
             case GraphType::Column:
