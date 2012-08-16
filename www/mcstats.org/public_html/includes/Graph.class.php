@@ -280,6 +280,9 @@ class Graph
         // Disable credits
         $chart->credits = array('enabled' => false);
 
+        // Disable scrollbar
+        $chart->scrollbar = array('enabled' => false);
+
         // Non-pie graph specifics
         if ($this->type != GraphType::Pie)
         {
