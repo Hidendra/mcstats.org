@@ -28,6 +28,11 @@ abstract class GraphType
      */
     const Pie = 3;
 
+    /**
+     * A percentage area graph
+     */
+    const Percentage_Area = 4;
+
 }
 
 /**
@@ -232,6 +237,7 @@ class Graph
                 break;
 
             case GraphType::Area:
+            case GraphType::Percentage_Area:
                 $chart = new HighRollerAreaChart();
                 break;
 
@@ -372,7 +378,14 @@ class Graph
                 'crosshairs' => true
             );
 
-            // TODO plot options
+            if ($this->type == GraphType::Percentage_Area)
+            {
+                $chart->plotOptions = array(
+                    'area' => array(
+                        'stacking' => 'percent'
+                    )
+                );
+            }
         } else // Pie
         {
             $chart->plotOptions = array(
@@ -447,7 +460,7 @@ class Graph
                             });
 
                             $.each(sortedPoints , function(i, point) {
-                                s += point.point.tooltipFormatter(series.tooltipOptions.pointFormat);
+                                s += point.point.tooltipFormatter('<span style=\"color:{series.color}\">{series.name}</span>: <b>{point.y}</b>" . ($this->type == GraphType::Percentage_Area ? "(' + Highcharts.numberFormat(this.percentage, 1) + '%)" : "") . "<br/>');
                             });
 
                             return s;

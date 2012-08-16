@@ -134,6 +134,7 @@ echo '
                                         <option value="' . GraphType::Area . '"' . ($type == GraphType::Area ? ' selected' : '') . '>Area</option>
                                         <option value="' . GraphType::Column . '"' . ($type == GraphType::Column ? ' selected' : '') . '>Column</option>
                                         <option value="' . GraphType::Pie . '"' . ($type == GraphType::Pie ? ' selected' : '') . '>Pie</option>
+                                        <option value="' . GraphType::Percentage_Area . '"' . ($type == GraphType::Percentage_Area ? ' selected' : '') . '>Percentage Area</option>
                                     </select>
                                 </div>
                             </div>
