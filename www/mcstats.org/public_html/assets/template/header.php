@@ -35,7 +35,8 @@ $show_navbar = $is_in_admin_ui || is_loggedin();
         <!-- charting scripts -->
         <script src="http://static.mcstats.org/javascript/highcharts/highcharts.js" type="text/javascript"></script>
         <script src="http://static.mcstats.org/javascript/highcharts/highstock.js" type="text/javascript"></script>
-        <script src="http://static.mcstats.org/javascript/highcharts/themes/simplex.js" type="text/javascript"></script>
+        <script src="http://static.mcstats.org/javascript/highcharts/exporting.js" type="text/javascript"></script>
+        <script src="http://static.mcstats.org/javascript/highcharts/themes/simplex-test.js" type="text/javascript"></script>
 
         <script type="text/javascript">
             // Google analytics

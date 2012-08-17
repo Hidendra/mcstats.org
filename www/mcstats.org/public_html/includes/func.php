@@ -71,18 +71,31 @@ function outputGraphs($plugin)
     /// Load all of the custom graphs for the plugin
     $activeGraphs = $plugin->getActiveGraphs();
 
+    // the 3 graphs to combine on the same row
+    // these graphs are expected to be together in similar order even if they are mixed up
+    $combineGraphs = array('Game Version', 'Server Software');
+
     /// Output a div for each one
     $index = 1;
+    $floated = FALSE;
     foreach ($activeGraphs as $activeGraph)
     {
-        echo '                    <div id="CustomChart' . $index++ . '" style="height:500"></div> <br/>
-';
+        if (in_array($activeGraph->getName(), $combineGraphs))
+        {
+            echo '<div id="CustomChart' . $index . '" style="height: 400px; width: 50%; float: left;"></div>';
+            $floated = TRUE;
+        } else
+        {
+            if ($floated)
+            {
+                echo '<div style="clear: both;"></div>';
+            }
+
+            echo '<div id="CustomChart' . $index . '" style="height: 400px;"></div>';
+        }
+
+        $index ++;
     }
-
-    echo '
-                </div>
-
-            </div>';
 
     /// Flush before sending / generating graph data
     flush();
@@ -117,17 +130,23 @@ function outputGraphs($plugin)
             // Now begin our magic
             asort($columnAmounts);
 
-            // remove low outlier data
-            foreach ($columnAmounts as $columnName => $amount)
-            {
-                if ($amount <= 5)
-                {
-                    unset ($columnAmounts[$columnName]);
-                }
-            }
-
             // Sum all of the points
             $data_sum = array_sum($columnAmounts);
+
+            // remove low outlier data on large datasets
+            if ($data_sum > 1000)
+            {
+                foreach ($columnAmounts as $columnName => $amount)
+                {
+                    if ($amount <= 5)
+                    {
+                        unset ($columnAmounts[$columnName]);
+                    }
+                }
+
+                // recalculate the data summages
+                $data_sum = array_sum($columnAmounts);
+            }
 
             $count = count($columnAmounts);
             if ($count >= MINIMUM_FOR_OTHERS)

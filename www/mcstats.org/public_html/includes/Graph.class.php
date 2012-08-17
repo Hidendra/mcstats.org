@@ -283,6 +283,12 @@ class Graph
         // Disable scrollbar
         $chart->scrollbar = array('enabled' => false);
 
+        // Exporting options
+        $chart->exporting = array(
+            'enabled' => true,
+            'filename' => str_replace(' ', '_', $this->getPlugin()->getName() . ' - ' . $this->getDisplayName())
+        );
+
         // Non-pie graph specifics
         if ($this->type != GraphType::Pie)
         {
@@ -501,7 +507,7 @@ class Graph
         }
 
         // Render it!!
-        return $chart->renderChart($classname, $rawJavascript);
+        return $chart->renderChart($renderTo, $classname, $rawJavascript);
     }
 
     /**

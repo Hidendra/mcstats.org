@@ -25,7 +25,7 @@ foreach ($plugins as $plugin)
     $plugin->getOrCreateGraph('Global Statistics', false, 1, GraphType::Area, TRUE, 1);
     $plugin->getOrCreateGraph('Server Locations', false, 1, GraphType::Pie, TRUE, 9002);
     $plugin->getOrCreateGraph('Version Trends', false, 1, GraphType::Area, TRUE, 9003);
-    $plugin->getOrCreateGraph('Minecraft Version', false, 1, GraphType::Pie, TRUE, 9000);
+    $plugin->getOrCreateGraph('Game Version', false, 1, GraphType::Pie, TRUE, 9000);
     $plugin->getOrCreateGraph('Server Software', false, 1, GraphType::Pie, TRUE, 9001);
 
     $converted ++;

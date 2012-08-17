@@ -71,7 +71,7 @@ class Server
     private $serverSoftware;
 
     /**
-     * The minecraft version the server is running
+     * The Game Version the server is running
      * @var string
      */
     private $minecraftVersion;

@@ -28,6 +28,7 @@ elif [ "$REALM" == "dev" ]; then
 else
     REMOTE_HOST="root@10.10.1.50"
     REMOTE_LOCATION="/data/www/test.mcstats.org/"
+    $RSYNC -e "ssh root@zero.mcstats.org ssh" --exclude 'config.php' static.mcstats.org $REMOTE_HOST:"/data/www/"
     cd mcstats.org
 fi
 
