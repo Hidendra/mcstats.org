@@ -119,11 +119,22 @@ $graph->drawGraphArea(250, 250, 250, true);
 $graph->drawScale($dataSet->GetData(), $dataSet->GetDataDescription(), SCALE_START0, 150, 150, 150, true, 0, 0);
 // $graph->drawGrid(4, true, 230, 230, 230, 100);
 
-$serversLast24Hours = $plugin->countServersLastUpdated(time() - SECONDS_IN_DAY);
+if ($plugin->getID() == GLOBAL_PLUGIN_ID)
+{
+    $statement = get_slave_db_handle()->prepare('SELECT Sum(GlobalHits) FROM Plugin');
+    $statement->execute();
+
+    $serverStarts = $statement->fetch()[0];
+    $serversLast24Hours = 0;
+} else
+{
+    $serverStarts = $plugin->getGlobalHits();
+    $serversLast24Hours = $plugin->countServersLastUpdated(time() - SECONDS_IN_DAY);
+}
 
 // Draw the footer
 $graph->setFontProperties('pf_arma_five.ttf', 6);
-$footer = sprintf('%s servers in the last 24 hours with %s all-time server starts  ', number_format($serversLast24Hours), number_format($plugin->getGlobalHits()));
+$footer = sprintf('%s servers in the last 24 hours with %s all-time server startups  ', number_format($serversLast24Hours), number_format($serverStarts));
 $graph->drawTextBox(60, IMAGE_HEIGHT - 25, IMAGE_WIDTH - 20, IMAGE_HEIGHT - 7, $footer, 0, 255, 255, 255, ALIGN_RIGHT, true, 0, 0, 0, 30);
 
 // Draw the data
