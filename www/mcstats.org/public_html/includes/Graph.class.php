@@ -33,6 +33,11 @@ abstract class GraphType
      */
     const Percentage_Area = 4;
 
+    /**
+     * A stacked column graph
+     */
+    const Stacked_Column = 5;
+
 }
 
 /**
@@ -242,6 +247,7 @@ class Graph
                 break;
 
             case GraphType::Column:
+            case GraphType::Stacked_Column:
                 $chart = new HighRollerColumnChart();
                 break;
 
@@ -293,7 +299,7 @@ class Graph
         if ($this->type != GraphType::Pie)
         {
             $chart->rangeSelector = array(
-                'selected' => ($this->type == GraphType::Column ? 0 : 3),
+                'selected' => (($this->type == GraphType::Column || $this->type == GraphType::Stacked_Column) ? 1 : 3),
                 'buttons' => array(
                     array(
                         'type' => 'hour',
@@ -390,8 +396,15 @@ class Graph
             if ($this->type == GraphType::Percentage_Area)
             {
                 $chart->plotOptions = array(
-                    'area' => array(
+                    'areaspline' => array(
                         'stacking' => 'percent'
+                    )
+                );
+            } elseif ($this->type == GraphType::Stacked_Column)
+            {
+                $chart->plotOptions = array(
+                    'column' => array(
+                        'stacking' => 'normal'
                     )
                 );
             }

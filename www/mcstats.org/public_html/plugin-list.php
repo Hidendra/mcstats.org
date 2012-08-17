@@ -33,7 +33,7 @@ if ($currentPage > $totalPages)
 }
 
 /// Templating
-$page_title = 'Plugin Metrics :: Plugin List';
+$page_title = 'MCStats :: Plugin List';
 $container_class = 'container-fluid';
 send_header();
 

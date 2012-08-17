@@ -7,7 +7,7 @@ require_once ROOT . 'includes/database.php';
 require_once ROOT . 'includes/func.php';
 
 /// Templating
-$page_title = 'Plugin Metrics :: Why MCStats?';
+$page_title = 'MCStats :: Why MCStats?';
 // $container_class = 'container';
 send_header();
 

@@ -32,7 +32,7 @@ $pluginName = htmlentities($plugin->getName());
 $encodedName = urlencode($pluginName); // encoded name, for use in signature url
 
 /// Template hook
-$page_title = $pluginName . ' Statistics';
+$page_title = 'MCStats :: ' . $pluginName;
 
 /// Templating
 send_header();

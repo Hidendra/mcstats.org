@@ -768,9 +768,10 @@ function can_admin_plugin($plugin)
 /**
  * Get all of the plugins the currently logged in user can access
  *
+ * @param $selectFromPendingPool If returned plugins can include plugins from the pending pool
  * @return array Plugin
  */
-function get_accessible_plugins()
+function get_accessible_plugins($selectFromPendingPool = TRUE)
 {
     global $_SESSION , $master_db_handle;
 
@@ -789,6 +790,11 @@ function get_accessible_plugins()
 
     while ($row = $statement->fetch())
     {
+        if ($selectFromPendingPool == FALSE && $row['Pending'] == 1)
+        {
+            continue;
+        }
+
         $plugin = resolvePlugin($row);
         $plugin->setPendingAccess($row['Pending'] == 1);
 

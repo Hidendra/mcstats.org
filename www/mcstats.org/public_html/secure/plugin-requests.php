@@ -150,7 +150,7 @@ END;
 }
 
 /// Templating
-$page_title = 'Plugin Metrics :: Secure';
+$page_title = 'MCStats :: Secure';
 send_header();
 
 echo '
