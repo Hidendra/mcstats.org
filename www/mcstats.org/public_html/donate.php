@@ -8,21 +8,21 @@ require_once ROOT . 'includes/func.php';
 
 /// Templating
 $page_title = 'MCStats :: Donate to MCStats';
-// $container_class = 'container';
+$container_class = 'container';
 send_header();
 
 echo '
 
-<div class="row-fluid" style="margin-left: 25%; text-align: center;">
-    <div class="span6" style="width: 50%;">
+<div class="row" style="margin-left: 10%; text-align: center;">
+    <div class="span6" style="width: 80%;">
         <h1 style="margin-bottom:30px; font-size:40px;">
             Serving you rock solid stats.
         </h1>
     </div>
 </div>
 
-<div class="row-fluid" style="margin-left: 25%;">
-    <div class="span6 well" style="width: 50%;">
+<div class="row" style="margin-left: 10%;">
+    <div class="span6 well" style="width: 80%;">
         <p style="font-size: 16px;">
             The MCStats / Plugin Metrics backend receives <b>over 400 requests per second</b> 24 hours a day, 7 days a week
         </p>
@@ -73,7 +73,7 @@ if (is_loggedin() && ($pluginCount = count($plugins = get_accessible_plugins()))
         </p>
     </div>
 </div>
-<div class="row-fluid">
+<div class="row">
     <div style="text-align: center;">
         <p>
             <img src="/signature/all+servers.png" />
@@ -88,7 +88,7 @@ echo '
     </div>
 </div>
 
-<div class="row-fluid">
+<div class="row">
     <div style="text-align: center;">
         <form action="https://www.paypal.com/cgi-bin/webscr" method="post">
             <input type="hidden" name="cmd" value="_s-xclick">
