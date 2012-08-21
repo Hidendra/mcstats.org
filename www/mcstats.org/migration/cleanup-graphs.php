@@ -13,7 +13,7 @@ $plugins = loadPlugins(PLUGIN_ORDER_ALPHABETICAL);
 $total = count($plugins);
 
 // pre prepare some statements
-$count_customdata = get_slave_db_handle()->prepare('SELECT COUNT(*) FROM CustomDataTimeline WHERE ColumnID = ? AND Epoch >= ?');
+$count_customdata = get_slave_db_handle()->prepare('SELECT COUNT(*) FROM GraphData WHERE ColumnID = ? AND Epoch >= ?');
 $delete_column = $master_db_handle->prepare('DELETE FROM CustomColumn where ID = ?');
 $delete_graph = $master_db_handle->prepare('DELETE FROM Graph where ID = ?');
 

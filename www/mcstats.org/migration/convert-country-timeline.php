@@ -17,7 +17,7 @@ $countries = loadCountries();
 
 // iterate through all of the plugins
 
-$statement = $master_db_handle->prepare('INSERT INTO CustomDataTimeline (Plugin, ColumnID, Sum, Count, Avg, Max, Min, Variance, StdDev, Epoch)
+$statement = $master_db_handle->prepare('INSERT INTO GraphData (Plugin, ColumnID, Sum, Count, Avg, Max, Min, Variance, StdDev, Epoch)
                                             SELECT Plugin, :ColumnID, Servers, 0, 0, 0, 0, 0, 0, Epoch FROM CountryTimeline where Plugin = :Plugin AND Country = :ShortCode');
 foreach ($plugins as $plugin)
 {

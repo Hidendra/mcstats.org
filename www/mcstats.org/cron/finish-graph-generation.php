@@ -9,9 +9,9 @@ require_once ROOT . 'includes/database.php';
 require_once ROOT . 'includes/func.php';
 
 // copy timeline data
-$statement = get_slave_db_handle()->prepare('INSERT INTO CustomDataTimeline SELECT * FROM CustomDataTimelineScratch');
+$statement = get_slave_db_handle()->prepare('INSERT INTO GraphData SELECT * FROM GraphDataScratch');
 $statement->execute();
 
 // empty the scratch table incase it failed to empty
-$statement = get_slave_db_handle()->prepare('TRUNCATE CustomDataTimelineScratch');
+$statement = get_slave_db_handle()->prepare('TRUNCATE GraphDataScratch');
 $statement->execute();

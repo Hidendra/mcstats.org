@@ -183,6 +183,11 @@ function outputGraphs($plugin)
                     continue;
                 }
 
+                if (is_numeric($columnName) || is_double($columnName))
+                {
+                    $columnName = "\0" . $columnName;
+                }
+
                 $seriesData[] = array($columnName, $percent);
             }
 
@@ -219,7 +224,7 @@ function error_fquit($message)
 function getTimeLast()
 {
     $timelast = -1;
-    $statement = get_slave_db_handle()->prepare('SELECT UNIX_TIMESTAMP(NOW()) - MAX(Epoch) FROM CustomDataTimeline');
+    $statement = get_slave_db_handle()->prepare('SELECT UNIX_TIMESTAMP(NOW()) - MAX(Epoch) FROM GraphData');
     $statement->execute();
     if ($row = $statement->fetch()) $timelast = (int)$row[0];
     // max 2 hours
@@ -233,7 +238,7 @@ function getTimeLast()
  */
 function getLastGraphEpoch()
 {
-    $statement = get_slave_db_handle()->prepare('SELECT MAX(Epoch) FROM CustomDataTimeline');
+    $statement = get_slave_db_handle()->prepare('SELECT MAX(Epoch) FROM GraphData');
     $statement->execute();
     $row = $statement->fetch();
     return $row != null ? $row[0] : 0;

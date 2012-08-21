@@ -12,7 +12,7 @@ $container_class = 'container';
 send_header();
 
 $lastEpoch = getLastGraphEpoch();
-$statement = get_slave_db_handle()->prepare('SELECT Sum FROM CustomDataTimeline where ColumnID = ? AND Epoch = ?');
+$statement = get_slave_db_handle()->prepare('SELECT Sum FROM GraphData where ColumnID = ? AND Epoch = ?');
 
 // vars used later on
 $pluginCount = 0;

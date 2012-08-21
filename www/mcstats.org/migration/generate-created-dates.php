@@ -33,7 +33,7 @@ foreach ($plugins as $plugin) {
         $master_db_handle = try_connect_database();
         echo sprintf('[%d%%] Estimating created date for %s ..%s', floor(($index / $total) * 100), $plugin->getName(), PHP_EOL);
 
-        $statement = get_slave_db_handle()->prepare('SELECT Min(Epoch) FROM CustomDataTimeline where Plugin = ?');
+        $statement = get_slave_db_handle()->prepare('SELECT Min(Epoch) FROM GraphData where Plugin = ?');
         $statement->execute(array($plugin->getID()));
 
         if ($row = $statement->fetch()) {

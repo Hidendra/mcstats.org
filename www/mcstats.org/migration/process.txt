@@ -8,12 +8,12 @@ ALTER TABLE `metrics`.`Graph` ADD COLUMN `Position` mediumint(5) NOT NULL DEFAUL
 DELETE FROM Graph where ID IN ( 64 , 514 );
 delete from Graph where Plugin = 4465 and Name = 'Default';
 ALTER TABLE `metrics`.`Graph` DROP PRIMARY KEY, ADD PRIMARY KEY (`ID`), ADD UNIQUE `Uniq` USING BTREE (`Plugin`, `Name`);
-ALTER TABLE CustomDataTimeline drop column ID ;
-ALTER TABLE CustomDataTimeline DROP INDEX `Ajax-Timeline` ; ALTER TABLE CustomDataTimeline ADD INDEX `Epoch` ( Epoch ) ;
+ALTER TABLE GraphData drop column ID ;
+ALTER TABLE GraphData DROP INDEX `Ajax-Timeline` ; ALTER TABLE GraphData ADD INDEX `Epoch` ( Epoch ) ;
 ALTER TABLE ServerPlugin ADD INDEX `Updated` ( Updated ) ;
 ALTER TABLE `metrics`.`Plugin` ADD COLUMN `Created` int NOT NULL DEFAULT '0' AFTER `Parent`;
 ALTER TABLE `metrics`.`Server` ADD COLUMN `ServerSoftware` varchar(30) NOT NULL DEFAULT 'Unknown' AFTER `Country`, ADD COLUMN `MinecraftVersion` varchar(20) NOT NULL DEFAULT 'Unknown' AFTER `ServerSoftware`;
-CREATE TABLE IF NOT EXISTS `CustomDataTimelineScratch` (
+CREATE TABLE IF NOT EXISTS `GraphDataScratch` (
   `Plugin` int(11) NOT NULL,
   `ColumnID` int(11) NOT NULL,
   `Sum` int(11) NOT NULL,

@@ -9,5 +9,5 @@ require_once ROOT . 'includes/database.php';
 require_once ROOT . 'includes/func.php';
 
 // empty the scratch table incase it failed to empty
-$statement = get_slave_db_handle()->prepare('TRUNCATE CustomDataTimelineScratch');
+$statement = get_slave_db_handle()->prepare('TRUNCATE GraphDataScratch');
 $statement->execute();

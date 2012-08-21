@@ -391,7 +391,7 @@ class Plugin
         $db_handle = get_slave_db_handle();
 
         $ret = array();
-        $statement = $db_handle->prepare('SELECT Sum, Epoch FROM CustomDataTimeline WHERE Plugin = ? AND ColumnID = ? AND Epoch >= ?');
+        $statement = $db_handle->prepare('SELECT Sum, Epoch FROM GraphData WHERE Plugin = ? AND ColumnID = ? AND Epoch >= ?');
         $statement->execute(array($this->id, $columnID, $minEpoch));
 
         while ($row = $statement->fetch())
@@ -414,7 +414,7 @@ class Plugin
 
         $epoch = getLastGraphEpoch();
         $ret = array();
-        $statement = $db_handle->prepare('SELECT Sum FROM CustomDataTimeline WHERE ColumnID = ? AND Plugin = ? AND Epoch = ?');
+        $statement = $db_handle->prepare('SELECT Sum FROM GraphData WHERE ColumnID = ? AND Plugin = ? AND Epoch = ?');
         $statement->execute(array($columnID, $this->id, $epoch));
 
         $row = $statement->fetch();
