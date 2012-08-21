@@ -17,7 +17,7 @@ echo 20 > "$GENERATOR_FILE"
 echo 32 > "$GENERATOR_FILE"
 /usr/local/bin/php -q generators/custom.php
 echo 44 > "$GENERATOR_FILE"
-/usr/local/bin/php -q generators/countries.php
+/usr/local/bin/php -q generators/server-locations.php
 echo 56 > "$GENERATOR_FILE"
 /usr/local/bin/php -q generators/versions.php
 echo 68 > "$GENERATOR_FILE"

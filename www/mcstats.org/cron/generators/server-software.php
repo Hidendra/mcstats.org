@@ -99,7 +99,7 @@ foreach ($plugins as $plugin)
                 $stddev = 0;
             }
 
-            $graph = $plugin->getOrCreateGraph('Server Software', false, 1, GraphType::Pie, TRUE, 9001);
+            $graph = $plugin->getOrCreateGraph('Server Software', false, 1, GraphType::Pie, TRUE, 9002);
             $columnID = $graph->getColumnID($softwareVersion);
 
             // insert it into the database

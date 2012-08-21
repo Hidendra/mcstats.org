@@ -99,7 +99,7 @@ foreach ($plugins as $plugin)
                 $stddev = 0;
             }
 
-            $graph = $plugin->getOrCreateGraph('Game Version', false, 1, GraphType::Pie, TRUE, 9000);
+            $graph = $plugin->getOrCreateGraph('Game Version', false, 1, GraphType::Pie, TRUE, 9001);
             $columnID = $graph->getColumnID($minecraftVersion);
 
             // insert it into the database

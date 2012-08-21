@@ -89,7 +89,7 @@ foreach ($plugins as $plugin)
                 $stddev = 0;
             }
 
-            $graph = $plugin->getOrCreateGraph('Server Locations', false, 1, GraphType::Pie, TRUE, 9002);
+            $graph = $plugin->getOrCreateGraph('Server Locations', false, 1, GraphType::Pie, TRUE, 9000);
             $columnID = $graph->getColumnID($fullName);
 
             // insert it into the database
