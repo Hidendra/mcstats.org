@@ -154,16 +154,16 @@ $page_title = 'MCStats :: Secure';
 send_header();
 
 echo '
-<div class="row" style="margin-left: 15%;">
-    <table class="table table-striped" style="width: 70%;">
+<div class="row" style="margin-left: 5%;">
+    <table class="table table-striped" style="width: 90%;">
         <thead>
             <tr>
-                <th> Author </th>
-                <th> Plugin </th>
+                <th> Author (ID) (# ACLs) </th>
+                <th> Plugin (ID) (# ACLs) </th>
                 <th> DBO </th>
                 <th> Email </th>
-                <th> Submitted </th>
-                <th> Relative </th>
+                <th> Request creation </th>
+                <th> Plugin creation </th>
                 <th> </th>
             </tr>
         </thead>
@@ -206,14 +206,24 @@ while ($row = $statement->fetch())
 
     $createdMinutesAgo = floor((time() - $created) / 60);
     if ($createdMinutesAgo < 0) $createdMinutesAgo = 0;
+    $pluginCreatedMinutesAgo = floor((time() - $plugin->getCreated()) / 60);
+    if ($pluginCreatedMinutesAgo < 0) $pluginCreatedMinutesAgo = 0;
+
+    $authorsStatement = get_slave_db_handle()->prepare('SELECT COUNT(*) FROM AuthorACL WHERE Plugin = ? AND Pending = 0');
+    $authorsStatement->execute(array($plugin->getID()));
+    $existingAuthors = $authorsStatement->fetch()[0];
+
+    $authorsStatement = get_slave_db_handle()->prepare('SELECT COUNT(*) FROM AuthorACL WHERE Author = ? AND Pending = 0');
+    $authorsStatement->execute(array($authorID));
+    $existingOwnedPlugins = $authorsStatement->fetch()[0];
 
     echo '
             <tr>
                 <td>
-                    ' . htmlentities($authorName) . ' (' . $authorID . ')
+                    ' . htmlentities($authorName) . ' (' . $authorID . ') (' . $existingOwnedPlugins . ')
                 </td>
                 <td>
-                    ' . htmlentities($plugin->getName()) . ' (' . $plugin->getID() . ')
+                    ' . htmlentities($plugin->getName()) . ' (' . $plugin->getID() . ') (' . $existingAuthors . ')
                 </td>
                 <td>
                     ' . $dbo_link . '
@@ -222,10 +232,10 @@ while ($row = $statement->fetch())
                     ' . htmlentities($email) . '
                 </td>
                 <td>
-                    ' . date('D, F d H:i T', $created) . '
+                    ' . epochToHumanString(time() - $created, FALSE) . ' ago
                 </td>
                 <td>
-                    <b>' . number_format($createdMinutesAgo) . '</b> minutes ago
+                    ' . epochToHumanString(time() - $plugin->getCreated(), FALSE) . ' ago
                 </td>
                 <td>
                     <form action="" method="POST">

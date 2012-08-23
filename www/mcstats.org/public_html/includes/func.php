@@ -895,3 +895,46 @@ function millitime()
     $timeparts = explode(" ",microtime());
     return bcadd(($timeparts[0]*1000),bcmul($timeparts[1],1000));
 }
+
+/**
+ * Converts a unix epoch to human string (e.g xx hours xx minutes xx seconds)
+ * @param $seconds
+ * @param $outputSeconds TRUE if seconds should be included in the output
+ */
+function epochToHumanString($epoch, $outputSeconds = TRUE)
+{
+    $seconds = $epoch;
+
+    $days = round($seconds / 86400);
+    $seconds -= $days * 86400;
+
+    $hours = round($seconds / 3600);
+    $seconds -= $hours * 3600;
+
+    $minutes = round($seconds / 60);
+    $seconds -= $minutes * 60;
+
+    $ret = '';
+
+    if ($days > 0) {
+        $ret .= $days . ' day' . ($days == 1 ? '' : 's') . ' ';
+    }
+
+    if ($hours > 0) {
+        $ret .= $hours . ' hour' . ($hours == 1 ? '' : 's') . ' ';
+    }
+
+    if ($minutes > 0) {
+        $ret .= $minutes . ' minute' . ($minutes == 1 ? '' : 's') . ' ';
+    }
+
+    if ($seconds > 0 && $outputSeconds) {
+        $ret .= $seconds . ' second' . ($seconds == 1 ? '' : 's') . ' ';
+    }
+
+    if ($ret == '') {
+        $ret = 'less than a ' . ($outputSeconds ? 'second' : 'minute');
+    }
+
+    return $ret;
+}
