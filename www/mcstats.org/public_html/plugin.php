@@ -97,11 +97,30 @@ if (is_numeric($rank) && $rank <= 10)
     $rank = '<b>' . $rank . '</b>';
 }
 
+// increase
+if ($plugin->getRank() < $plugin->getLastRank())
+{
+    $rank .= ' <i class="fam-arrow-up" title="Increased from ' . $plugin->getLastRank() . ' (+' . ($plugin->getLastRank() - $plugin->getRank()) . ')"></i>';
+}
+
+// decrease
+elseif ($plugin->getRank() > $plugin->getLastRank())
+{
+    $rank .= ' <i class="fam-arrow-down" title="Decreased from ' . $plugin->getLastRank() . ' (-' . ($plugin->getRank() - $plugin->getLastRank()) . ')"></i>';
+}
+
+// no change
+else
+{
+    $rank .= ' <i class="fam-bullet-blue" title="No change"></i>';
+}
+
 echo '
                     <table class="table table-striped">
                         <tbody>
-                            <tr> <td> Rank </td> <td> ' . $rank . ' </td> </tr>
                             <tr> <td> Name </td> <td> ' . $pluginName . ' </td> </tr>
+                            <tr> <td> Rank </td> <td> ' . $rank . ' </td> </tr>
+                            <tr> <td> Rank held for </td> <td> ' . epochToHumanString(time() - $plugin->getLastRankChange()) . ' </td> </tr>
                             <tr> <td> Author' . $author_prepend .' </td> <td> ' . $authors . ' </td> </tr>
                             <tr> <td> Date added </td> <td> ' . date('F d, Y', $plugin->getCreated()) . ' </td> </tr>
                             <tr> <td> Global starts </td> <td> ' . number_format($plugin->getGlobalHits()) . ' </td> </tr>

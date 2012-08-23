@@ -62,6 +62,24 @@ function loadPluginListPage(page) {
                 plugin.servers24 = "<b>" + plugin.servers24 + "</b>";
             }
 
+            // increase
+            if (plugin.rank < plugin.lastrank)
+            {
+                rank += ' <i class="fam-arrow-up" title="Increased from ' + plugin.lastrank + ' (+' + (plugin.lastrank - plugin.rank) + ')"></i>';
+            }
+
+            // decrease
+            else  if (plugin.rank > plugin.lastrank)
+            {
+                rank += ' <i class="fam-arrow-down" title="Decreased from ' + plugin.lastrank + ' (-' + (plugin.rank - plugin.lastrank) + ')"></i>';
+            }
+
+            // no change
+            else
+            {
+                rank += ' <i class="fam-bullet-blue" title="No change"></i>';
+            }
+
             html += '<tr id="plugin-list-item"> <td style="text-align: center;">' + rank + ' </td> <td> <a href="/plugin/' + linkName + '" target="_blank">' + plugin.name + '</a> </td> <td style="text-align: center;"> ' + plugin.servers24 + ' </td> </tr>';
         }
 

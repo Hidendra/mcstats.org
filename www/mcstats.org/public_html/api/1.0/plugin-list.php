@@ -22,29 +22,23 @@ $response['maxPages'] = ceil($totalPlugins / PLUGIN_LIST_RESULTS_PER_PAGE);
 
 // offset is how many plugins to start after
 $offset = ($page - 1) * PLUGIN_LIST_RESULTS_PER_PAGE;
-
-$step = 1;
 foreach (loadPlugins(PLUGIN_ORDER_POPULARITY, PLUGIN_LIST_RESULTS_PER_PAGE, $offset) as $plugin)
 {
     if ($plugin->isHidden()) {
         continue;
     }
 
-    // calculate this plugin's rank
-    $rank = $offset + $step;
-
     // count the number of servers in the last 24 hours
     $servers24 = $plugin->countServersLastUpdated(normalizeTime() - SECONDS_IN_DAY);
 
     // add the plugin
     $response['plugins'][] = array(
-        'rank' => $rank,
+        'rank' => $plugin->getRank(),
+        'lastrank' => $plugin->getLastRank(),
         'name' => htmlentities($plugin->getName()),
         'authors' => htmlentities($plugin->getAuthors()),
         'servers24' => number_format($servers24)
     );
-
-    $step ++;
 }
 
 $response['status'] = 'ok';

@@ -68,6 +68,18 @@ class Plugin
     private $rank;
 
     /**
+     * The plugin's last rank
+     * @var
+     */
+    private $lastRank;
+
+    /**
+     * The plugin's last rank change (unix epoch)
+     * @var
+     */
+    private $lastRankChange;
+
+    /**
      * Normalized server count for the last 24 hours
      * @var
      */
@@ -702,7 +714,7 @@ class Plugin
         global $master_db_handle;
 
         // Prepare it
-        $statement = $master_db_handle->prepare('UPDATE Plugin SET Name = :Name, Author = :Author, Hidden = :Hidden, GlobalHits = :GlobalHits, Created = :Created, LastUpdated = :LastUpdated, Rank = :Rank WHERE ID = :ID');
+        $statement = $master_db_handle->prepare('UPDATE Plugin SET Name = :Name, Author = :Author, Hidden = :Hidden, GlobalHits = :GlobalHits, Created = :Created, LastUpdated = :LastUpdated, Rank = :Rank, LastRank = :LastRank, LastRankChange = :LastRankChange WHERE ID = :ID');
 
         // Execute
         $statement->execute(array(
@@ -713,7 +725,9 @@ class Plugin
             ':GlobalHits' => $this->globalHits,
             ':Created' => $this->created,
             ':LastUpdated' => $this->lastUpdated,
-            ':Rank' => $this->rank
+            ':Rank' => $this->rank,
+            ':LastRank' => $this->lastRank,
+            ':LastRankChange' => $this->lastRankChange
         ));
     }
 
@@ -869,6 +883,38 @@ class Plugin
     public function setRank($rank)
     {
         $this->rank = $rank;
+    }
+
+    /**
+     * @return
+     */
+    public function getLastRank()
+    {
+        return $this->lastRank;
+    }
+
+    /**
+     * @param  $lastRank
+     */
+    public function setLastRank($lastRank)
+    {
+        $this->lastRank = $lastRank;
+    }
+
+    /**
+     * @return
+     */
+    public function getLastRankChange()
+    {
+        return $this->lastRankChange;
+    }
+
+    /**
+     * @param  $lastRankChange
+     */
+    public function setLastRankChange($lastRankChange)
+    {
+        $this->lastRankChange = $lastRankChange;
     }
 
 }

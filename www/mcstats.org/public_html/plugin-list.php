@@ -76,7 +76,7 @@ if (!$output)
 
                     <table class="table table-striped table-bordered table-condensed" id="plugin-list">
                         <thead>
-                            <tr> <th style="text-align: center; width: 20px;">Rank <br/> &nbsp; </th> <th style="text-align: center; width: 160px;"> Plugin <br/> &nbsp; </th> <th style="text-align: center; width: 100px;"> Servers<br/> <span style="font-size: 10px;">(last 24 hrs)</span> </th> </tr>
+                            <tr> <th style="text-align: center; width: 60px;">Rank <br/> &nbsp; </th> <th style="text-align: center; width: 170px;"> Plugin <br/> &nbsp; </th> <th style="text-align: center; width: 70px;"> Servers<br/> <span style="font-size: 10px;">(last 24 hrs)</span> </th> </tr>
                         </thead>
 
                         <tbody>
@@ -99,6 +99,24 @@ if (!$output)
             $rank = '<b>' . $rank . '</b>';
             $pluginName = '<b>' . $pluginName . '</b>';
             $format = '<b>' . $format . '</b>';
+        }
+
+        // increase
+        if ($plugin->getRank() < $plugin->getLastRank())
+        {
+            $rank .= ' <i class="fam-arrow-up" title="Increased from ' . $plugin->getLastRank() . ' (+' . ($plugin->getLastRank() - $plugin->getRank()) . ')"></i>';
+        }
+
+        // decrease
+        elseif ($plugin->getRank() > $plugin->getLastRank())
+        {
+            $rank .= ' <i class="fam-arrow-down" title="Decreased from ' . $plugin->getLastRank() . ' (-' . ($plugin->getRank() - $plugin->getLastRank()) . ')"></i>';
+        }
+
+        // no change
+        else
+        {
+            $rank .= ' <i class="fam-bullet-blue" title="No change"></i>';
         }
 
         echo '                          <tr id="plugin-list-item"> <td style="text-align: center;">' . $rank . ' </td> <td> <a href="/plugin/' . htmlentities($plugin->getName()) . '" target="_blank">' . $pluginName . '</a> </td> <td style="text-align: center;"> ' . $format . ' </td> </tr>
