@@ -10,6 +10,7 @@ $statement = get_slave_db_handle()->prepare('SELECT Plugin.ID, Parent, Name, Aut
 $statement->execute(array(normalizeTime() - SECONDS_IN_DAY));
 
 $rank = 0;
+$lastChange = normalizeTime();
 while ($row = $statement->fetch())
 {
     $plugin = resolvePlugin($row);
@@ -19,7 +20,7 @@ while ($row = $statement->fetch())
     // did their rank change ?
     if ($newRank != $plugin->getRank())
     {
-        $plugin->setLastRankChange(time());
+        $plugin->setLastRankChange($lastChange);
     }
 
     $plugin->setLastRank($plugin->getRank());
