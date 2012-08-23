@@ -31,6 +31,7 @@ define('GLOBAL_PLUGIN_ID', -1);
 
 // Connect to the caching daemon
 $cache = new Cache();
+$cache->connect();
 
 /**
  * Get the graph generator's generation percentage. This can return NULL which means generation is not currently
@@ -590,7 +591,7 @@ function loadPlugins($order = PLUGIN_ORDER_POPULARITY, $limit = -1, $start = -1)
         foreach ($plugins as $plugin)
         {
             $plugins_assoc[$plugin->getID()] = $plugin;
-            $count = $plugin->countServersLastUpdated(normalizeTime() - SECONDS_IN_DAY);
+            $count = $plugin->getServerCount();
 
             if ($count != 0)
             {

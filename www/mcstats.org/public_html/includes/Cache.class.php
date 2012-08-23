@@ -19,8 +19,8 @@ class Cache
     {
         if ($handle === NULL && $this->isEnabled())
         {
-            $this->handle = new Memcached('memcached_pool');
-            $this->connect();
+            $this->handle = new Memcache();
+            $this->handle->addServer('127.0.0.1', 11211);
         } else
         {
             $this->handle = $handle;
@@ -49,19 +49,7 @@ class Cache
      */
     public function connect()
     {
-        if (!$this->isEnabled())
-        {
-            return;
-        }
-
-        $list = $this->handle->getServerList();
-        if (empty($list))
-        {
-            $this->handle->setOption(Memcached::OPT_RECV_TIMEOUT, 1000);
-            $this->handle->setOption(Memcached::OPT_SEND_TIMEOUT, 3000);
-            $this->handle->setOption(Memcached::OPT_TCP_NODELAY, true);
-            $this->handle->addServer('127.0.0.1', 11211); // TODO configuration
-        }
+        // nothing needed for Memcache
     }
 
     /**
@@ -88,6 +76,8 @@ class Cache
      */
     public function set($key, $value, $expire = 0)
     {
+        global $config;
+
         if (!$this->isEnabled())
         {
             return FALSE;
@@ -96,10 +86,10 @@ class Cache
         // Check for flags
         if ($expire == CACHE_UNTIL_NEXT_GRAPH)
         {
-            $expire = timeUntilNextGraph() - time();
+            $expire = (normalizeTime() + ($config['graph']['interval'] * 60)) - time();
         }
 
-        return $this->handle->setByKey($key, json_encode($value), false, $expire);
+        return $this->handle->set($key, json_encode($value), false, $expire);
     }
 
 }
