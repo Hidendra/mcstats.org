@@ -204,11 +204,6 @@ while ($row = $statement->fetch())
         $dbo_link = htmlentities($dbo);
     }
 
-    $createdMinutesAgo = floor((time() - $created) / 60);
-    if ($createdMinutesAgo < 0) $createdMinutesAgo = 0;
-    $pluginCreatedMinutesAgo = floor((time() - $plugin->getCreated()) / 60);
-    if ($pluginCreatedMinutesAgo < 0) $pluginCreatedMinutesAgo = 0;
-
     $authorsStatement = get_slave_db_handle()->prepare('SELECT COUNT(*) FROM AuthorACL WHERE Plugin = ? AND Pending = 0');
     $authorsStatement->execute(array($plugin->getID()));
     $existingAuthors = $authorsStatement->fetch()[0];
