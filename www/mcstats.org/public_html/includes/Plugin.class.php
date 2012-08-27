@@ -163,6 +163,28 @@ class Plugin
     }
 
     /**
+     * Loads a graph from the database and if it does not exist
+     *
+     * @param $name
+     * @return Graph The Graph object and if it does not exist, NULL
+     */
+    public function getGraphByName($name)
+    {
+        global $master_db_handle;
+
+        // Try to get it from the database
+        $statement = $master_db_handle->prepare('SELECT ID, Plugin, Type, Active, Readonly, Name, DisplayName, Scale, Position FROM Graph WHERE Plugin = ? AND Name = ?');
+        $statement->execute(array($this->id, $name));
+
+        if ($row = $statement->fetch())
+        {
+            return new Graph($row['ID'], $this, $row['Type'], $row['Name'], $row['DisplayName'], $row['Active'], $row['Readonly'], $row['Position'], $row['Scale']);
+        }
+
+        return NULL;
+    }
+
+    /**
      * Load a graph using its ID
      * @param $id integer
      * @return Graph if found, otherwise NULL

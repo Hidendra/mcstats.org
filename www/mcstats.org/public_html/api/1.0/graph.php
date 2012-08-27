@@ -5,9 +5,10 @@ require_once ROOT . 'config.php';
 require_once ROOT . 'includes/database.php';
 require_once ROOT . 'includes/func.php';
 
+header('Last-Modified: ' . gmdate('D, d M Y H:i:s', getLastGraphEpoch()) . ' GMT');
+
 // Fine-tune this or allow customizations?
-// This is 1 week
-$hours = 168;
+$hours = 744;
 
 // Our json encoded response
 $response = array();
@@ -26,7 +27,7 @@ if (!isset($_GET['graph']))
     exit(json_encode($response));
 }
 
-$plugin = loadPlugin($_GET['plugin']);
+$plugin = loadPlugin(urldecode($_GET['plugin']));
 
 if ($plugin === NULL)
 {
@@ -36,9 +37,10 @@ if ($plugin === NULL)
 }
 
 // Decide which graph they want
-switch (strtolower($_GET['graph']))
+$graphName = urldecode($_GET['graph']);
+switch ($graphName)
 {
-        case 'global':
+    case 'global':
         // load the plugin's stats graph
         $globalstatistics = $plugin->getOrCreateGraph('Global Statistics');
         // the player plot's column id
@@ -49,13 +51,8 @@ switch (strtolower($_GET['graph']))
         $response['status'] = 'ok';
         $response['data']['players'] = DataGenerator::generateCustomChartData($globalstatistics, $playersColumnID, $hours);
         $response['data']['servers'] = DataGenerator::generateCustomChartData($globalstatistics, $serversColumnID, $hours);
-        break;
-
-    case 'country':
-        // $response['status'] = 'ok';
-        // $response['data'] = DataGenerator::generateCountryChartData($plugin);
-        $response['status'] = 'err';
-        $response['data'] = 'Support for this has been removed for now';
+        $response['name'] = htmlentities($globalstatistics->getName());
+        $response['type'] = GraphType::toString($globalstatistics->getType());
         break;
 
     case 'players':
@@ -66,6 +63,8 @@ switch (strtolower($_GET['graph']))
 
         $response['status'] = 'ok';
         $response['data'] = DataGenerator::generateCustomChartData($globalstatistics, $playersColumnID, $hours);
+        $response['name'] = htmlentities($globalstatistics->getName());
+        $response['type'] = GraphType::toString($globalstatistics->getType());
         break;
 
     case 'servers':
@@ -76,11 +75,48 @@ switch (strtolower($_GET['graph']))
 
         $response['status'] = 'ok';
         $response['data'] = DataGenerator::generateCustomChartData($globalstatistics, $serversColumnID, $hours);
+        $response['name'] = htmlentities($globalstatistics->getName());
+        $response['type'] = GraphType::toString($globalstatistics->getType());
         break;
 
     default:
-        $response['msg'] = 'Invalid graph type';
-        $response['status'] = 'err';
+        $graph = $plugin->getGraphByName($graphName);
+
+        if ($graph == NULL)
+        {
+            $response['msg'] = 'Invalid graph type';
+            $response['status'] = 'err';
+            break;
+        }
+
+        // if it's a pie chart, it's easier
+        if ($graph->getType() == GraphType::Pie)
+        {
+            $response['status'] = 'ok';
+            $response['data'] = DataGenerator::generateCustomChartData($graph, -1, $hours);
+            $response['name'] = htmlentities($graph->getName());
+            $response['type'] = GraphType::toString($graph->getType());
+        }
+
+        // otherwise we need to generate data for every column
+        else
+        {
+            foreach ($graph->getColumns() as $columnID => $columnName)
+            {
+                if (is_numeric($columnName) || is_double($columnName))
+                {
+                    $columnName = "\0" . $columnName;
+                }
+
+                $response['data'][utf8_encode($columnName)] = DataGenerator::generateCustomChartData($graph, $columnID, $hours);
+            }
+
+            $response['status'] = 'ok';
+            $response['name'] = htmlentities($graph->getName());
+            $response['type'] = GraphType::toString($graph->getType());
+        }
+
+
         break;
 
 }

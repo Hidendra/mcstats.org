@@ -181,3 +181,48 @@ function showMoreServers() {
     // Show the servers
     $(".hide-server").show();
 }
+
+var HIGHCHARTS = "highcharts";
+var HIGHSTOCKS = "highstocks";
+
+/**
+ * Retrieve graph data for a given options object and then regenerate the graph.
+ *
+ * @param options
+ * @param framework
+ * @param feedurl
+ */
+function retrieveGraphData(options, framework, feedurl)
+{
+    $.getJSON(feedurl, function(json) {
+        // if the graph is a simple pie graph we've got our work cut out for us
+        if (json.type == "Pie") {
+            options.series = [{
+                name: "",
+                data: json.data
+            }];
+        }
+
+        // bit lengthier, we need to generate each column
+        else {
+            // init the array
+            options.series = [];
+
+            // go through each column
+            for (columnName in json.data) {
+                options.series.push({
+                    name: columnName,
+                    data: json.data[columnName]
+                });
+            }
+        }
+
+        // now regenerate the graph
+        if (framework == HIGHSTOCKS) {
+            new Highcharts.StockChart(options);
+        } else {
+            new Highcharts.Chart(options);
+        }
+    });
+
+}

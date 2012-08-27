@@ -61,6 +61,7 @@ class HighRoller
 //  public $tooltip;
 //  public $plotOptions;
     public $series = array();
+    public $feedurl = '';
 
     function __construct()
     {
@@ -185,12 +186,19 @@ class HighRoller
         */
 
         // $chartJS .= "\n\n    // HIGHROLLER - HIGHCHARTS '" . $this->title->text . "' " . $this->chart->type . " chart";
-        $chartJS .= "\n    var " . $this->chart->renderTo . " = \n";
-        $chartJS .= "       " . $this->getChartOptionsObject() . "\n";
-        $chartJS .= "    ;\n";
+        $chartJS .= "\n    " . $this->chart->renderTo . "Options = " . $this->getChartOptionsObject() . ";";
         $chartJS .= $rawJavascript;
-        $chartJS .= "${renderTo}Obj = new Highcharts.$classname(" . $this->chart->renderTo . ");";
+        $chartJS .= "${renderTo}Obj = new Highcharts.$classname(" . $this->chart->renderTo . "Options);";
+
+        // request rendering via feed URL if it was supplied
+        if (!empty($this->feedurl))
+        {
+            $chartJS .= 'retrieveGraphData(' . $renderTo . 'Options, ' . ($chart == 'highcharts' ? 'HIGHCHARTS' : 'HIGHSTOCKS') . ', "' . $this->feedurl . '");' . "\n";
+        }
+
+        // closes ready function
         $chartJS .= "\n  });\n";
+
         return trim($chartJS);
     }
 

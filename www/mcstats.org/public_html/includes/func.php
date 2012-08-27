@@ -106,6 +106,9 @@ function outputGraphs($plugin)
     $index = 1; // WE GIVE A UNIQUE NUMBER TO EACH CHART
     foreach ($activeGraphs as $activeGraph)
     {
+        // TODO not hardcoded ? heh
+        $activeGraph->setFeedURL(sprintf('http://test.mcstats.org/api/1.0/%s/graph/%s', urlencode(htmlentities($plugin->getName())), urlencode(htmlentities($activeGraph->getName()))));
+
         // ADD ALL OF THE SERIES PLOTS TO THE CHART
         if ($activeGraph->getType() != GraphType::Pie)
         {
@@ -113,8 +116,10 @@ function outputGraphs($plugin)
             {
                 // GENERATE SOME DATA DIRECTLY TO THE CHART!
                 $series = new HighRollerSeriesData();
-                $activeGraph->addSeries($series->addName($columnName)->addData(DataGenerator::generateCustomChartData($activeGraph, $id)));
+                // $activeGraph->addSeries($series->addName($columnName)->addData(DataGenerator::generateCustomChartData($activeGraph, $id)));
             }
+            $series = new HighRollerSeriesData();
+            $activeGraph->addSeries($series);
         } else // Pie chart
         {
             $series = new HighRollerSeriesData();
@@ -193,7 +198,8 @@ function outputGraphs($plugin)
             }
 
             // Finalize
-            $activeGraph->addSeries($series->addName('')->addData($seriesData));
+            // $activeGraph->addSeries($series->addName('')->addData($seriesData));
+            $activeGraph->addSeries($series);
         }
 
         // GENERATE THE GRAPH, OH HELL YEAH!

@@ -38,6 +38,33 @@ abstract class GraphType
      */
     const Stacked_Column = 5;
 
+    public static function toString($type)
+    {
+        switch ($type)
+        {
+            case GraphType::Line:
+                return "Line";
+
+            case GraphType::Area:
+                return "Area";
+
+            case GraphType::Column:
+                return "Column";
+
+            case GraphType::Pie:
+                return "Pie";
+
+            case GraphType::Percentage_Area:
+                return "Percentage Area";
+
+            case GraphType::Stacked_Column:
+                return "Stacked Column";
+
+            default:
+                return 'UNDEFINED';
+        }
+    }
+
 }
 
 /**
@@ -127,6 +154,12 @@ class Graph
      * @var HighRollerSeriesData[]
      */
     private $series = array();
+
+    /**
+     * The feed url that feeds JSON to the graph
+     * @var string
+     */
+    private $feedURL = '';
 
     public function __construct($id = -1, $plugin = NULL, $type = GraphType::Line, $name = '', $displayName = '', $active = 0, $readonly = FALSE, $position = 1, $scale = 'linear')
     {
@@ -264,6 +297,7 @@ class Graph
         }
 
         // Set chart options
+        $chart->feedurl = $this->feedURL;
         $chart->chart->renderTo = $renderTo;
         $chart->chart->zoomType = 'x';
 
@@ -468,7 +502,7 @@ class Graph
             {
                 // just sorts the series
                 $rawJavascript = "
-                    $renderTo.tooltip =
+                    ${renderTo}Options.tooltip =
                     {
                         \"shared\": true,
                         \"crosshairs\": true,
@@ -494,7 +528,7 @@ class Graph
         { // Pie chart
 
             $rawJavascript = "
-                $renderTo.plotOptions =
+                ${renderTo}Options.plotOptions =
                 {
                     pie: {
                         allowPointSelect: true,
@@ -509,7 +543,7 @@ class Graph
                         }
                     }
                 };
-                $renderTo.tooltip =
+                ${renderTo}Options.tooltip =
                 {
                     \"formatter\": function() {
                         return '<b>' + this.point.name + '</b>: ' + ( Math.round(this.percentage * 100) / 100 ) + ' %';
@@ -696,6 +730,22 @@ class Graph
     public function setPosition($position)
     {
         $this->position = $position;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFeedURL()
+    {
+        return $this->feedURL;
+    }
+
+    /**
+     * @param string $feedURL
+     */
+    public function setFeedURL($feedURL)
+    {
+        $this->feedURL = $feedURL;
     }
 
 }
