@@ -64,7 +64,7 @@ class Cache
             return null;
         }
 
-        return $this->handle->get(json_decode($key));
+        return json_decode($this->handle->get($key));
     }
 
     /**

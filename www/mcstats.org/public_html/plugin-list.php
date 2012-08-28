@@ -21,7 +21,7 @@ if (isset($_GET['page']))
 $showMoreServers = false;
 
 // number of pages
-$totalPages = ceil(count(loadPlugins(PLUGIN_ORDER_POPULARITY)) / PLUGIN_LIST_RESULTS_PER_PAGE);
+$totalPages = ceil(countPlugins(PLUGIN_ORDER_POPULARITY) / PLUGIN_LIST_RESULTS_PER_PAGE);
 
 // offset is how many plugins to start after
 $offset = ($currentPage - 1) * PLUGIN_LIST_RESULTS_PER_PAGE;
@@ -89,8 +89,7 @@ if (!$output)
             continue;
         }
 
-        // calculate this plugin's rank
-        $rank = $offset + $step;
+        $rank = $plugin->getRank();
 
         $pluginName = htmlentities($plugin->getName());
         $format = number_format($plugin->getServerCount());
@@ -139,7 +138,7 @@ if (!$output)
                 <div style="margin-left: 310px;">
 ';
 
-// Load the global plugin
+    // Load the global plugin
     $globalPlugin = loadPluginByID(GLOBAL_PLUGIN_ID);
     outputGraphs($globalPlugin);
 

@@ -122,7 +122,7 @@ function outputGraphs($plugin)
             $activeGraph->addSeries($series);
         } else // Pie chart
         {
-            $series = new HighRollerSeriesData();
+            /* $series = new HighRollerSeriesData();
             $seriesData = array();
 
             // the amounts for each column
@@ -195,10 +195,11 @@ function outputGraphs($plugin)
                 }
 
                 $seriesData[] = array($columnName, $percent);
-            }
+            } */
 
             // Finalize
             // $activeGraph->addSeries($series->addName('')->addData($seriesData));
+            $series = new HighRollerSeriesData();
             $activeGraph->addSeries($series);
         }
 
@@ -513,6 +514,7 @@ function resolvePlugin($row)
     $plugin->setRank($row['Rank']);
     $plugin->setLastRank($row['LastRank']);
     $plugin->setLastRankChange($row['LastRankChange']);
+    $plugin->setServerCount($row['ServerCount30']);
 
     return $plugin;
 }
@@ -520,7 +522,45 @@ function resolvePlugin($row)
 define ('PLUGIN_ORDER_ALPHABETICAL', 1);
 define ('PLUGIN_ORDER_POPULARITY', 2);
 define ('PLUGIN_ORDER_RANDOM', 3);
-define ('PLUGIN_ORDER_RANDOM_TOP100', 3);
+define ('PLUGIN_ORDER_RANDOM_TOP100', 4);
+
+/**
+ * Count the number of plugins in the database
+ * @param int $order the order / ruleset to count
+ */
+function countPlugins($order = PLUGIN_ORDER_POPULARITY)
+{
+    $db_handle = get_slave_db_handle();
+
+    switch ($order)
+    {
+        case PLUGIN_ORDER_ALPHABETICAL:
+            $query = 'SELECT COUNT(*) FROM Plugin WHERE Parent = -1';
+            break;
+
+        case PLUGIN_ORDER_POPULARITY:
+            $query = 'SELECT COUNT(*) FROM Plugin WHERE LastUpdated >= ? AND Plugin.Parent = -1';
+            break;
+
+        case PLUGIN_ORDER_RANDOM:
+            $query = 'SELECT COUNT(*) FROM Plugin WHERE Parent = -1';
+            break;
+
+        case PLUGIN_ORDER_RANDOM_TOP100:
+            $query = 'SELECT COUNT(*) FROM Plugin WHERE Parent = -1 AND Rank <= 100';
+            break;
+
+        default:
+            error_log ('Unimplemented loadPlugins () order => ' . $order);
+            exit('Unimplemented loadPlugins () order => ' . $order);
+    }
+
+    $statement = $db_handle->prepare($query);
+    $statement->execute(array(normalizeTime() - SECONDS_IN_DAY));
+
+    $row = $statement->fetch();
+    return $row != null ? $row[0] : 0;
+}
 
 /**
  * Loads all of the plugins from the database
@@ -529,44 +569,25 @@ define ('PLUGIN_ORDER_RANDOM_TOP100', 3);
  */
 function loadPlugins($order = PLUGIN_ORDER_POPULARITY, $limit = -1, $start = -1)
 {
-    // separate handling for POPULARITY_TOP100
-    // should be faster this way than writing some query which would be slower
-    if ($order == PLUGIN_ORDER_RANDOM_TOP100)
-    {
-        // load the top 100
-        $plugins = loadPlugins(PLUGIN_ORDER_POPULARITY, 100);
-
-        // mix them up
-        shuffle($plugins);
-
-        // if $limit is specified, trim down the array to suit
-        if ($limit != -1 && $limit < 100)
-        {
-            for ($i = $limit; $i < 100; $i++)
-            {
-                // remove it from the array
-                unset ($plugins[$i]);
-            }
-        }
-
-        return $plugins;
-    }
-
     $db_handle = get_slave_db_handle();
     $plugins = array();
 
     switch ($order)
     {
         case PLUGIN_ORDER_ALPHABETICAL:
-            $query = 'SELECT ID, Parent, Name, Author, Hidden, GlobalHits, Created, Rank, LastRank, LastRankChange, LastUpdated FROM Plugin WHERE Parent = -1 ORDER BY Name ASC';
+            $query = 'SELECT ID, Parent, Name, Author, Hidden, GlobalHits, Created, Rank, LastRank, LastRankChange, LastUpdated, ServerCount30 FROM Plugin WHERE Parent = -1 ORDER BY Name ASC';
             break;
 
         case PLUGIN_ORDER_POPULARITY:
-            $query = 'SELECT Plugin.ID, Parent, Name, Author, Hidden, GlobalHits, Created, Rank, LastRank, LastRankChange, LastUpdated FROM Plugin WHERE LastUpdated >= ? AND Plugin.Parent = -1 ORDER BY Rank ASC';
+            $query = 'SELECT Plugin.ID, Parent, Name, Author, Hidden, GlobalHits, Created, Rank, LastRank, LastRankChange, LastUpdated, ServerCount30 FROM Plugin WHERE LastUpdated >= ? AND Plugin.Parent = -1 AND Rank IS NOT NULL ORDER BY Rank ASC';
             break;
 
         case PLUGIN_ORDER_RANDOM:
-            $query = 'SELECT ID, Parent, Name, Author, Hidden, GlobalHits, Created, Rank, LastRank, LastRankChange, LastUpdated FROM Plugin WHERE Parent = -1 ORDER BY RAND()';
+            $query = 'SELECT ID, Parent, Name, Author, Hidden, GlobalHits, Created, Rank, LastRank, LastRankChange, LastUpdated, ServerCount30 FROM Plugin WHERE Parent = -1 ORDER BY RAND()';
+            break;
+
+        case PLUGIN_ORDER_RANDOM_TOP100:
+            $query = 'SELECT ID, Parent, Name, Author, Hidden, GlobalHits, Created, Rank, LastRank, LastRankChange, LastUpdated, ServerCount30 FROM Plugin WHERE Parent = -1 AND Rank <= 100 ORDER BY RAND()';
             break;
 
         default:
@@ -590,36 +611,6 @@ function loadPlugins($order = PLUGIN_ORDER_POPULARITY, $limit = -1, $start = -1)
         $plugins[] = resolvePlugin($row);
     }
 
-    // sort by popularity if necessary
-    if ($order == PLUGIN_ORDER_POPULARITY)
-    {
-        $plugins_assoc = array();
-        $counts = array();
-
-        foreach ($plugins as $plugin)
-        {
-            $plugins_assoc[$plugin->getID()] = $plugin;
-            $count = $plugin->getServerCount();
-
-            if ($count != 0)
-            {
-                $counts[$plugin->getID()] = $count;
-            }
-        }
-
-        // sort the ids
-        arsort($counts);
-
-        // create the new array
-        $plugins = array();
-        foreach ($counts as $id => $count)
-        {
-            $plugin = $plugins_assoc[$id];
-            $plugins[] = $plugin;
-        }
-
-    }
-
     return $plugins;
 }
 
@@ -631,7 +622,7 @@ function loadPlugins($order = PLUGIN_ORDER_POPULARITY, $limit = -1, $start = -1)
  */
 function loadPlugin($plugin)
 {
-    $statement = get_slave_db_handle()->prepare('SELECT ID, Parent, Name, Author, Hidden, GlobalHits, Created, Rank, LastRank, LastRankChange, LastUpdated FROM Plugin WHERE Name = :Name');
+    $statement = get_slave_db_handle()->prepare('SELECT ID, Parent, Name, Author, Hidden, GlobalHits, Created, Rank, LastRank, LastRankChange, LastUpdated, ServerCount30 FROM Plugin WHERE Name = :Name');
     $statement->execute(array(':Name' => $plugin));
 
     if ($row = $statement->fetch())
@@ -663,7 +654,7 @@ function loadPlugin($plugin)
  */
 function loadPluginByID($id)
 {
-    $statement = get_slave_db_handle()->prepare('SELECT ID, Parent, Name, Author, Hidden, GlobalHits, Created, Rank, LastRank, LastRankChange, LastUpdated FROM Plugin WHERE ID = :ID');
+    $statement = get_slave_db_handle()->prepare('SELECT ID, Parent, Name, Author, Hidden, GlobalHits, Created, Rank, LastRank, LastRankChange, LastUpdated, ServerCount30 FROM Plugin WHERE ID = :ID');
     $statement->execute(array(':ID' => $id));
 
     if ($row = $statement->fetch())
@@ -799,7 +790,7 @@ function get_accessible_plugins($selectFromPendingPool = TRUE)
     }
 
     // Query for all of the plugins
-    $statement = $master_db_handle->prepare('SELECT Plugin, ID, Name, Parent, Plugin.Author, Hidden, GlobalHits, Created, Pending, Rank, LastRank, LastRankChange, LastUpdated FROM AuthorACL LEFT OUTER JOIN Plugin ON Plugin.ID = Plugin WHERE AuthorACL.Author = ? ORDER BY Name ASC');
+    $statement = $master_db_handle->prepare('SELECT Plugin, ID, Name, Parent, Plugin.Author, Hidden, GlobalHits, Created, Pending, Rank, LastRank, LastRankChange, LastUpdated, ServerCount30 FROM AuthorACL LEFT OUTER JOIN Plugin ON Plugin.ID = Plugin WHERE AuthorACL.Author = ? ORDER BY Name ASC');
     $statement->execute(array($_SESSION['uid']));
 
     while ($row = $statement->fetch())

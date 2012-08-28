@@ -17,7 +17,7 @@ if (!isset($_GET['page']))
 }
 
 // get the total number of plugins
-$totalPlugins = count(loadPlugins(PLUGIN_ORDER_POPULARITY));
+$totalPlugins = countPlugins(PLUGIN_ORDER_POPULARITY);
 $response['maxPages'] = ceil($totalPlugins / PLUGIN_LIST_RESULTS_PER_PAGE);
 
 // offset is how many plugins to start after
@@ -29,7 +29,7 @@ foreach (loadPlugins(PLUGIN_ORDER_POPULARITY, PLUGIN_LIST_RESULTS_PER_PAGE, $off
     }
 
     // count the number of servers in the last 24 hours
-    $servers24 = $plugin->countServersLastUpdated(normalizeTime() - SECONDS_IN_DAY);
+    $servers24 = $plugin->getServerCount();
 
     // add the plugin
     $response['plugins'][] = array(

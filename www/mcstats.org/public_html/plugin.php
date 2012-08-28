@@ -67,61 +67,67 @@ if($timelast > 0) {
 ';
 }
 
-$authors = htmlentities($plugin->getAuthors());
+$output = $cache->get('plugin/' . $plugin->getName());
 
-// set a default author if none is set
-if ($authors == '')
+if (!$output)
 {
-    $authors = 'unknown :-(';
-}
+    ob_start();
 
-// check for spaces or commas (and if they exist, throw is (s) after Author
-$author_prepend = '';
-if (strstr($authors, ' ') !== FALSE || strstr($authors, ',') !== FALSE)
-{
-    $author_prepend = '(s)';
-}
+    $authors = htmlentities($plugin->getAuthors());
 
-// Ranking
-$rank = $plugin->getRank();
+    // set a default author if none is set
+    if ($authors == '')
+    {
+        $authors = 'unknown :-(';
+    }
 
-// unknown rank
-if ($rank == '')
-{
-    $rank = '<i>Unknown</i>';
-}
+    // check for spaces or commas (and if they exist, throw is (s) after Author
+    $author_prepend = '';
+    if (strstr($authors, ' ') !== FALSE || strstr($authors, ',') !== FALSE)
+    {
+        $author_prepend = '(s)';
+    }
 
-// bolden the rank if they're in the top-10
-if (is_numeric($rank) && $rank <= 10)
-{
-    $rank = '<b>' . $rank . '</b>';
-}
+    // Ranking
+    $rank = $plugin->getRank();
 
-// increase
-if ($plugin->getRank() < $plugin->getLastRank())
-{
-    $rank .= ' <i class="fam-arrow-up" title="Increased from ' . $plugin->getLastRank() . ' (+' . ($plugin->getLastRank() - $plugin->getRank()) . ')"></i>';
-}
+    // unknown rank
+    if ($rank == '')
+    {
+        $rank = '<i>Unknown</i>';
+    }
 
-// decrease
-elseif ($plugin->getRank() > $plugin->getLastRank())
-{
-    $rank .= ' <i class="fam-arrow-down" title="Decreased from ' . $plugin->getLastRank() . ' (-' . ($plugin->getRank() - $plugin->getLastRank()) . ')"></i>';
-}
+    // bolden the rank if they're in the top-10
+    if (is_numeric($rank) && $rank <= 10)
+    {
+        $rank = '<b>' . $rank . '</b>';
+    }
 
-// no change
-else
-{
-    $rank .= ' <i class="fam-bullet-blue" title="No change"></i>';
-}
+    // increase
+    if ($plugin->getRank() < $plugin->getLastRank())
+    {
+        $rank .= ' <i class="fam-arrow-up" title="Increased from ' . $plugin->getLastRank() . ' (+' . ($plugin->getLastRank() - $plugin->getRank()) . ')"></i>';
+    }
 
-echo '
+    // decrease
+    elseif ($plugin->getRank() > $plugin->getLastRank())
+    {
+        $rank .= ' <i class="fam-arrow-down" title="Decreased from ' . $plugin->getLastRank() . ' (-' . ($plugin->getRank() - $plugin->getLastRank()) . ')"></i>';
+    }
+
+    // no change
+    else
+    {
+        $rank .= ' <i class="fam-bullet-blue" title="No change"></i>';
+    }
+
+    echo '
                     <table class="table table-striped">
                         <tbody>
                             <tr> <td> Name </td> <td> ' . $pluginName . ' </td> </tr>
                             <tr> <td> Rank </td> <td> ' . $rank . ' </td> </tr>
                             <tr> <td> Rank held for </td> <td> ' . epochToHumanString(time() - $plugin->getLastRankChange()) . ' </td> </tr>
-                            <tr> <td> Author' . $author_prepend .' </td> <td> ' . $authors . ' </td> </tr>
+                            <tr> <td> Author' . $author_prepend . ' </td> <td> ' . $authors . ' </td> </tr>
                             <tr> <td> Date added </td> <td> ' . date('F d, Y', $plugin->getCreated()) . ' </td> </tr>
                             <tr> <td> Global starts </td> <td> ' . number_format($plugin->getGlobalHits()) . ' </td> </tr>
                             <tr> <td> </td>
@@ -142,45 +148,26 @@ echo '
                             <tr> <td> Last 12 hrs </td> <td> ' . number_format($plugin->countServersLastUpdated(normalizeTime() - SECONDS_IN_HALFDAY)) . ' </td> </tr>
                             <tr> <td> Last 24 hrs </td> <td> ' . number_format($plugin->countServersLastUpdated(normalizeTime() - SECONDS_IN_DAY)) . ' </td> </tr>
                             <tr> <td> Last 7 days </td> <td> ' . number_format($plugin->countServersLastUpdated(normalizeTime() - SECONDS_IN_WEEK)) . ' </td> </tr>
-                            <tr> <td> This month </td> <td> ' . number_format($plugin->countServersLastUpdated(strtotime(date('m').'/01/' . date('Y') . ' 00:00:00'))) . ' </td> </tr>
+                            <tr> <td> This month </td> <td> ' . number_format($plugin->countServersLastUpdated(strtotime(date('m') . '/01/' . date('Y') . ' 00:00:00'))) . ' </td> </tr>
                         </tbody>
-                    </table>
-
-                    <h3>Servers\' last known version<sup>*</sup></h3>
-                    <p>
-                        <ul>
-                            <li>Counts are for servers started in the last 24 hours</li>
-                            <li>Versions with less than 5 servers are omitted</li>
-                        </ul>
-                    </p>
-                    <table class="table table-striped">
-                        <tbody>';
-
-foreach ($plugin->getVersions() as $versionID => $version)
-{
-    $count = $plugin->countServersUsingVersion($version);
-
-    if ($count < 5)
-    {
-        continue;
-    }
+                    </table>';
 
     echo '
-                              <tr> <td>' . $version . '</td> <td>' . number_format($count) . '</td> </tr>';
-}
-
-echo '
-                        </tbody>
-                    </table>
                 </div>
 
                 <div style="margin-left: 320px;">
 ';
 
-outputGraphs($plugin);
+    outputGraphs($plugin);
 
-echo '
+    echo '
                 </div>';
+    $output = ob_get_contents();
+    ob_end_clean();
+    $cache->set('plugin/' . $plugin->getName(), $output, CACHE_UNTIL_NEXT_GRAPH);
+}
+
+echo $output;
 
 /// Templating
 send_footer();

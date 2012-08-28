@@ -19,12 +19,14 @@ echo 32 > "$GENERATOR_FILE"
 echo 44 > "$GENERATOR_FILE"
 /usr/local/bin/php -q generators/server-locations.php
 echo 56 > "$GENERATOR_FILE"
-/usr/local/bin/php -q generators/versions.php
+/usr/local/bin/php -q generators/version-trends.php
 echo 68 > "$GENERATOR_FILE"
-/usr/local/bin/php -q generators/server-software.php
+/usr/local/bin/php -q generators/version-demographics.php
 echo 80 > "$GENERATOR_FILE"
-/usr/local/bin/php -q generators/game-version.php
+/usr/local/bin/php -q generators/server-software.php
 echo 92 > "$GENERATOR_FILE"
+/usr/local/bin/php -q generators/game-version.php
+echo 98 > "$GENERATOR_FILE"
 
 # finish !
 /usr/local/bin/php -q finish-graph-generation.php

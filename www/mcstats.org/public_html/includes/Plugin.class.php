@@ -518,18 +518,12 @@ class Plugin
      * Count all of the servers that were updated after the given epoch
      * @param $after integer
      */
-    public function countServersLastUpdated($min, $max = -1)
+    public function countServersLastUpdated($min)
     {
         $db_handle = get_slave_db_handle();
 
-        // use time() if $max is -1
-        if ($max == -1)
-        {
-            $max = time();
-        }
-
-        $statement = $db_handle->prepare('SELECT COUNT(*) FROM ServerPlugin WHERE Plugin = ? AND Updated >= ? AND Updated <= ?');
-        $statement->execute(array($this->id, $min, $max));
+        $statement = $db_handle->prepare('SELECT COUNT(*) FROM ServerPlugin WHERE Plugin = ? AND Updated >= ?');
+        $statement->execute(array($this->id, $min));
 
         $row = $statement->fetch();
         return $row != null ? $row[0] : 0;
@@ -736,7 +730,7 @@ class Plugin
         global $master_db_handle;
 
         // Prepare it
-        $statement = $master_db_handle->prepare('UPDATE Plugin SET Name = :Name, Author = :Author, Hidden = :Hidden, GlobalHits = :GlobalHits, Created = :Created, LastUpdated = :LastUpdated, Rank = :Rank, LastRank = :LastRank, LastRankChange = :LastRankChange WHERE ID = :ID');
+        $statement = $master_db_handle->prepare('UPDATE Plugin SET Name = :Name, Author = :Author, Hidden = :Hidden, GlobalHits = :GlobalHits, Created = :Created, LastUpdated, ServerCount30 = :LastUpdated, Rank = :Rank, LastRank = :LastRank, LastRankChange = :LastRankChange, ServerCount30 = :ServerCount30 WHERE ID = :ID');
 
         // Execute
         $statement->execute(array(
@@ -749,7 +743,8 @@ class Plugin
             ':LastUpdated' => $this->lastUpdated,
             ':Rank' => $this->rank,
             ':LastRank' => $this->lastRank,
-            ':LastRankChange' => $this->lastRankChange
+            ':LastRankChange' => $this->lastRankChange,
+            ':ServerCount30' => $this->serverCount
         ));
     }
 

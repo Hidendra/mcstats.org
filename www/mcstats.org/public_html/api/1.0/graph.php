@@ -111,6 +111,42 @@ switch ($graphName)
                 $response['data'][utf8_encode($columnName)] = DataGenerator::generateCustomChartData($graph, $columnID, $hours);
             }
 
+            // total the counts
+            $total = 0;
+            foreach ($response['data'] as $name => $data)
+            {
+                $count = count($data);
+
+                // evict the column if it has none (wasting space !)
+                if ($count == 0)
+                {
+                    unset($response['data'][$name]);
+                    continue;
+                }
+
+                $total += $data[$count - 1][1]; // [[0,5], [1,7]] the expression will return 7
+            }
+
+            // now evict more data if necessary
+            if ($total > 10000) // TODO better magic number
+            {
+                $removed_total = 0;
+
+                foreach ($response['data'] as $name => $data)
+                {
+                    $count = count($data);
+                    $value = $data[$count - 1][1];
+                    $percent = ($value / $total) * 100;
+
+                    // evict any data below 0.05%
+                    if ($percent <= 0.05)
+                    {
+                        unset($response['data'][$name]);
+                    }
+                }
+            }
+
+
             $response['status'] = 'ok';
             $response['name'] = htmlentities($graph->getName());
             $response['type'] = GraphType::toString($graph->getType());
