@@ -14,7 +14,7 @@ class DataGenerator
      */
     public static function generateCustomChartData($graph, $columnID = -1, $hours = 372)
     {
-        $_cacheid = 'CustomChart' . $columnID . $hours;
+        $_cacheid = 'CustomChart/' . $graph->getID() . '/' . $columnID . '/' . $hours;
 
         // Check the cache
         if ($data = $graph->getPlugin()->cacheGet($_cacheid))

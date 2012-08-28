@@ -730,7 +730,7 @@ class Plugin
         global $master_db_handle;
 
         // Prepare it
-        $statement = $master_db_handle->prepare('UPDATE Plugin SET Name = :Name, Author = :Author, Hidden = :Hidden, GlobalHits = :GlobalHits, Created = :Created, LastUpdated, ServerCount30 = :LastUpdated, Rank = :Rank, LastRank = :LastRank, LastRankChange = :LastRankChange, ServerCount30 = :ServerCount30 WHERE ID = :ID');
+        $statement = $master_db_handle->prepare('UPDATE Plugin SET Name = :Name, Author = :Author, Hidden = :Hidden, GlobalHits = :GlobalHits, Created = :Created, LastUpdated = :LastUpdated, Rank = :Rank, LastRank = :LastRank, LastRankChange = :LastRankChange, ServerCount30 = :ServerCount30 WHERE ID = :ID');
 
         // Execute
         $statement->execute(array(

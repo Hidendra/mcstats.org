@@ -27,6 +27,7 @@ echo 80 > "$GENERATOR_FILE"
 echo 92 > "$GENERATOR_FILE"
 /usr/local/bin/php -q generators/game-version.php
 echo 98 > "$GENERATOR_FILE"
+/usr/local/bin/php -q server-counts.php
 
 # finish !
 /usr/local/bin/php -q finish-graph-generation.php

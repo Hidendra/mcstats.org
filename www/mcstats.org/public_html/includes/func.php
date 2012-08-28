@@ -107,7 +107,7 @@ function outputGraphs($plugin)
     foreach ($activeGraphs as $activeGraph)
     {
         // TODO not hardcoded ? heh
-        $activeGraph->setFeedURL(sprintf('http://test.mcstats.org/api/1.0/%s/graph/%s', urlencode(htmlentities($plugin->getName())), urlencode(htmlentities($activeGraph->getName()))));
+        $activeGraph->setFeedURL(sprintf('http://mcstats.org/api/1.0/%s/graph/%s', urlencode(htmlentities($plugin->getName())), urlencode(htmlentities($activeGraph->getName()))));
 
         // ADD ALL OF THE SERIES PLOTS TO THE CHART
         if ($activeGraph->getType() != GraphType::Pie)

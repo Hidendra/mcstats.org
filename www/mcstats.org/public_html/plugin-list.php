@@ -61,7 +61,8 @@ if($timelast > 0) {
 ';
 }
 
-$output = $cache->get('plugin_list');
+// $output = $cache->get('plugin_list');
+$output = FALSE;
 
 if (!$output)
 {
@@ -147,7 +148,7 @@ if (!$output)
 
     $output = ob_get_contents();
     ob_end_clean();
-    $cache->set('plugin_list', $output, CACHE_UNTIL_NEXT_GRAPH);
+    // $cache->set('plugin_list', $output, CACHE_UNTIL_NEXT_GRAPH);
 }
 
 echo $output;
