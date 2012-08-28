@@ -46,6 +46,11 @@ if ($plugin == null)
 // case-correct plugin name
 $pluginName = $plugin->getName();
 
+$pCache = new pCache('../cache/');
+
+// get the graph from cache
+$cacheKey = 'preview/' . $pluginName;
+
 // Create a new data set
 $dataSet = new pData();
 
@@ -109,40 +114,50 @@ $dataSet->SetYAxisName('');
 // Add all of the series
 $dataSet->AddAllSeries();
 
-// Set us up the bomb
-$graph = new pChart(IMAGE_WIDTH, IMAGE_HEIGHT);
-$graph->setFontProperties('tahoma.ttf', 8);
-$graph->setGraphArea(45, 10, IMAGE_WIDTH - 5, IMAGE_HEIGHT - 5);
-// $graph->drawGraphArea(255, 255, 255);
-$graph->drawScale($dataSet->GetData(), $dataSet->GetDataDescription(), SCALE_START0, 150, 150, 150, true, 0, 0);
-// $graph->drawGrid(4, true, 230, 230, 230, 100);
+// Check caches
+if ($pCache->IsInCache($cacheKey, $dataSet->GetData()) === FALSE)
+{
+    // Set us up the bomb
+    $graph = new pChart(IMAGE_WIDTH, IMAGE_HEIGHT);
+    $graph->setFontProperties('tahoma.ttf', 8);
+    $graph->setGraphArea(45, 10, IMAGE_WIDTH - 5, IMAGE_HEIGHT - 5);
+    // $graph->drawGraphArea(255, 255, 255);
+    $graph->drawScale($dataSet->GetData(), $dataSet->GetDataDescription(), SCALE_START0, 150, 150, 150, true, 0, 0);
+    // $graph->drawGrid(4, true, 230, 230, 230, 100);
 
-// Draw the data
-$graph->drawFilledLineGraph($dataSet->GetData(), $dataSet->GetDataDescription(), 75, true);
+    // Draw the data
+    $graph->drawFilledLineGraph($dataSet->GetData(), $dataSet->GetDataDescription(), 75, true);
 
-// Stroke the image
-$graphImage = $graph->Render('__handle');
+    // Stroke the image
+    $graphImage = $graph->Render('__handle');
 
-// generate the image
-$image = imagecreatetruecolor(IMAGE_WIDTH, IMAGE_HEIGHT);
+    // generate the image
+    $image = imagecreatetruecolor(IMAGE_WIDTH, IMAGE_HEIGHT);
 
-// Some colors
-$white = imagecolorallocate($image, 255, 255, 255);
-$black = imagecolorallocate($image, 0, 0, 0);
+    // Some colors
+    $white = imagecolorallocate($image, 255, 255, 255);
+    $black = imagecolorallocate($image, 0, 0, 0);
 
-// Make white transparent
-imagecolortransparent($image, $white);
+    // Make white transparent
+    imagecolortransparent($image, $white);
 
-// Fill the background with white
-imagefilledrectangle($image, 0, 0, IMAGE_WIDTH, IMAGE_HEIGHT, $white);
+    // Fill the background with white
+    imagefilledrectangle($image, 0, 0, IMAGE_WIDTH, IMAGE_HEIGHT, $white);
 
-// Copy our graph into the image
-imagecopy($image, $graphImage, 0, 0, 0, 0, IMAGE_WIDTH, IMAGE_HEIGHT);
+    // Copy our graph into the image
+    imagecopy($image, $graphImage, 0, 0, 0, 0, IMAGE_WIDTH, IMAGE_HEIGHT);
 
-imagepng($image);
+    imagepng($image);
 
-// Destroy it
-imagedestroy($image);
+    // Destroy it
+    imagedestroy($image);
+
+    // Cache the image
+    $pCache->WriteToCache($cacheKey, $dataSet->GetData(), $graph);
+} else
+{
+    $pCache->GetFromCache($cacheKey, $dataSet->GetData());
+}
 
 /**
  * Create an error image, send it to the client, and then exit
