@@ -86,7 +86,7 @@ class Cache
         // Check for flags
         if ($expire == CACHE_UNTIL_NEXT_GRAPH)
         {
-            $expire = (normalizeTime() + ($config['graph']['interval'] * 60)) - time();
+            $expire = strtotime('+30 minutes', getLastGraphEpoch());
         }
 
         return $this->handle->set($key, json_encode($value), false, $expire);
