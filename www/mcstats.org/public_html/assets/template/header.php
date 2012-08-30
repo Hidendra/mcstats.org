@@ -20,10 +20,15 @@ $show_navbar = $is_in_admin_ui || is_loggedin();
         <meta name="description" content="" />
         <meta name="author" content="Tyler Blair <hidendra@griefcraft.com>" />
 
+        <meta name="viewport" content="width=device-width">
+
+        <link href="http://static.mcstats.org/css/main.css" rel="stylesheet" />
         <link href="http://static.mcstats.org/css/bootstrap.min.css" rel="stylesheet" />
         <link href="http://static.mcstats.org/css/bootstrap-responsive.min.css" rel="stylesheet" />
         <link href="http://static.mcstats.org/css/fam-icons.css" rel="stylesheet" />
         <link href="http://static.mcstats.org/css/ui-lightness/jquery-ui.css" rel="stylesheet" />
+        <link href="http://static.mcstats.org/css/iphone.css" type="text/css" rel="stylesheet" media="only screen and (max-device-width: 480px)" />
+        <link href="http://static.mcstats.org/css/ipad.css" type="text/css" rel="stylesheet" media="only screen and (max-device-width: 1024px)" />
 
         <script src="http://static.mcstats.org/javascript/jquery.js" type="text/javascript"></script>
         <script src="http://static.mcstats.org/javascript/jquery.pjax.js" type="text/javascript"></script>

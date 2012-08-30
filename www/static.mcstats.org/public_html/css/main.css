@@ -1,0 +1,12 @@
+.clear {
+    clear: both;
+}
+
+#plugin-table {
+    margin-left: 10px;
+    width: 300px;
+}
+
+#graph-content {
+    margin-left: 320px;
+}

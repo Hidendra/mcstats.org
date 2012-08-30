@@ -1,0 +1,12 @@
+#plugin-table {
+    width: 70%;
+    margin-left: 15%;
+    text-align: center;
+}
+
+#graph-content {
+    margin-left: 0;
+    clear: both;
+    float: left;
+    width: 100%;
+}

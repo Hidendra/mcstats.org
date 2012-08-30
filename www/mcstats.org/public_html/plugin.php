@@ -45,7 +45,7 @@ echo '
 
             <div id="row-fluid" style="width: 100%">
 
-                <div class="span4" style="margin-left: 10px; width: 300px;">
+                <div class="span4" id="plugin-table">
                     <h3>Plugin information</h3>
 ';
 
@@ -155,13 +155,14 @@ if (!$output)
     echo '
                 </div>
 
-                <div style="margin-left: 320px;">
+                <div id="graph-content">
 ';
 
     outputGraphs($plugin);
 
     echo '
-                </div>';
+                </div>
+                <div class="clear"></div>';
     $output = ob_get_contents();
     ob_end_clean();
     $cache->set('plugin/' . $plugin->getName(), $output, CACHE_UNTIL_NEXT_GRAPH);
