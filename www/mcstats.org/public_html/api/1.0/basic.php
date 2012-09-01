@@ -1,5 +1,6 @@
 <?php
 define('ROOT', '../../');
+header('Access-Control-Allow-Origin: *');
 
 require_once ROOT . 'config.php';
 require_once ROOT . 'includes/database.php';
@@ -30,7 +31,7 @@ $response['author'] = $plugin->getAuthors();
 $response['starts'] = $plugin->getGlobalHits();
 
 // Server data
-$response['servers'][24] = $plugin->countServersLastUpdated(time() - SECONDS_IN_DAY);
+$response['servers'][24] = $plugin->getServerCount();
 
 
 $response['status'] = 'ok';

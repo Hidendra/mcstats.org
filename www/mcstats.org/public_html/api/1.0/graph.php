@@ -1,5 +1,6 @@
 <?php
 define('ROOT', '../../');
+header('Access-Control-Allow-Origin: *');
 
 require_once ROOT . 'config.php';
 require_once ROOT . 'includes/database.php';
