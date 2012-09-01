@@ -67,15 +67,27 @@ function send_registration($username = '')
 
                 <div class="hero-unit">
                     <div class="offset4">
-                        <p>Once you complete registration, you will want to get access to your plugin.</p>
-                        <p>To do this you will need to contact Hidendra, the best place to do this is on IRC: irc.esper.net #metrics</p>
+                        <p>Once you complete registration, you will be able to add plugins to your account.</p>
 
-                        <form action="" method="post">
+                        <form action="" method="post" class="form-horizontal">
                             <div class="control-group">
+                                <label class="control-label" for="username">Username</label>
                                 <div class="controls">
-                                    <input type="text" name="username" value="' . $username . '" placeholder="Username" /> <br/>
-                                    <input type="password" name="password" placeholder="Password" /> <br/>
-                                    <input type="password" name="password2" placeholder="Confirm password" />
+                                    <input type="text" name="username" value="' . $username . '" />
+                                </div>
+                            </div>
+
+                            <div class="control-group">
+                                <label class="control-label" for="password">Password</label>
+                                <div class="controls">
+                                    <input type="password" name="password" />
+                                </div>
+                            </div>
+
+                            <div class="control-group">
+                                <label class="control-label" for="password2">Confirm password</label>
+                                <div class="controls">
+                                    <input type="password" name="password2" />
                                 </div>
                             </div>
 
