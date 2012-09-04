@@ -29,6 +29,20 @@ require 'pChart/pData.class.php';
 require 'pChart/pChart.class.php';
 require 'pChart/pCache.class.php';
 
+// image modifier
+$scale = isset($_GET['scale']) ? $_GET['scale'] : 1;
+
+if ($scale > 10 || $scale <= 0)
+{
+    define('REAL_IMAGE_HEIGHT', IMAGE_HEIGHT);
+    define('REAL_IMAGE_WIDTH', IMAGE_WIDTH);
+    error_image('Invalid modifier');
+} else
+{
+    define('REAL_IMAGE_HEIGHT', IMAGE_HEIGHT * $scale);
+    define('REAL_IMAGE_WIDTH', IMAGE_WIDTH * $scale);
+}
+
 // The plugin we are graphing
 $pluginName = urldecode($_GET['plugin']);
 
@@ -49,7 +63,7 @@ $pluginName = $plugin->getName();
 $pCache = new pCache('../cache/');
 
 // get the graph from cache
-$cacheKey = 'preview/' . $pluginName;
+$cacheKey = 'preview/' . $scale . '/' . $pluginName;
 
 // Create a new data set
 $dataSet = new pData();
@@ -118,9 +132,9 @@ $dataSet->AddAllSeries();
 if ($pCache->IsInCache($cacheKey, $dataSet->GetData()) === FALSE)
 {
     // Set us up the bomb
-    $graph = new pChart(IMAGE_WIDTH, IMAGE_HEIGHT);
+    $graph = new pChart(REAL_IMAGE_WIDTH, REAL_IMAGE_HEIGHT);
     $graph->setFontProperties('tahoma.ttf', 8);
-    $graph->setGraphArea(45, 10, IMAGE_WIDTH - 5, IMAGE_HEIGHT - 5);
+    $graph->setGraphArea(45, 10, REAL_IMAGE_WIDTH - 5, REAL_IMAGE_HEIGHT - 5);
     // $graph->drawGraphArea(255, 255, 255);
     $graph->drawScale($dataSet->GetData(), $dataSet->GetDataDescription(), SCALE_START0, 150, 150, 150, true, 0, 0);
     // $graph->drawGrid(4, true, 230, 230, 230, 100);
@@ -132,7 +146,7 @@ if ($pCache->IsInCache($cacheKey, $dataSet->GetData()) === FALSE)
     $graphImage = $graph->Render('__handle');
 
     // generate the image
-    $image = imagecreatetruecolor(IMAGE_WIDTH, IMAGE_HEIGHT);
+    $image = imagecreatetruecolor(REAL_IMAGE_WIDTH, REAL_IMAGE_HEIGHT);
 
     // Some colors
     $white = imagecolorallocate($image, 255, 255, 255);
@@ -142,10 +156,10 @@ if ($pCache->IsInCache($cacheKey, $dataSet->GetData()) === FALSE)
     imagecolortransparent($image, $white);
 
     // Fill the background with white
-    imagefilledrectangle($image, 0, 0, IMAGE_WIDTH, IMAGE_HEIGHT, $white);
+    imagefilledrectangle($image, 0, 0, REAL_IMAGE_WIDTH, REAL_IMAGE_HEIGHT, $white);
 
     // Copy our graph into the image
-    imagecopy($image, $graphImage, 0, 0, 0, 0, IMAGE_WIDTH, IMAGE_HEIGHT);
+    imagecopy($image, $graphImage, 0, 0, 0, 0, REAL_IMAGE_WIDTH, REAL_IMAGE_HEIGHT);
 
     imagepng($image);
 
@@ -167,14 +181,14 @@ if ($pCache->IsInCache($cacheKey, $dataSet->GetData()) === FALSE)
 function error_image($text)
 {
     // allocate image
-    $image = imagecreatetruecolor(IMAGE_WIDTH, IMAGE_HEIGHT);
+    $image = imagecreatetruecolor(REAL_IMAGE_WIDTH, REAL_IMAGE_HEIGHT);
 
     // create some colours
     $white = imagecolorallocate($image, 255, 255, 255);
     $black = imagecolorallocate($image, 0, 0, 0);
 
     // draw teh background
-    imagefilledrectangle($image, 0, 0, IMAGE_WIDTH, IMAGE_HEIGHT, $white);
+    imagefilledrectangle($image, 0, 0, REAL_IMAGE_WIDTH, REAL_IMAGE_HEIGHT, $white);
 
     // write the text
     imagettftext($image, 16, 0, 5, 25, $black, '../fonts/pf_arma_five.ttf', $text);

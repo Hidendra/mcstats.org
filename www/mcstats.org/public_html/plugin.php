@@ -121,12 +121,20 @@ if (!$output)
         $rank .= ' <i class="fam-bullet-blue" title="No change"></i>';
     }
 
+    if (!is_numeric($plugin->getLastRankChange()))
+    {
+        $rankHeldFor = '<i>No rank</i>';
+    } else
+    {
+        $rankHeldFor = epochToHumanString(time() - $plugin->getLastRankChange());
+    }
+
     echo '
                     <table class="table table-striped">
                         <tbody>
                             <tr> <td> Name </td> <td> ' . $pluginName . ' </td> </tr>
                             <tr> <td> Rank </td> <td> ' . $rank . ' </td> </tr>
-                            <tr> <td> Rank held for </td> <td> ' . epochToHumanString(time() - $plugin->getLastRankChange()) . ' </td> </tr>
+                            <tr> <td> Rank held for </td> <td> ' . $rankHeldFor . ' </td> </tr>
                             <tr> <td> Author' . $author_prepend . ' </td> <td> ' . $authors . ' </td> </tr>
                             <tr> <td> Date added </td> <td> ' . date('F d, Y', $plugin->getCreated()) . ' </td> </tr>
                             <tr> <td> Global starts </td> <td> ' . number_format($plugin->getGlobalHits()) . ' </td> </tr>

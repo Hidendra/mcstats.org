@@ -29,13 +29,27 @@ require 'pChart/pData.class.php';
 require 'pChart/pChart.class.php';
 require 'pChart/pCache.class.php';
 
+// image modifier
+$scale = isset($_GET['scale']) ? $_GET['scale'] : 1;
+
+if ($scale > 10 || $scale <= 0)
+{
+    define('REAL_IMAGE_HEIGHT', IMAGE_HEIGHT);
+    define('REAL_IMAGE_WIDTH', IMAGE_WIDTH);
+    error_image('Invalid modifier');
+} else
+{
+    define('REAL_IMAGE_HEIGHT', IMAGE_HEIGHT * $scale);
+    define('REAL_IMAGE_WIDTH', IMAGE_WIDTH * $scale);
+}
+
 // The plugin we are graphing
 $pluginName = urldecode($_GET['plugin']);
 
 $pCache = new pCache('../cache/');
 
 // get the graph from cache
-$cacheKey = 'signature/' . $pluginName;
+$cacheKey = 'signature/' . $scale . '/' . $pluginName;
 
 // Load the json data from the api
 // First, basic plugin data
@@ -119,11 +133,11 @@ if ($pCache->IsInCache($cacheKey, $dataSet->GetData()) === FALSE)
 {
 
     // Set us up the bomb
-    $graph = new pChart(IMAGE_WIDTH, IMAGE_HEIGHT);
+    $graph = new pChart(REAL_IMAGE_WIDTH, REAL_IMAGE_HEIGHT);
     $graph->setFontProperties('tahoma.ttf', 8);
-    $graph->setGraphArea(60, 30, IMAGE_WIDTH - 20, IMAGE_HEIGHT - 30);
-    $graph->drawFilledRoundedRectangle(7, 7, IMAGE_WIDTH - 7, IMAGE_HEIGHT - 7, 5, 240, 240, 240);
-    $graph->drawRoundedRectangle(5, 5, IMAGE_WIDTH - 5, IMAGE_HEIGHT - 5, 5, 230, 230, 230);
+    $graph->setGraphArea(60, 30, REAL_IMAGE_WIDTH - 20, REAL_IMAGE_HEIGHT - 30);
+    $graph->drawFilledRoundedRectangle(7, 7, REAL_IMAGE_WIDTH - 7, REAL_IMAGE_HEIGHT - 7, 5, 240, 240, 240);
+    $graph->drawRoundedRectangle(5, 5, REAL_IMAGE_WIDTH - 5, REAL_IMAGE_HEIGHT - 5, 5, 230, 230, 230);
     $graph->drawGraphArea(250, 250, 250, true);
     $graph->drawScale($dataSet->GetData(), $dataSet->GetDataDescription(), SCALE_START0, 150, 150, 150, true, 0, 0);
     // $graph->drawGrid(4, true, 230, 230, 230, 100);
@@ -144,7 +158,7 @@ if ($pCache->IsInCache($cacheKey, $dataSet->GetData()) === FALSE)
     // Draw the footer
     $graph->setFontProperties('pf_arma_five.ttf', 6);
     $footer = sprintf('%s servers in the last 24 hours with %s all-time server startups  ', number_format($serversLast24Hours), number_format($serverStarts));
-    $graph->drawTextBox(60, IMAGE_HEIGHT - 25, IMAGE_WIDTH - 20, IMAGE_HEIGHT - 7, $footer, 0, 255, 255, 255, ALIGN_RIGHT, true, 0, 0, 0, 30);
+    $graph->drawTextBox(60, REAL_IMAGE_HEIGHT - 25, REAL_IMAGE_WIDTH - 20, REAL_IMAGE_HEIGHT - 7, $footer, 0, 255, 255, 255, ALIGN_RIGHT, true, 0, 0, 0, 30);
 
     // Draw the data
     $graph->drawFilledLineGraph($dataSet->GetData(), $dataSet->GetDataDescription(), 75, true);
@@ -161,7 +175,7 @@ if ($pCache->IsInCache($cacheKey, $dataSet->GetData()) === FALSE)
 
     $tahoma = 'tahoma.ttf';
     $bounding_box = imagettfbbox(11, 0, $tahoma, $title);
-    $center_x = ceil((IMAGE_WIDTH - $bounding_box[2]) / 2);
+    $center_x = ceil((REAL_IMAGE_WIDTH - $bounding_box[2]) / 2);
 
     // Draw the title there
     $graph->setFontProperties($tahoma, 11); // Switch to font size 10
@@ -169,13 +183,13 @@ if ($pCache->IsInCache($cacheKey, $dataSet->GetData()) === FALSE)
 
     // shameless advertising
     $graph->setFontProperties('pf_arma_five.ttf', 6);
-    $graph->drawTitle(63, IMAGE_HEIGHT - 9, 'mcstats.org', 210, 210, 210, -1, -1, TRUE);
+    $graph->drawTitle(63, REAL_IMAGE_HEIGHT - 9, 'mcstats.org', 210, 210, 210, -1, -1, TRUE);
 
     // Stroke the image
     $graphImage = $graph->Render('__handle');
 
     // generate the image
-    $image = imagecreatetruecolor(IMAGE_WIDTH, IMAGE_HEIGHT);
+    $image = imagecreatetruecolor(REAL_IMAGE_WIDTH, REAL_IMAGE_HEIGHT);
 
     // Some colors
     $white = imagecolorallocate($image, 255, 255, 255);
@@ -185,10 +199,10 @@ if ($pCache->IsInCache($cacheKey, $dataSet->GetData()) === FALSE)
     imagecolortransparent($image, $white);
 
     // Fill the background with white
-    imagefilledrectangle($image, 0, 0, IMAGE_WIDTH, IMAGE_HEIGHT, $white);
+    imagefilledrectangle($image, 0, 0, REAL_IMAGE_WIDTH, REAL_IMAGE_HEIGHT, $white);
 
     // Copy our graph into the image
-    imagecopy($image, $graphImage, 0, 0, 0, 0, IMAGE_WIDTH, IMAGE_HEIGHT);
+    imagecopy($image, $graphImage, 0, 0, 0, 0, REAL_IMAGE_WIDTH, REAL_IMAGE_HEIGHT);
 
     imagepng($image);
 
@@ -210,14 +224,14 @@ if ($pCache->IsInCache($cacheKey, $dataSet->GetData()) === FALSE)
 function error_image($text)
 {
     // allocate image
-    $image = imagecreatetruecolor(IMAGE_WIDTH, IMAGE_HEIGHT);
+    $image = imagecreatetruecolor(REAL_IMAGE_WIDTH, REAL_IMAGE_HEIGHT);
 
     // create some colours
     $white = imagecolorallocate($image, 255, 255, 255);
     $black = imagecolorallocate($image, 0, 0, 0);
 
     // draw teh background
-    imagefilledrectangle($image, 0, 0, IMAGE_WIDTH, IMAGE_HEIGHT, $white);
+    imagefilledrectangle($image, 0, 0, REAL_IMAGE_WIDTH, REAL_IMAGE_HEIGHT, $white);
 
     // write the text
     imagettftext($image, 16, 0, 5, 25, $black, '../fonts/pf_arma_five.ttf', $text);
