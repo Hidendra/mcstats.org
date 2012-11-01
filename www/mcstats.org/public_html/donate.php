@@ -24,19 +24,19 @@ echo '
 <div class="row" style="margin-left: 10%;">
     <div class="span6 well" style="width: 80%;">
         <p style="font-size: 16px;">
-            The MCStats / Plugin Metrics backend receives <b>over 400 requests per second</b> 24 hours a day, 7 days a week
+            MCStats serves over <span style="font-weight:bold; font-size: 20px;">500 requests per second</span> 24 hours a day, 7 days a week
         </p>
         <p style="font-size: 16px;">
-            That is over <b><span style="font-size: 20px;">1 billion</span> requests per month</b> and over <b><span style="font-size: 20px;">30 million</span> requests each day</b> and it will only <b>continue to rise</b>
+            That is over <b><span style="font-size: 20px;">1.3 billion</span> requests per month</b> and over <b><span style="font-size: 20px;">45 million</span> requests each day</b> and it will only continue to rise.
         </p>
         <p>
-            Every single server is tracked. To get useful data for plugins, each server needs to be identified and from there
-            data is stored such as the plugins a server is using (that support MCStats), the amount of players online,
-            and even the Minecraft version the server is on including the server software (e.g CraftBukkit).
+            Every single server is tracked. To get useful data for plugins, every server needs to be identified and from there
+            data is stored such as the plugins the server is using (that support MCStats), the amount of players online,
+            and even the Minecraft version the server is on.
         </p>
         <p>
             And this is no simple task. It requires a lot of power and it also needs room for growth. Right now the service
-            is <b>entirely funded by myself, Hidendra</b> and no outside sources fund the service in any way.
+            is <b>entirely funded by myself, Hidendra</b>. MCStats has no sponsors or outside funding other than donations.
         </p>';
 
 // appeal to their plugins they have if they are logged in
@@ -50,9 +50,9 @@ if (is_loggedin() && ($pluginCount = count($plugins = get_accessible_plugins()))
 
     echo '
         <p>
-            You have ' . $pluginCount . ' plugin' . ($pluginCount > 1 ? 's' : '') . ' that collects data from servers attached to MCStats / Plugin Metrics.
+            You have ' . $pluginCount . ' plugin' . ($pluginCount > 1 ? 's' : '') . ' that collect data from servers attached to MCStats / Plugin Metrics.
             Even if you only have one plugin, or a dozen, you have still helped MCStats in a tremendous way by helping
-            it rise to where it is today. And I\'m sure this has also been mutual -- this service has helped you
+            it rise to where it is today. And I\'m sure this has also been mutual &mdash; this service has helped you
             see live, real world statistics about your plugin that download counters can\'t give you.
         </p>
     </div>
@@ -67,9 +67,9 @@ if (is_loggedin() && ($pluginCount = count($plugins = get_accessible_plugins()))
 {
     echo '
         <p>
-            MCStats / Plugin Metrics is unrivaled in stat collection for Minecraft plugins. Many of the plugin authors
-            who decided to use MCStats had an eye-opening experience. Seeing real numbers in a beautiful format is
-            amazing and for some, gives them the motivation to continue with plugin development.
+            MCStats is unrivaled in stat collection for Minecraft plugins. Many of the plugin authors who decided to use
+            MCStats had an eye-opening experience. Seeing real numbers in a beautiful format is amazing and for some,
+            it gives them the motivation to continue developing plugins.
         </p>
     </div>
 </div>
@@ -83,7 +83,7 @@ if (is_loggedin() && ($pluginCount = count($plugins = get_accessible_plugins()))
 
 echo '
         <p>
-            So donate today. Give as little as a dollar, or as much as you want, or don\'t donate at all -- the decision is yours and yours alone.
+            So donate today. Give as little as a dollar, or as much as you want, or don\'t donate at all &mdash; the decision is yours and yours alone.
         </p>
     </div>
 </div>
