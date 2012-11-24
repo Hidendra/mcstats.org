@@ -81,8 +81,10 @@ function outputGraphs($plugin)
     $floated = FALSE;
     foreach ($activeGraphs as $activeGraph)
     {
+        $safeName = urlencode(htmlentities($activeGraph->getDisplayName()));
         if (in_array($activeGraph->getName(), $combineGraphs))
         {
+            echo '<a name="' . $safeName . '"></a>';
             echo '<div id="CustomChart' . $index . '" style="height: 400px; width: 50%; float: left;"></div>';
             $floated = TRUE;
         } else
@@ -91,7 +93,7 @@ function outputGraphs($plugin)
             {
                 echo '<div style="clear: both;"></div>';
             }
-
+            echo '<a name="' . $safeName . '"></a>';
             echo '<div id="CustomChart' . $index . '" style="height: 400px;"></div>';
         }
 
