@@ -302,7 +302,8 @@ class Graph
         $chart->chart->zoomType = 'x';
 
         // The title
-        $chart->title->text = htmlentities($this->displayName); // $this->name;
+        $safeName = htmlentities($this->displayName);
+        $chart->title->text = "<a href=\"#" . urlencode($safeName) . "\">" . $safeName . "</a>"; // $this->name;
 
         // Subtitle
         if ($this->plugin != null)
