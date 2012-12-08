@@ -227,7 +227,7 @@ class Graph
      * @param $columnName string
      * @return int
      */
-    public function getColumnID($columnName, $attemptedToCreate = false)
+    public function getColumnID($columnName, $create = false)
     {
         global $master_db_handle;
 
@@ -239,6 +239,11 @@ class Graph
         {
             $id = $row['ID'];
             return $id;
+        }
+
+        if (!$create)
+        {
+            return -1;
         }
 
         $statement = $master_db_handle->prepare('INSERT INTO CustomColumn (Plugin, Graph, Name) VALUES (:Plugin, :Graph, :Name)');

@@ -163,7 +163,7 @@ class Plugin
     }
 
     /**
-     * Loads a graph from the database and if it does not exist
+     * Loads a graph from the database and if it does not exist return NULL
      *
      * @param $name
      * @return Graph The Graph object and if it does not exist, NULL

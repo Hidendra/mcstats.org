@@ -9,9 +9,13 @@ require_once ROOT . 'includes/database.php';
 require_once ROOT . 'includes/func.php';
 
 // copy timeline data
-$statement = get_slave_db_handle()->prepare('INSERT INTO GraphData SELECT * FROM GraphDataScratch');
+$statement = $master_db_handle->prepare('INSERT INTO GraphData SELECT * FROM GraphDataScratch');
 $statement->execute();
 
 // empty the scratch table incase it failed to empty
-$statement = get_slave_db_handle()->prepare('TRUNCATE GraphDataScratch');
+$statement = $master_db_handle->prepare('TRUNCATE GraphDataScratch');
+$statement->execute();
+
+// empty the CustomData table (MEMORY table, it only needs data for the last 30 minutes)
+$statement = $master_db_handle->prepare('TRUNCATE CustomData');
 $statement->execute();

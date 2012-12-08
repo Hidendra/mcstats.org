@@ -22,24 +22,24 @@ $show_navbar = $is_in_admin_ui || is_loggedin();
 
         <meta name="viewport" content="width=device-width">
 
-        <link href="http://static.mcstats.org/css/main.css" rel="stylesheet" />
-        <link href="http://static.mcstats.org/css/bootstrap.min.css" rel="stylesheet" />
-        <link href="http://static.mcstats.org/css/bootstrap-responsive.min.css" rel="stylesheet" />
-        <link href="http://static.mcstats.org/css/fam-icons.css" rel="stylesheet" />
-        <link href="http://static.mcstats.org/css/ui-lightness/jquery-ui.css" rel="stylesheet" />
-        <link href="http://static.mcstats.org/css/iphone.css" type="text/css" rel="stylesheet" media="only screen and (max-device-width: 480px)" />
-        <link href="http://static.mcstats.org/css/ipad.css" type="text/css" rel="stylesheet" media="only screen and (max-device-width: 1024px)" />
+        <link href="https://static.mcstats.org/css/main.css" rel="stylesheet" />
+        <link href="https://static.mcstats.org/css/bootstrap.min.css" rel="stylesheet" />
+        <link href="https://static.mcstats.org/css/bootstrap-responsive.min.css" rel="stylesheet" />
+        <link href="https://static.mcstats.org/css/fam-icons.css" rel="stylesheet" />
+        <link href="https://static.mcstats.org/css/ui-lightness/jquery-ui.css" rel="stylesheet" />
+        <link href="https://static.mcstats.org/css/iphone.css" type="text/css" rel="stylesheet" media="only screen and (max-device-width: 480px)" />
+        <link href="https://static.mcstats.org/css/ipad.css" type="text/css" rel="stylesheet" media="only screen and (max-device-width: 1024px)" />
 
-        <script src="http://static.mcstats.org/javascript/jquery.js" type="text/javascript"></script>
-        <script src="http://static.mcstats.org/javascript/jquery.pjax.js" type="text/javascript"></script>
-        <script src="http://static.mcstats.org/javascript/jquery-ui.js" type="text/javascript"></script>
-        <script src="http://static.mcstats.org/javascript/main.js" type="text/javascript"></script>
+        <script src="https://static.mcstats.org/javascript/jquery.js" type="text/javascript"></script>
+        <script src="https://static.mcstats.org/javascript/jquery.pjax.js" type="text/javascript"></script>
+        <script src="https://static.mcstats.org/javascript/jquery-ui.js" type="text/javascript"></script>
+        <script src="https://static.mcstats.org/javascript/main.js" type="text/javascript"></script>
 
         <!-- charting scripts -->
-        <script src="http://static.mcstats.org/javascript/highcharts/highcharts.js" type="text/javascript"></script>
-        <script src="http://static.mcstats.org/javascript/highcharts/highstock.js" type="text/javascript"></script>
-        <script src="http://static.mcstats.org/javascript/highcharts/exporting.js" type="text/javascript"></script>
-        <script src="http://static.mcstats.org/javascript/highcharts/themes/simplex.js" type="text/javascript"></script>
+        <script src="https://static.mcstats.org/javascript/highcharts/highcharts.js" type="text/javascript"></script>
+        <script src="https://static.mcstats.org/javascript/highcharts/highstock.js" type="text/javascript"></script>
+        <script src="https://static.mcstats.org/javascript/highcharts/exporting.js" type="text/javascript"></script>
+        <script src="https://static.mcstats.org/javascript/highcharts/themes/simplex.js" type="text/javascript"></script>
 
         <script type="text/javascript">
             // Google analytics
