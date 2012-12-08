@@ -15,8 +15,9 @@ function doGeneration($pluginId, $data)
 {
     global $countries, $baseEpoch;
     $plugin = loadPluginByID($pluginId);
+    $osname = $data['osname'];
+    $osversion = $data['osversion'];
     $sum = $data['Sum'];
-    $countryShortCode = $data['Country'];
     $count = $data['Count'];
     $avg = $data['Avg'];
     $max = $data['Max'];
@@ -24,14 +25,17 @@ function doGeneration($pluginId, $data)
     $variance = $data['Variance'];
     $stddev = $data['StdDev'];
 
-    // get the full country name
-    $fullName = $countries[$countryShortCode];
+    $fullName = $osname . '~=~' . $osversion;
 
     if ($count == 0 || $sum == 0) {
         return;
     }
 
-    $graph = $plugin->getOrCreateGraph('Server Locations', false, 1, GraphType::Pie, TRUE, 9000);
+    if ($osname == '' || $osname == 'Unknown' || $osversion == '' || $osversion == 'Unknown') {
+        return;
+    }
+
+    $graph = $plugin->getOrCreateGraph('Operating System', false, 0, GraphType::Pie, TRUE, 9010);
     insertGraphDataScratch($graph, $pluginId, $fullName, $baseEpoch, $sum, $count, $avg, $max, $min, $variance, $stddev);
 }
 
@@ -39,7 +43,8 @@ function doGeneration($pluginId, $data)
 $statement = get_slave_db_handle()->prepare('
         SELECT
             Plugin,
-            Country,
+            osname,
+            osversion,
             SUM(1) AS Sum,
             COUNT(*) AS Count,
             AVG(1) AS Avg,
@@ -50,7 +55,7 @@ $statement = get_slave_db_handle()->prepare('
         FROM ServerPlugin
         LEFT OUTER JOIN Server ON Server.ID = ServerPlugin.Server
         WHERE Updated >= ?
-        GROUP BY Plugin, Country');
+        GROUP BY Plugin, osname, osversion');
 $statement->execute(array($minimum));
 
 while ($row = $statement->fetch()) {
@@ -60,7 +65,8 @@ while ($row = $statement->fetch()) {
 // global plugin
 $statement = get_slave_db_handle()->prepare('
                     SELECT
-                        Country,
+                        osname,
+                        osversion,
                         SUM(1) AS Sum,
                         COUNT(dev.Server) AS Count,
                         AVG(1) AS Avg,
@@ -69,12 +75,12 @@ $statement = get_slave_db_handle()->prepare('
                         VAR_SAMP(1) AS Variance,
                         STDDEV_SAMP(1) AS StdDev
                     FROM (
-                      SELECT DISTINCT Server, Server.Players, Server.Country AS Country
+                      SELECT DISTINCT Server, Server.Players, Server.osname AS osname, Server.osversion as osversion
                       FROM ServerPlugin
                       LEFT OUTER JOIN Server ON Server.ID = ServerPlugin.Server
                       WHERE ServerPlugin.Updated >= ?
                     ) dev
-                    GROUP BY Country');
+                    GROUP BY osname, osversion');
 $statement->execute(array($minimum));
 
 while ($row = $statement->fetch()) {

@@ -136,6 +136,7 @@ echo '
                                         <option value="' . GraphType::Stacked_Column . '"' . ($type == GraphType::Stacked_Column ? ' selected' : '') . '>Stacked Column</option>
                                         <option value="' . GraphType::Pie . '"' . ($type == GraphType::Pie ? ' selected' : '') . '>Pie</option>
                                         <option value="' . GraphType::Percentage_Area . '"' . ($type == GraphType::Percentage_Area ? ' selected' : '') . '>Percentage Area</option>
+                                        <option value="' . GraphType::Donut . '"' . ($type == GraphType::Donut ? ' selected' : '') . '>Donut (req. compatible data)</option>
                                     </select>
                                 </div>
                             </div>

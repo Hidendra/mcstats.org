@@ -6,7 +6,9 @@ require_once ROOT . 'config.php';
 require_once ROOT . 'includes/database.php';
 require_once ROOT . 'includes/func.php';
 
-// Load all of the countries we can use
+// the current number of running forks
+$running_processes = 0;
+
 $baseEpoch = normalizeTime();
 $minimum = strtotime('-30 minutes', $baseEpoch);
 
@@ -15,7 +17,6 @@ function doGeneration($pluginId, $data)
     global $baseEpoch;
     $plugin = loadPluginByID($pluginId);
     $sum = $data['Sum'];
-    $version = $data['MinecraftVersion'];
     $count = $data['Count'];
     $avg = $data['Avg'];
     $max = $data['Max'];
@@ -27,26 +28,30 @@ function doGeneration($pluginId, $data)
         return;
     }
 
-    $graph = $plugin->getOrCreateGraph('Game Version', false, 1, GraphType::Pie, TRUE, 9001);
-    insertGraphDataScratch($graph, $pluginId, $version, $baseEpoch, $sum, $count, $avg, $max, $min, $variance, $stddev);
+    $graph = $plugin->getOrCreateGraph('Global Statistics', false, 1, GraphType::Area, TRUE, 1);
+
+    // players
+    insertGraphDataScratch($graph, $pluginId, 'Players', $baseEpoch, $sum, $count, $avg, $max, $min, $variance, $stddev);
+
+    // servers
+    insertGraphDataScratch($graph, $pluginId, 'Servers', $baseEpoch, $count, $count, 1, 1, 1, 1, 1);
 }
 
 // Plugins
 $statement = get_slave_db_handle()->prepare('
         SELECT
             Plugin,
-            MinecraftVersion,
-            SUM(1) AS Sum,
+            SUM(Players) AS Sum,
             COUNT(*) AS Count,
-            AVG(1) AS Avg,
-            MAX(1) AS Max,
-            MIN(1) AS Min,
-            VAR_SAMP(1) AS Variance,
-            STDDEV_SAMP(1) AS StdDev
+            AVG(Players) AS Avg,
+            MAX(Players) AS Max,
+            MIN(Players) AS Min,
+            VAR_SAMP(Players) AS Variance,
+            STDDEV_SAMP(Players) AS StdDev
         FROM ServerPlugin
         LEFT OUTER JOIN Server ON Server.ID = ServerPlugin.Server
         WHERE Updated >= ?
-        GROUP BY Plugin, MinecraftVersion');
+        GROUP BY Plugin');
 $statement->execute(array($minimum));
 
 while ($row = $statement->fetch()) {
@@ -56,21 +61,19 @@ while ($row = $statement->fetch()) {
 // global plugin
 $statement = get_slave_db_handle()->prepare('
         SELECT
-            MinecraftVersion,
-            SUM(1) AS Sum,
-            COUNT(dev.Server) AS Count,
-            AVG(1) AS Avg,
-            MAX(1) AS Max,
-            MIN(1) AS Min,
-            VAR_SAMP(1) AS Variance,
-            STDDEV_SAMP(1) AS StdDev
+            SUM(Players) AS Sum,
+            COUNT(*) AS Count,
+            AVG(Players) AS Avg,
+            MAX(Players) AS Max,
+            MIN(Players) AS Min,
+            VAR_SAMP(Players) AS Variance,
+            STDDEV_SAMP(Players) AS StdDev
         FROM (
-          SELECT DISTINCT Server, Server.Players, Server.MinecraftVersion AS MinecraftVersion
+          SELECT DISTINCT Server, Server.Players
           FROM ServerPlugin
           LEFT OUTER JOIN Server ON Server.ID = ServerPlugin.Server
           WHERE ServerPlugin.Updated >= ?
-        ) dev
-        GROUP BY MinecraftVersion');
+        ) dev');
 $statement->execute(array($minimum));
 
 while ($row = $statement->fetch()) {

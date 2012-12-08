@@ -34,6 +34,47 @@ $cache = new Cache();
 $cache->connect();
 
 /**
+ * Utility function for generating graphs
+ *
+ * @param $plugin
+ * @param $columnName
+ * @param $epoch
+ * @param $sum
+ * @param $count
+ * @param $avg
+ * @param $max
+ * @param $min
+ * @param $variance
+ * @param $stddev
+ */
+function insertGraphDataScratch($graph, $plugin, $columnName, $epoch, $sum, $count, $avg, $max, $min, $variance, $stddev) {
+    global $master_db_handle;
+
+    // these can be NULL IFF there is only one data point (e.g one server) in the sample
+    // we're using sample functions NOT population so this should be fairly obvious why
+    // this will return null
+    if ($variance === null || $stddev === null) {
+        $variance = 0;
+        $stddev = 0;
+    }
+
+    $insert = $master_db_handle->prepare('INSERT INTO GraphDataScratch (Plugin, ColumnID, Sum, Count, Avg, Max, Min, Variance, StdDev, Epoch)
+                                                    VALUES (:Plugin, :ColumnID, :Sum, :Count, :Avg, :Max, :Min, :Variance, :StdDev, :Epoch)');
+    $insert->execute(array(
+        ':Plugin' => $plugin,
+        ':ColumnID' => $graph->getColumnID($columnName),
+        ':Epoch' => $epoch,
+        ':Sum' => $sum,
+        ':Count' => $count,
+        ':Avg' => $avg,
+        ':Max' => $max,
+        ':Min' => $min,
+        ':Variance' => $variance,
+        ':StdDev' => $stddev
+    ));
+}
+
+/**
  * Get the graph generator's generation percentage. This can return NULL which means generation is not currently
  * happening.
  *
@@ -81,10 +122,8 @@ function outputGraphs($plugin)
     $floated = FALSE;
     foreach ($activeGraphs as $activeGraph)
     {
-        $safeName = urlencode(htmlentities($activeGraph->getDisplayName()));
         if (in_array($activeGraph->getName(), $combineGraphs))
         {
-            echo '<a name="' . $safeName . '"></a>';
             echo '<div id="CustomChart' . $index . '" style="height: 400px; width: 50%; float: left;"></div>';
             $floated = TRUE;
         } else
@@ -93,7 +132,7 @@ function outputGraphs($plugin)
             {
                 echo '<div style="clear: both;"></div>';
             }
-            echo '<a name="' . $safeName . '"></a>';
+
             echo '<div id="CustomChart' . $index . '" style="height: 400px;"></div>';
         }
 
@@ -109,7 +148,7 @@ function outputGraphs($plugin)
     foreach ($activeGraphs as $activeGraph)
     {
         // TODO not hardcoded ? heh
-        $activeGraph->setFeedURL(sprintf('http://mcstats.org/api/1.0/%s/graph/%s', urlencode(htmlentities($plugin->getName())), urlencode(htmlentities($activeGraph->getName()))));
+        $activeGraph->setFeedURL(sprintf('https://mcstats.org/api/1.0/%s/graph/%s', urlencode(htmlentities($plugin->getName())), urlencode(htmlentities($activeGraph->getName()))));
 
         // ADD ALL OF THE SERIES PLOTS TO THE CHART
         if ($activeGraph->getType() != GraphType::Pie)
@@ -648,6 +687,9 @@ function loadPlugin($plugin)
     return NULL;
 }
 
+// array of plugin objects
+$plugins = array();
+
 /**
  * Load a plugin using its internal ID
  *
@@ -656,12 +698,19 @@ function loadPlugin($plugin)
  */
 function loadPluginByID($id)
 {
+    global $plugins;
+
+    if (isset($plugins[$id])) {
+        return $plugins[$id];
+    }
+
     $statement = get_slave_db_handle()->prepare('SELECT ID, Parent, Name, Author, Hidden, GlobalHits, Created, Rank, LastRank, LastRankChange, LastUpdated, ServerCount30 FROM Plugin WHERE ID = :ID');
     $statement->execute(array(':ID' => $id));
 
     if ($row = $statement->fetch())
     {
-        return resolvePlugin($row);
+        $plugins[$id] = resolvePlugin($row);
+        return $plugins[$id];
     }
 
     return NULL;

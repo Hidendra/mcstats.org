@@ -38,6 +38,11 @@ abstract class GraphType
      */
     const Stacked_Column = 5;
 
+    /**
+     * Donut graph
+     */
+    const Donut = 6;
+
     public static function toString($type)
     {
         switch ($type)
@@ -59,6 +64,9 @@ abstract class GraphType
 
             case GraphType::Stacked_Column:
                 return "Stacked Column";
+
+            case GraphType::Donut:
+                return "Donut";
 
             default:
                 return 'UNDEFINED';
@@ -227,7 +235,7 @@ class Graph
      * @param $columnName string
      * @return int
      */
-    public function getColumnID($columnName, $create = false)
+    public function getColumnID($columnName, $create = true)
     {
         global $master_db_handle;
 

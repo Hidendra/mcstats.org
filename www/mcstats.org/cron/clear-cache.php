@@ -12,3 +12,6 @@ $pCache->ClearCache();
 
 // memcached
 $cache->handle()->flush();
+
+// mysql
+$master_db_handle->exec('TRUNCATE CustomData');

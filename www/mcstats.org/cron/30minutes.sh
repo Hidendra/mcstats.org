@@ -11,10 +11,8 @@ echo 1 > "$GENERATOR_FILE"
 /usr/local/bin/php -q prepare-graph-generators.php
 echo 8 > "$GENERATOR_FILE"
 
-/usr/local/bin/php -q generators/players.php
+/usr/local/bin/php -q generators/global-statistics.php
 echo 20 > "$GENERATOR_FILE"
-/usr/local/bin/php -q generators/servers.php
-echo 32 > "$GENERATOR_FILE"
 /usr/local/bin/php -q generators/custom.php
 echo 44 > "$GENERATOR_FILE"
 /usr/local/bin/php -q generators/server-locations.php
