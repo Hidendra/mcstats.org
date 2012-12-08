@@ -24,6 +24,8 @@ echo 80 > "$GENERATOR_FILE"
 /usr/local/bin/php -q generators/server-software.php
 echo 92 > "$GENERATOR_FILE"
 /usr/local/bin/php -q generators/game-version.php
+echo 94 > "$GENERATOR_FILE"
+/usr/local/bin/php -q generators/operating-system.php
 echo 98 > "$GENERATOR_FILE"
 /usr/local/bin/php -q server-counts.php
 /usr/local/bin/php -q clear-cache.php
