@@ -3,7 +3,7 @@
             <footer class="row" style="margin-left: 20px;">
                 <hr />
                 <p> MCStats backend created by Hidendra. Plugins are owned by their respective authors. </p>
-                <p>  <a href="/donate/"><i class="icon-heart"></i> Donate</a> | <a href="/plugin-list/">plugin list</a> | <a href="/status/">backend status</a> | <a href="/admin/">admin</a> | <a href="http://github.com/Hidendra/mcstats.org">github</a> | irc.esper.net #metrics </p>
+                <p>  <a href="/donate/"><i class="icon-heart"></i> Donate</a> | <a href="/plugin-list/">plugin list</a> | <a href="/status/">backend status</a> | <a href="/admin/">admin</a> | <a href="http://github.com/Hidendra/mcstats.org">github</a> | <a href="irc://irc.esper.net/metrics">irc.esper.net #metrics</a> </p>
             </footer>
 
         </div>

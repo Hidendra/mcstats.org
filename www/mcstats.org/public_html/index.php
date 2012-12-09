@@ -47,7 +47,7 @@ echo <<<END
     <h1 style="margin-bottom:10px; font-size:57px;">Glorious plugin stats.</h1>
     <p>MCStats / Plugin Metrics is the de facto statistical engine for Minecraft, actively used by over <b>$pluginCount</b> plugins.</p>
     <p>Across the world, over <b>$playerCount</b> players have been seen <b>in the last 30 minutes</b> on over <b>$serverCount</b> servers.</p>
-    <p><a href="/learn-more/" class="btn btn-success"><i class="icon-white icon-star-empty"></i> Learn More</a> :: <a class="btn btn-primary" href="/plugin-list/"><i class="icon-white icon-th-list"></i> Plugin List</a></p>
+    <p><a href="/learn-more/" class="btn btn-success"><i class="icon-white icon-star-empty"></i> Learn More</a>  <a class="btn btn-primary" href="/plugin-list/"><i class="icon-white icon-th-list"></i> Plugin List</a></p>
 </div>
 
 <div class="row" style="text-align: center;">
@@ -72,7 +72,7 @@ foreach (loadPlugins(PLUGIN_ORDER_RANDOM_TOP100, 4) as $plugin)
 
     echo '
     <div class="span3">
-        <h2 style="margin-bottom:7px;"><b>' . $name . '</b></h2>
+        <h2 style="margin-bottom:7px;"><a style="color: inherit;" href="/plugin/' . $name . '" target="_blank"><b>' . $name . '</b></a></h2>
         <p>
             ' . (empty ($authors) ? '' : ('Author' . $author_prepend . ': ' . $authors)) . ' <br/>
             Started ' . number_format($plugin->getGlobalHits()) . ' times <br/>
@@ -81,7 +81,7 @@ foreach (loadPlugins(PLUGIN_ORDER_RANDOM_TOP100, 4) as $plugin)
         <p>
             <img src="/plugin-preview/' . $name . '" />
         </p>
-        <p><a class="btn" href="/plugin/' . htmlentities($plugin->getName()) . '" target="_blank">More info &raquo;</a></p>
+        <p><a class="btn" href="/plugin/' . $name . '" target="_blank">More info &raquo;</a></p>
     </div>
 ';
     $first = false;
