@@ -79,7 +79,7 @@ foreach (loadPlugins(PLUGIN_ORDER_RANDOM_TOP100, 4) as $plugin)
             Servers (last 24 hrs): ' . number_format($plugin->getServerCount()) . '
         </p>
         <p>
-            <img src="/plugin-preview/' . $name . '" />
+            <img src="/plugin-preview/' . $name . '" alt="' . $name . '" />
         </p>
         <p><a class="btn" href="/plugin/' . $name . '" target="_blank">More info &raquo;</a></p>
     </div>

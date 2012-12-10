@@ -99,6 +99,14 @@ switch ($graphName)
             $response['type'] = GraphType::toString($graph->getType());
         }
 
+        else if ($graph->getType() == GraphType::Donut)
+        {
+            $response['status'] = 'ok';
+            $response['data'] = DataGenerator::generateCustomChartData($graph, -1, $hours);
+            $response['name'] = htmlentities($graph->getName());
+            $response['type'] = GraphType::toString($graph->getType());
+        }
+
         // otherwise we need to generate data for every column
         else
         {

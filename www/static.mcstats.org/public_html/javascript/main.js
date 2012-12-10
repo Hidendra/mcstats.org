@@ -203,6 +203,67 @@ function retrieveGraphData(options, framework, feedurl)
             }];
         }
 
+        else if (json.type == "Donut") {
+            var colors = [ "#4572A7", "#AA4643", "#89A54E", "#80699B", "#3D96AE", "#DB843D", "#92A8CD", "#A47D7C","#B5CA92" ]; // Highcharts.getOptions().colors;
+            var inner = [];
+            var outer = [];
+            var colorIndex = 0;
+
+            for (outName in json.data) {
+                var sum = 0;
+                var length = 0;
+
+                for (oin in json.data[outName]) {
+                    length ++;
+                }
+
+                var j = 0;
+                for (oin in json.data[outName]) {
+                    var inobject = json.data[outName][oin];
+                    var brightness = 0.2 - (j / length) / 5 ;
+                    sum += inobject.y;
+
+                    outer.push({
+                        name: inobject.name,
+                        y: inobject.y,
+                        color: Highcharts.Color(colors[colorIndex]).brighten(brightness).get()
+                    });
+                    j ++;
+                }
+
+                inner.push({
+                    name: outName,
+                    y: sum,
+                    color: colors[colorIndex]
+                });
+
+                colorIndex ++;
+            }
+
+            options.series = [{
+                name: '',
+                data: inner,
+                size: '60%',
+                dataLabels: {
+                    formatter: function() {
+                        return this.y > 5 ? this.point.name : null;
+                    },
+                    color: 'white',
+                    distance: -30
+                }
+            }, {
+                name: '',
+                data: outer,
+                innerSize: '60%',
+                dataLabels: {
+                    formatter: function() {
+                        // display only if larger than 1
+                        return this.y > 1 ? '<b>'+ this.point.name +':</b> '+ this.y +'%'  : null;
+                    }
+                }
+            }];
+        }
+
         // bit lengthier, we need to generate each column
         else {
             // init the array

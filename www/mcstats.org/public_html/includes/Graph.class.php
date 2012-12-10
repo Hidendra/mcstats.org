@@ -298,6 +298,7 @@ class Graph
                 break;
 
             case GraphType::Pie:
+            case GraphType::Donut:
                 $chart = new HighRollerPieChart();
                 $classname = 'highcharts';
                 break;
@@ -344,7 +345,7 @@ class Graph
         );
 
         // Non-pie graph specifics
-        if ($this->type != GraphType::Pie)
+        if ($this->type != GraphType::Pie && $this->type != GraphType::Donut)
         {
             $chart->rangeSelector = array(
                 'selected' => (($this->type == GraphType::Column || $this->type == GraphType::Stacked_Column) ? 1 : 3),
@@ -434,7 +435,7 @@ class Graph
         }
 
         // Tooltip + plotOptions
-        if ($this->type != GraphType::Pie)
+        if ($this->type != GraphType::Pie && $this->type != GraphType::Donut)
         {
             $chart->tooltip = array(
                 'shared' => true,
@@ -509,7 +510,7 @@ class Graph
         // Some raw javascript
         $rawJavascript = '';
 
-        if ($this->type != GraphType::Pie)
+        if ($this->type != GraphType::Pie && $this->type != GraphType::Donut)
         {
 
             if (!$isPlayerChart)

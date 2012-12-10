@@ -103,10 +103,15 @@ class Plugin
             return;
         }
 
-        $current = 2; // the current position to use
-        for ($i = 1; $i < $count - 4; $i++)
+        $current = 2; // the position to use
+        foreach ($graphs as $graph)
         {
-            $graph = $graphs[$i];
+            // ignore predefined graphs
+            if ($graph->isReadOnly())
+            {
+                continue;
+            }
+
             $graph->setPosition($current++);
             $graph->save();
         }

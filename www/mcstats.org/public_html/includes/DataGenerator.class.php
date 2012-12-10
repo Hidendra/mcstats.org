@@ -102,7 +102,63 @@ class DataGenerator
 
                 $generatedData[] = array($columnName, $percent);
             }
-        } else
+        }
+
+        else if ($graph->getType() == GraphType::Donut)
+        {
+            // the amounts for each column
+            $columnAmounts = array();
+
+            foreach ($graph->getColumns() as $id => $columnName)
+            {
+                $columnAmounts[$columnName] = $graph->getPlugin()->getTimelineCustomLast($id);
+            }
+
+            // Now begin our magic
+            asort($columnAmounts);
+
+            // Sum all of the points
+            $data_sum = array_sum($columnAmounts);
+
+            // remove low outlier data on large datasets
+            if ($data_sum > 1000)
+            {
+                foreach ($columnAmounts as $columnName => $amount)
+                {
+                    if ($amount <= 5)
+                    {
+                        unset ($columnAmounts[$columnName]);
+                    }
+                }
+
+                // recalculate the data summages
+                $data_sum = array_sum($columnAmounts);
+            }
+
+            // Now convert it to %
+            foreach ($columnAmounts as $columnName => $dataPoint)
+            {
+                $percent = round(($dataPoint / $data_sum) * 100, 2);
+
+                // Leave out 0%s !
+                if ($percent == 0)
+                {
+                    continue;
+                }
+
+                if (is_numeric($columnName) || is_double($columnName))
+                {
+                    $columnName = "\0" . $columnName;
+                }
+
+                // explode the string on the delimiter
+                $expl = explode('~=~', $columnName);
+
+                $generatedData[$expl[0]][] = array("name" => $expl[1], "y" => $percent);
+            }
+        }
+
+        else
         {
             // Get all of the custom data points
             $dataPoints = $graph->getPlugin()->getTimelineCustom($columnID, $minimum, $maximum);

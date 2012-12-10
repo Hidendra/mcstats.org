@@ -122,8 +122,10 @@ function outputGraphs($plugin)
     $floated = FALSE;
     foreach ($activeGraphs as $activeGraph)
     {
+        $safeName = urlencode(htmlentities($activeGraph->getDisplayName()));
         if (in_array($activeGraph->getName(), $combineGraphs))
         {
+            echo '<a id="' . $safeName . '"></a>';
             echo '<div id="CustomChart' . $index . '" style="height: 400px; width: 50%; float: left;"></div>';
             $floated = TRUE;
         } else
@@ -133,6 +135,7 @@ function outputGraphs($plugin)
                 echo '<div style="clear: both;"></div>';
             }
 
+            echo '<a id="' . $safeName . '"></a>';
             echo '<div id="CustomChart' . $index . '" style="height: 400px;"></div>';
         }
 
@@ -151,7 +154,7 @@ function outputGraphs($plugin)
         $activeGraph->setFeedURL(sprintf('https://mcstats.org/api/1.0/%s/graph/%s', urlencode(htmlentities($plugin->getName())), urlencode(htmlentities($activeGraph->getName()))));
 
         // ADD ALL OF THE SERIES PLOTS TO THE CHART
-        if ($activeGraph->getType() != GraphType::Pie)
+        if ($activeGraph->getType() != GraphType::Pie && $activeGraph->getType() != GraphType::Donut)
         {
             foreach ($activeGraph->getColumns() as $id => $columnName)
             {
@@ -163,81 +166,6 @@ function outputGraphs($plugin)
             $activeGraph->addSeries($series);
         } else // Pie chart
         {
-            /* $series = new HighRollerSeriesData();
-            $seriesData = array();
-
-            // the amounts for each column
-            $columnAmounts = array();
-
-            foreach ($activeGraph->getColumns() as $id => $columnName)
-            {
-                $columnAmounts[$columnName] = $activeGraph->getPlugin()->getTimelineCustomLast($id);
-            }
-
-            // Now begin our magic
-            asort($columnAmounts);
-
-            // Sum all of the points
-            $data_sum = array_sum($columnAmounts);
-
-            // remove low outlier data on large datasets
-            if ($data_sum > 1000)
-            {
-                foreach ($columnAmounts as $columnName => $amount)
-                {
-                    if ($amount <= 5)
-                    {
-                        unset ($columnAmounts[$columnName]);
-                    }
-                }
-
-                // recalculate the data summages
-                $data_sum = array_sum($columnAmounts);
-            }
-
-            $count = count($columnAmounts);
-            if ($count >= MINIMUM_FOR_OTHERS)
-            {
-                $others_total = 0;
-
-                foreach ($columnAmounts as $columnName => $amount)
-                {
-                    if ($count <= MINIMUM_FOR_OTHERS)
-                    {
-                        break;
-                    }
-
-                    $count--;
-                    $others_total += $amount;
-                    unset($columnAmounts[$columnName]);
-                }
-
-                // Set the 'Others' stat
-                $columnAmounts['Others'] = $others_total;
-
-                // Sort again
-                arsort($columnAmounts);
-            }
-
-            // Now convert it to %
-            foreach ($columnAmounts as $columnName => $dataPoint)
-            {
-                $percent = round(($dataPoint / $data_sum) * 100, 2);
-
-                // Leave out 0%s !
-                if ($percent == 0)
-                {
-                    continue;
-                }
-
-                if (is_numeric($columnName) || is_double($columnName))
-                {
-                    $columnName = "\0" . $columnName;
-                }
-
-                $seriesData[] = array($columnName, $percent);
-            } */
-
             // Finalize
             // $activeGraph->addSeries($series->addName('')->addData($seriesData));
             $series = new HighRollerSeriesData();
