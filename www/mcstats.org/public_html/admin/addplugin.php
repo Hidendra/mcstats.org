@@ -152,7 +152,7 @@ function send_add_plugin($plugin = '', $email = '', $dbo = '')
 
                 <div style="width: 50%;">
                     <p style="font-size:18px; font-weight:200; line-height:27px; text-align: center;">
-                        <b>BEFORE YOU USE THIS:</b> You must add your plugin to the backend. Please take a look at <a href="https://github.com/Hidendra/Plugin-Metrics/wiki/Usage">the wiki</a>
+                        <b>BEFORE YOU CAN REGISTER:</b> Your plugin already must have sent some data to our server, before you can register it. Refer to <a href="https://github.com/Hidendra/Plugin-Metrics/wiki/Usage">the wiki</a> for integrating MCStats in your plguin.
                     </p>
 
                     <p style="font-size:18px; font-weight:200; line-height:27px; text-align: center;">
