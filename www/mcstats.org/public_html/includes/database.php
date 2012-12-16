@@ -1,10 +1,6 @@
 <?php
 if (!defined('ROOT')) exit('For science.');
 
-// Profiling
-require 'profiler/PDOStatementProfiler.class.php';
-require 'profiler/PDOProfiler.class.php';
-
 /**
  * Global PDO object that is accessible after the database is connected to
  * @var PDO
@@ -44,15 +40,7 @@ function try_connect_database($dbtype = 'master')
     {
         // Profiling:
         // return new PDOProfiler("mysql:host={$db['hostname']};dbname={$db['dbname']}", $db['username'], $db['password']);
-        if (php_sapi_name() == 'cli')
-        {
-            return new PDO("mysql:host={$db['hostname']};dbname={$db['dbname']}", $db['username'], $db['password']);
-        } else
-        {
-            return new PDO("mysql:host={$db['hostname']};dbname={$db['dbname']}", $db['username'], $db['password'], array(
-                PDO::ATTR_PERSISTENT => true
-            ));
-        }
+        return new PDO("mysql:host={$db['hostname']};dbname={$db['dbname']}", $db['username'], $db['password']);
     } catch (PDOException $e)
     {
         error_log('Error while connecting to the database ' . $dbtype . ': <br/><b>' . $e->getMessage() . '</b>');

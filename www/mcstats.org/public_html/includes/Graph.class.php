@@ -221,11 +221,11 @@ class Graph
 
         $statement = $master_db_handle->prepare('INSERT INTO CustomData (Server, Plugin, ColumnID, DataPoint, Updated) VALUES (:Server, :Plugin, :ColumnID, :DataPoint, :Updated)
                                     ON DUPLICATE KEY UPDATE DataPoint = VALUES(DataPoint) , Updated = VALUES(Updated)');
-        $statement->bindValue(':Server', intval($server->getID()), PDO::PARAM_INT);
-        $statement->bindValue(':Plugin', intval($this->plugin->getID()), PDO::PARAM_INT);
-        $statement->bindValue(':ColumnID', intval($columnID), PDO::PARAM_INT);
-        $statement->bindValue(':DataPoint', intval($value), PDO::PARAM_INT);
-        $statement->bindValue(':Updated', time(), PDO::PARAM_INT);
+        $statement->bindValue(':Server', intval($server->getID()));
+        $statement->bindValue(':Plugin', intval($this->plugin->getID()));
+        $statement->bindValue(':ColumnID', intval($columnID));
+        $statement->bindValue(':DataPoint', intval($value));
+        $statement->bindValue(':Updated', time());
         $statement->execute();
     }
 

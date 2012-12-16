@@ -156,10 +156,10 @@ class Server
         }
 
         $statement = $master_db_handle->prepare('INSERT INTO VersionHistory (Plugin, Server, Version, Created) VALUES (:Plugin, :Server, :Version, :Created)');
-        $statement->bindValue(':Plugin', intval($this->plugin), PDO::PARAM_INT);
-        $statement->bindValue(':Server', intval($this->id), PDO::PARAM_INT);
-        $statement->bindValue(':Version', intval($versionID), PDO::PARAM_INT);
-        $statement->bindValue(':Created', time(), PDO::PARAM_INT);
+        $statement->bindValue(':Plugin', intval($this->plugin));
+        $statement->bindValue(':Server', intval($this->id));
+        $statement->bindValue(':Version', intval($versionID));
+        $statement->bindValue(':Created', time());
         $statement->execute();
     }
 
@@ -194,10 +194,10 @@ class Server
 
         // inserts or updates into the ServerPlugin table
         $statement = $master_db_handle->prepare('UPDATE ServerPlugin SET Version = :Version , Updated = :Updated WHERE Server = :Server AND Plugin = :Plugin');
-        $statement->bindValue(':Server', intval($this->getID()), PDO::PARAM_INT);
-        $statement->bindValue(':Plugin', intval($this->getPlugin()), PDO::PARAM_INT);
-        $statement->bindValue(':Updated', intval($this->getUpdated()), PDO::PARAM_INT);
-        $statement->bindValue(':Version', $this->getCurrentVersion(), PDO::PARAM_STR);
+        $statement->bindValue(':Server', intval($this->getID()));
+        $statement->bindValue(':Plugin', intval($this->getPlugin()));
+        $statement->bindValue(':Updated', intval($this->getUpdated()));
+        $statement->bindValue(':Version', $this->getCurrentVersion());
 
         // Execute
         $statement->execute();
