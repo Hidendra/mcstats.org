@@ -12,21 +12,29 @@ echo 1 > "$GENERATOR_FILE"
 echo 8 > "$GENERATOR_FILE"
 
 /usr/local/bin/php -q generators/global-statistics.php
-echo 20 > "$GENERATOR_FILE"
+echo 12 > "$GENERATOR_FILE"
 /usr/local/bin/php -q generators/custom.php
-echo 44 > "$GENERATOR_FILE"
+echo 20 > "$GENERATOR_FILE"
 /usr/local/bin/php -q generators/server-locations.php
-echo 56 > "$GENERATOR_FILE"
+echo 28 > "$GENERATOR_FILE"
 /usr/local/bin/php -q generators/version-trends.php
-echo 68 > "$GENERATOR_FILE"
+echo 36 > "$GENERATOR_FILE"
 /usr/local/bin/php -q generators/version-demographics.php
-echo 80 > "$GENERATOR_FILE"
+echo 44 > "$GENERATOR_FILE"
 /usr/local/bin/php -q generators/server-software.php
-echo 92 > "$GENERATOR_FILE"
+echo 52 > "$GENERATOR_FILE"
 /usr/local/bin/php -q generators/game-version.php
-echo 94 > "$GENERATOR_FILE"
+echo 60 > "$GENERATOR_FILE"
 /usr/local/bin/php -q generators/operating-system.php
-echo 98 > "$GENERATOR_FILE"
+echo 68 > "$GENERATOR_FILE"
+/usr/local/bin/php -q generators/java-version.php
+echo 76 > "$GENERATOR_FILE"
+/usr/local/bin/php -q generators/auth-mode.php
+echo 84 > "$GENERATOR_FILE"
+/usr/local/bin/php -q generators/system-arch.php
+echo 92 > "$GENERATOR_FILE"
+/usr/local/bin/php -q generators/system-cores.php
+echo 99 > "$GENERATOR_FILE"
 /usr/local/bin/php -q server-counts.php
 /usr/local/bin/php -q clear-cache.php
 

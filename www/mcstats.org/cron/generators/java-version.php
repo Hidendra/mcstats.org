@@ -15,8 +15,8 @@ function doGeneration($pluginId, $data)
 {
     global $countries, $baseEpoch;
     $plugin = loadPluginByID($pluginId);
-    $osname = $data['osname'];
-    $osversion = $data['osversion'];
+    $java_name = $data['java_name'];
+    $java_version = $data['java_version'];
     $sum = $data['Sum'];
     $count = $data['Count'];
     $avg = $data['Avg'];
@@ -25,17 +25,17 @@ function doGeneration($pluginId, $data)
     $variance = $data['Variance'];
     $stddev = $data['StdDev'];
 
-    $fullName = $osname . '~=~' . $osversion;
+    $fullName = $java_name . '~=~' . $java_version;
 
     if ($count == 0 || $sum == 0) {
         return;
     }
 
-    if ($osname == '' || $osname == 'Unknown' || $osversion == '' || $osversion == 'Unknown') {
+    if ($java_name == '' || $java_name == 'Unknown' || $java_version == '' || $java_version == 'Unknown') {
         return;
     }
 
-    $graph = $plugin->getOrCreateGraph('Operating System', false, 0, GraphType::Donut, TRUE, 9010);
+    $graph = $plugin->getOrCreateGraph('Java Version', false, 0, GraphType::Donut, TRUE, 9013);
     insertGraphDataScratch($graph, $pluginId, $fullName, $baseEpoch, $sum, $count, $avg, $max, $min, $variance, $stddev);
 }
 
@@ -43,8 +43,8 @@ function doGeneration($pluginId, $data)
 $statement = get_slave_db_handle()->prepare('
         SELECT
             Plugin,
-            osname,
-            osversion,
+            java_name,
+            java_version,
             SUM(1) AS Sum,
             COUNT(*) AS Count,
             AVG(1) AS Avg,
@@ -55,7 +55,7 @@ $statement = get_slave_db_handle()->prepare('
         FROM ServerPlugin
         LEFT OUTER JOIN Server ON Server.ID = ServerPlugin.Server
         WHERE Updated >= ?
-        GROUP BY Plugin, osname, osversion');
+        GROUP BY Plugin, java_name, java_version');
 $statement->execute(array($minimum));
 
 while ($row = $statement->fetch()) {
@@ -65,8 +65,8 @@ while ($row = $statement->fetch()) {
 // global plugin
 $statement = get_slave_db_handle()->prepare('
                     SELECT
-                        osname,
-                        osversion,
+                        java_name,
+                        java_version,
                         SUM(1) AS Sum,
                         COUNT(dev.Server) AS Count,
                         AVG(1) AS Avg,
@@ -75,12 +75,12 @@ $statement = get_slave_db_handle()->prepare('
                         VAR_SAMP(1) AS Variance,
                         STDDEV_SAMP(1) AS StdDev
                     FROM (
-                      SELECT DISTINCT Server, Server.Players, Server.osname AS osname, Server.osversion as osversion
+                      SELECT DISTINCT Server, Server.Players, Server.java_name AS java_name, Server.java_version as java_version
                       FROM ServerPlugin
                       LEFT OUTER JOIN Server ON Server.ID = ServerPlugin.Server
                       WHERE ServerPlugin.Updated >= ?
                     ) dev
-                    GROUP BY osname, osversion');
+                    GROUP BY java_name, java_version');
 $statement->execute(array($minimum));
 
 while ($row = $statement->fetch()) {
