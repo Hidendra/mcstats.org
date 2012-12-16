@@ -24,6 +24,10 @@ function doGeneration($pluginId, $data)
     $variance = $data['Variance'];
     $stddev = $data['StdDev'];
 
+    if (!isset($countries[$countryShortCode])) {
+        return;
+    }
+
     // get the full country name
     $fullName = $countries[$countryShortCode];
 
