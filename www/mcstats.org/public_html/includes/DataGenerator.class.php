@@ -102,6 +102,10 @@ class DataGenerator
 
                 $generatedData[] = array($columnName, $percent);
             }
+
+            if (count($generatedData) == 0) {
+                $generatedData[] = array('NO DATA', 100);
+            }
         }
 
         else if ($graph->getType() == GraphType::Donut)
@@ -125,14 +129,27 @@ class DataGenerator
             {
                 foreach ($columnAmounts as $columnName => $amount)
                 {
-                    if ($amount <= 5)
+                    $percent = round(($amount / $data_sum) * 100, 2);
+
+                    if ($percent <= 0.25)
                     {
+                        $expl = explode('~=~', $columnName);
                         unset ($columnAmounts[$columnName]);
+
+                        $otherName = $expl[0] . '~=~Others';
+                        if (!isset($columnAmounts[$otherName]))
+                        {
+                            $columnAmounts[$otherName] = 0;
+                        } else
+                        {
+                            $columnAmounts[$otherName] += round($percent * $data_sum / 100);
+                        }
                     }
                 }
 
                 // recalculate the data summages
                 $data_sum = array_sum($columnAmounts);
+                asort($columnAmounts);
             }
 
             // Now convert it to %

@@ -5,8 +5,11 @@
 #plugin-table {
     margin-left: 10px;
     width: 300px;
+    height: 630px;
+    overflow: hidden;
 }
 
 #graph-content {
-    margin-left: 320px;
+    width: auto;
+    overflow: hidden;
 }

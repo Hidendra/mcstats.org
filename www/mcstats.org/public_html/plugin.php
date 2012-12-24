@@ -43,7 +43,7 @@ echo '
                 var pluginName = "' . $pluginName . '";
             </script>
 
-            <div id="row-fluid" style="width: 100%">
+            <div id="row-fluid" style="width: 100%; float: left;">
 
                 <div class="span4" id="plugin-table">
                     <h3>Plugin information</h3>

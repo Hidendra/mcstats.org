@@ -116,6 +116,7 @@ function outputGraphs($plugin)
     // the 3 graphs to combine on the same row
     // these graphs are expected to be together in similar order even if they are mixed up
     $combineGraphs = array(
+        'Java Version', 'Operating System',
         'System Arch', 'System Cores',
         'Game Version', 'Server Software'
     );
