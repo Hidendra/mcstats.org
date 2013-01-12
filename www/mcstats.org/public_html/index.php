@@ -2,9 +2,9 @@
 define('ROOT', './');
 session_start();
 
-require_once ROOT . 'config.php';
-require_once ROOT . 'includes/database.php';
-require_once ROOT . 'includes/func.php';
+require_once ROOT . '../private_html/config.php';
+require_once ROOT . '../private_html/includes/database.php';
+require_once ROOT . '../private_html/includes/func.php';
 
 /// Templating
 $page_title = 'MCStats :: Homepage';
@@ -24,12 +24,13 @@ $serverCount = number_format($statement->fetch()[0]);
 $statement->execute(array($graph->getColumnID('Players'), $lastEpoch));
 $playerCount = number_format($statement->fetch()[0]);
 
-$statement = get_slave_db_handle()->prepare('SELECT COUNT(*) FROM Plugin where LastUpdated >= ?');
+$statement = get_slave_db_handle()->prepare('SELECT * FROM Plugin where LastUpdated >= ?');
 $statement->execute(array(normalizeTime() - SECONDS_IN_DAY));
 
-if ($row = $statement->fetch())
+$pluginCount = 0;
+while ($row = $statement->fetch())
 {
-    $pluginCount = $row[0];
+    $pluginCount ++;
 }
 
 // generally the time player count is is last 30-60 minutes, so get the real time for popover
@@ -43,50 +44,55 @@ echo <<<END
     });
 </script>
 
-<div class="hero-unit">
-    <h1 style="margin-bottom:10px; font-size:57px;">Glorious plugin stats.</h1>
-    <p>MCStats / Plugin Metrics is the de facto statistical engine for Minecraft, actively used by over <b>$pluginCount</b> plugins.</p>
-    <p>Across the world, over <b>$playerCount</b> players have been seen <b>in the last 30 minutes</b> on over <b>$serverCount</b> servers.</p>
-    <p><a href="/learn-more/" class="btn btn-success"><i class="icon-white icon-star-empty"></i> Learn More</a>  <a class="btn btn-primary" href="/plugin-list/"><i class="icon-white icon-th-list"></i> Plugin List</a></p>
+
+<div class="row-fluid">
+    <div class="hero-unit">
+        <h1 style="margin-bottom:10px; font-size:57px;">Glorious plugin stats.</h1>
+        <p>MCStats / Plugin Metrics is the de facto statistical engine for Minecraft, actively used by over <b>$pluginCount</b> plugins.</p>
+        <p>Across the world, over <b>$playerCount</b> players have been seen <b>in the last 30 minutes</b> on over <b>$serverCount</b> servers.</p>
+        <p><a href="/learn-more/" class="btn btn-success"><i class="icon-white icon-star-empty"></i> Learn More</a>  <a class="btn btn-primary" href="/plugin-list/"><i class="icon-white icon-th-list"></i> Plugin List</a></p>
+    </div>
 </div>
 
-<div class="row" style="text-align: center;">
+<div class="row-fluid" style="text-align: center;">
     <h1 style="margin-bottom:30px; font-size:40px;">4 of the top 100 plugins. Do you use them?</h1>
 </div>
 
-<div class="row" style="text-align: center;">
 END;
 
-$first = true;
+$first = TRUE;
 foreach (loadPlugins(PLUGIN_ORDER_RANDOM_TOP100, 4) as $plugin)
 {
     $name = htmlentities($plugin->getName());
-    $authors = htmlentities($plugin->getAuthors());
+    $encodedName = urlencode($name);
 
-    // check for spaces or commas (and if they exist, throw is (s) after Author
-    $author_prepend = '';
-    if (strstr($authors, ' ') !== FALSE || strstr($authors, ',') !== FALSE)
-    {
-        $author_prepend = '(s)';
+    if ($first) {
+        echo '<div class="row-fluid">';
     }
 
-    echo '
-    <div class="span3">
-        <h2 style="margin-bottom:7px;"><a style="color: inherit;" href="/plugin/' . $name . '" target="_blank"><b>' . $name . '</b></a></h2>
-        <p>
-            ' . (empty ($authors) ? '' : ('Author' . $author_prepend . ': ' . $authors)) . ' <br/>
-            Started ' . number_format($plugin->getGlobalHits()) . ' times <br/>
-            Servers (last 24 hrs): ' . number_format($plugin->getServerCount()) . '
-        </p>
-        <p>
-            <img src="/plugin-preview/' . $name . '" alt="' . $name . '" />
-        </p>
-        <p><a class="btn" href="/plugin/' . $name . '" target="_blank">More info &raquo;</a></p>
+    echo <<<END
+    <div class="span6">
+        <div class="widget-box">
+            <div class="widget-title">
+                                <span class="icon">
+                                    <i class="icon-signal"></i>
+                                    #{$plugin->getRank()}
+                                </span>
+                <h5><a href="/plugin/$encodedName">$name</a></h5>
+            </div>
+            <div class="widget-content" style="text-align: center;">
+                <img src="/plugin-preview/1.5/$encodedName.png" alt="$name" />
+            </div>
+        </div>
     </div>
-';
-    $first = false;
-}
+END;
 
-echo '</div>';
+    if (!$first) {
+        echo '</div>';
+        $first = TRUE;
+    } else {
+        $first = FALSE;
+    }
+}
 
 send_footer();

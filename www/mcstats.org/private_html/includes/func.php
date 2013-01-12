@@ -126,21 +126,65 @@ function outputGraphs($plugin)
     $floated = FALSE;
     foreach ($activeGraphs as $activeGraph)
     {
-        $safeName = urlencode(htmlentities($activeGraph->getDisplayName()));
+        // TODO not hardcoded ? heh
+        $activeGraph->setFeedURL(sprintf('https://mcstats.org/api/1.0/%s/graph/%s', urlencode(htmlentities($plugin->getName())), urlencode(htmlentities($activeGraph->getName()))));
+
+        $safeHTMLName = htmlentities($activeGraph->getDisplayName());
+        $safeName = urlencode($safeHTMLName);
+
+        $height = '450px';
+        if ($activeGraph->getType() == GraphType::Pie || $activeGraph->getType() == GraphType::Donut)
+        {
+            $height = '400px';
+        }
+
+        $jsLoader = 'retrieveGraphData(CustomChart' . $index . 'Options, ' . ($activeGraph->getHighstocksClassName() == 'highcharts' ? 'HIGHCHARTS' : 'HIGHSTOCKS') . ', "' . $activeGraph->getFeedURL() . '");';
         if (in_array($activeGraph->getName(), $combineGraphs))
         {
-            echo '<a id="' . $safeName . '"></a>';
-            echo '<div id="CustomChart' . $index . '" style="height: 400px; width: 50%; float: left;"></div>';
-            $floated = TRUE;
+            $reset = FALSE;
+            if (!$floated)
+            {
+                $floated = TRUE;
+                echo '<div class="row-fluid">';
+            } else
+            {
+                $reset = TRUE;
+            }
+            echo <<<END
+                        <div class="span6">
+                            <div class="widget-box">
+                                <a id="$safeName"></a>
+                                <div class="widget-title"><span class="icon"><i class="icon-signal"></i></span><h5><a href="#$safeName">$safeHTMLName</a></h5><div class="buttons"><a href="javascript:void;" class="btn btn-mini" onclick='$jsLoader'><i class="icon-refresh"></i> Update stats</a></div></div>
+                                <div class="widget-content">
+                                    <div id="CustomChart$index" style="height: $height;"></div>
+                                </div>
+                            </div>
+                        </div>
+
+END;
+            if ($reset)
+            {
+                echo '</div>';
+                $floated = FALSE;
+            }
         } else
         {
             if ($floated)
             {
-                echo '<div style="clear: both;"></div>';
+                echo '</div>';
             }
 
-            echo '<a id="' . $safeName . '"></a>';
-            echo '<div id="CustomChart' . $index . '" style="height: 400px;"></div>';
+            echo <<<END
+                        <div class="row-fluid widget-box">
+                            <a id="$safeName"></a>
+                            <div class="widget-title"><span class="icon"><i class="icon-signal"></i></span><h5><a href="#$safeName">$safeHTMLName</a></h5><div class="buttons"><a href="javascript:void;" class="btn btn-mini" onclick='$jsLoader'><i class="icon-refresh"></i> Update stats</a></div></div>
+                            <div class="widget-content">
+                                <div id="CustomChart$index" style="height: $height;"></div>
+                            </div>
+                        </div>
+
+END;
+
         }
 
         $index ++;
@@ -154,9 +198,6 @@ function outputGraphs($plugin)
     $index = 1; // WE GIVE A UNIQUE NUMBER TO EACH CHART
     foreach ($activeGraphs as $activeGraph)
     {
-        // TODO not hardcoded ? heh
-        $activeGraph->setFeedURL(sprintf('https://mcstats.org/api/1.0/%s/graph/%s', urlencode(htmlentities($plugin->getName())), urlencode(htmlentities($activeGraph->getName()))));
-
         // ADD ALL OF THE SERIES PLOTS TO THE CHART
         if ($activeGraph->getType() != GraphType::Pie && $activeGraph->getType() != GraphType::Donut)
         {
@@ -508,19 +549,19 @@ function countPlugins($order = PLUGIN_ORDER_POPULARITY)
     switch ($order)
     {
         case PLUGIN_ORDER_ALPHABETICAL:
-            $query = 'SELECT COUNT(*) FROM Plugin WHERE Parent = -1';
+            $query = 'SELECT * FROM Plugin WHERE Parent = -1';
             break;
 
         case PLUGIN_ORDER_POPULARITY:
-            $query = 'SELECT COUNT(*) FROM Plugin WHERE LastUpdated >= ? AND Plugin.Parent = -1';
+            $query = 'SELECT * FROM Plugin WHERE Plugin.Parent = -1';
             break;
 
         case PLUGIN_ORDER_RANDOM:
-            $query = 'SELECT COUNT(*) FROM Plugin WHERE Parent = -1';
+            $query = 'SELECT * FROM Plugin WHERE Parent = -1';
             break;
 
         case PLUGIN_ORDER_RANDOM_TOP100:
-            $query = 'SELECT COUNT(*) FROM Plugin WHERE Parent = -1 AND Rank <= 100';
+            $query = 'SELECT * FROM Plugin WHERE Parent = -1 AND Rank <= 100';
             break;
 
         default:
@@ -531,8 +572,12 @@ function countPlugins($order = PLUGIN_ORDER_POPULARITY)
     $statement = $db_handle->prepare($query);
     $statement->execute(array(normalizeTime() - SECONDS_IN_DAY));
 
-    $row = $statement->fetch();
-    return $row != null ? $row[0] : 0;
+    $pluginCount = 0;
+    while ($row = $statement->fetch())
+    {
+        $pluginCount ++;
+    }
+    return $pluginCount;
 }
 
 /**
@@ -669,7 +714,7 @@ function str_endswith($needle, $haystack)
  */
 function send_header()
 {
-    include ROOT . 'assets/template/header.php';
+    include ROOT . '../private_html/assets/template/header.php';
 }
 
 /**
@@ -677,7 +722,7 @@ function send_header()
  */
 function send_footer()
 {
-    include ROOT . 'assets/template/footer.php';
+    include ROOT . '../private_html/assets/template/footer.php';
 }
 
 
@@ -919,4 +964,18 @@ function epochToHumanString($epoch, $outputSeconds = TRUE)
     }
 
     return $ret;
+}
+
+function insert_cache_headers()
+{
+    global $config;
+    header('Expires: ' . gmdate('D, d M Y H:i:s \G\M\T', getLastGraphEpoch() + (60 * $config['graph']['interval'])));
+    header('Last-Modified: ' . gmdate('D, d M Y H:i:s \G\M\T', getLastGraphEpoch()));
+
+    if (isset($_SERVER['HTTP_IF_MODIFIED_SINCE'])) {
+        if (strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']) >= getLastGraphEpoch() && graph_generator_percentage() === NULL) {
+            header('HTTP/1.1 304 Not Modified');
+            exit;
+        }
+    }
 }

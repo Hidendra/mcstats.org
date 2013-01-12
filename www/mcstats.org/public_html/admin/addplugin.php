@@ -3,11 +3,13 @@
 define('ROOT', '../');
 session_start();
 
-require_once ROOT . 'config.php';
-require_once ROOT . 'includes/database.php';
-require_once ROOT . 'includes/func.php';
+require_once ROOT . '../private_html/config.php';
+require_once ROOT . '../private_html/includes/database.php';
+require_once ROOT . '../private_html/includes/func.php';
 
 ensure_loggedin();
+
+$breadcrumbs = '<a href="/admin/">Administration</a> <a href="/admin/add-plugin/" class="current">Add Plugin</a>';
 
 send_header();
 
@@ -152,11 +154,12 @@ function send_add_plugin($plugin = '', $email = '', $dbo = '')
 
                 <div style="width: 50%;">
                     <p style="font-size:18px; font-weight:200; line-height:27px; text-align: center;">
-                        <b>BEFORE YOU CAN REGISTER:</b> Your plugin already must have sent some data to our server, before you can register it. Refer to <a href="https://github.com/Hidendra/Plugin-Metrics/wiki/Usage">the wiki</a> for integrating MCStats in your plugin.
+                        <b>BEFORE YOU CAN ADD YOUR PLUGIN:</b> Your plugin must have already sent data to MCStats at least once. Refer to <a href="https://github.com/Hidendra/Plugin-Metrics/wiki/Usage">the wiki</a> for integrating M
+CStats into your plugin.
                     </p>
 
                     <p style="font-size:18px; font-weight:200; line-height:27px; text-align: center;">
-                        <b>NOTE:</b> All admin plugin additions are manually processed. <br/> If you enter an email address you will be notified via email once it has been processed.
+                        <b>ALSO NOTE:</b> All admin plugin additions are manually processed. <br/> If you enter an email address you will be notified via email once it has been processed.
                     </p>
 
                     <div class="well">

@@ -263,6 +263,23 @@ class Graph
     }
 
     /**
+     * Get the highstocks class name to use
+     * @return string
+     */
+    public function getHighstocksClassName()
+    {
+        switch ($this->type)
+        {
+            case GraphType::Pie:
+            case GraphType::Donut:
+                return 'highcharts';
+
+            default:
+                return 'highstock';
+        }
+    }
+
+    /**
      * Generate the graph to be printed out onto the page.
      * The generated code should be placed inside <script> tags.
      * @return string javascript
@@ -279,7 +296,7 @@ class Graph
         $chart = NULL;
 
         // The graphing classname to use
-        $classname = 'highstock';
+        $classname = $this->getHighstocksClassName();
 
         switch ($this->type)
         {
@@ -300,7 +317,6 @@ class Graph
             case GraphType::Pie:
             case GraphType::Donut:
                 $chart = new HighRollerPieChart();
-                $classname = 'highcharts';
                 break;
         }
 
@@ -317,20 +333,8 @@ class Graph
 
         // The title
         $safeName = htmlentities($this->displayName);
-        $chart->title->text = "<a href=\"#" . urlencode($safeName) . "\">" . $safeName . "</a>"; // $this->name;
-
-        // Subtitle
-        if ($this->plugin != null)
-        {
-            $chart->subtitle = array(
-                'text' => 'for ' . htmlentities($this->plugin->getName()) . ' via http://mcstats.org'
-            );
-        } else
-        {
-            $chart->subtitle = array(
-                'text' => 'via http://mcstats.org'
-            );
-        }
+        $chart->title->text = ' ';
+        $chart->subtitle = array('text' => '');
 
         // Disable credits
         $chart->credits = array('enabled' => false);
@@ -568,7 +572,6 @@ class Graph
 
         }
 
-        // Render it!!
         return $chart->renderChart($renderTo, $classname, $rawJavascript);
     }
 

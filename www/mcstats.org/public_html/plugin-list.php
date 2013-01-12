@@ -2,9 +2,9 @@
 define('ROOT', './');
 session_start();
 
-require_once ROOT . 'config.php';
-require_once ROOT . 'includes/database.php';
-require_once ROOT . 'includes/func.php';
+require_once ROOT . '../private_html/config.php';
+require_once ROOT . '../private_html/includes/database.php';
+require_once ROOT . '../private_html/includes/func.php';
 
 // Cache until the next interval
 header('Cache-Control: public, s-maxage=' . (timeUntilNextGraph() - time()));
@@ -34,50 +34,24 @@ if ($currentPage > $totalPages)
 
 /// Templating
 $page_title = 'MCStats :: Plugin List';
-$container_class = 'container-fluid';
+$breadcrumbs = '<a href="/plugin-list/" class="current">Plugin List</a>';
 send_header();
 
-echo '
-
-            <div class="row-fluid" style="text-align: center; margin-bottom: 15px;">
-                    <h2> MCStats / Plugin Metrics </h2>
-';
-
-// get last updated
-$timelast = getTimeLast();
-
-// display the time since the last graph update
-if($timelast > 0) {
-    $lastUpdate = floor($timelast / 60);
-    $nextUpdate = $config['graph']['interval'] - $lastUpdate;
-    if ($nextUpdate < 0)
-    {
-        $nextUpdate = 0;
-    }
-
-    echo '
-                    <p> Last update: ' . $lastUpdate . ' minutes ago <br/>
-                        Next update in: ' . $nextUpdate . ' minutes</p>
-';
-}
-
-// $output = $cache->get('plugin_list');
-$output = FALSE;
+$output = $cache->get('plugin_list');
 
 if (!$output)
 {
     ob_start();
 
     echo '
-            </div>
 
             <div class="row-fluid">
 
-                <div class="span4" style="width: 300px;">
+                <div class="span12 widget-content nopaddings" style="padding-left: 0;">
 
-                    <table class="table table-striped table-bordered table-condensed" id="plugin-list">
+                    <table class="table table-bordered table-condensed data-table" id="plugin-list">
                         <thead>
-                            <tr> <th style="text-align: center; width: 60px;">Rank <br/> &nbsp; </th> <th style="text-align: center; width: 170px;"> Plugin <br/> &nbsp; </th> <th style="text-align: center; width: 70px;"> Servers<br/> <span style="font-size: 10px;">(last 24 hrs)</span> </th> </tr>
+                            <tr> <th style="text-align: center; width: 15%;">Rank</th> <th style="text-align: center; width: 170px;">Plugin</th> <th style="text-align: center; width: 70px;">Servers</th> </tr>
                         </thead>
 
                         <tbody>
@@ -135,20 +109,13 @@ if (!$output)
     echo '
                     </table>
                 </div>
-
-                <div style="margin-left: 310px;">
 ';
 
-    // Load the global plugin
-    $globalPlugin = loadPluginByID(GLOBAL_PLUGIN_ID);
-    outputGraphs($globalPlugin);
-
-    echo '          </div>
-            </div>';
+    echo '  </div>';
 
     $output = ob_get_contents();
     ob_end_clean();
-    // $cache->set('plugin_list', $output, CACHE_UNTIL_NEXT_GRAPH);
+    $cache->set('plugin_list', $output, CACHE_UNTIL_NEXT_GRAPH);
 }
 
 echo $output;

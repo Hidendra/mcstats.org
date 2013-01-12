@@ -3,20 +3,14 @@
 define('ROOT', '../');
 session_start();
 
-require_once ROOT . 'config.php';
-require_once ROOT . 'includes/database.php';
-require_once ROOT . 'includes/func.php';
+require_once ROOT . '../private_html/config.php';
+require_once ROOT . '../private_html/includes/database.php';
+require_once ROOT . '../private_html/includes/func.php';
 
 ensure_loggedin();
 
 /// Is this an ajax call?
 $ajax = isset($_GET['ajax']) || isset($_SERVER['HTTP_X_PJAX']) || isset($_SERVER['X-PJAX']);
-
-// If not........
-if (!$ajax)
-{
-    send_header();
-}
 
 /// Check for the plugin in $_GET
 if (!isset($_GET['plugin']))
@@ -34,8 +28,19 @@ else
         err ('Invalid plugin.');
     }
 
+    $pluginName = htmlentities($plugin->getName());
+    $encodedName = urlencode($pluginName);
+
+    $breadcrumbs = '<a href="/admin/">Administration</a> <a href="/admin/plugin/' . $encodedName . '/view" class="current">Edit Plugin: ' . $pluginName . '</a>';
+
+    // If not........
+    if (!$ajax)
+    {
+        send_header();
+    }
+
     /// Can we access it?
-    elseif (!can_admin_plugin($plugin))
+    if (!can_admin_plugin($plugin))
     {
         err ('You do not have ownership access of that plugin!');
     }
@@ -54,7 +59,7 @@ else
     }
 ?>
 
-                    <div class="span4" style="margin-left: 10px; width: 320px;">
+                    <div class="span6 offset3">
 
                         <form action="/admin/plugin/<?php echo $plugin->getName(); ?>/update" method="post" class="form-horizontal">
                             <legend>
@@ -173,12 +178,6 @@ echo '
                             </div>
 
                         </form>
-
-                    </div>
-
-                    <div style="margin-left: 410px;">
-
-<?php outputGraphs($plugin); ?>
 
                     </div>
 

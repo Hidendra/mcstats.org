@@ -3,9 +3,9 @@
 define('ROOT', '../');
 session_start();
 
-require_once ROOT . 'config.php';
-require_once ROOT . 'includes/database.php';
-require_once ROOT . 'includes/func.php';
+require_once ROOT . '../private_html/config.php';
+require_once ROOT . '../private_html/includes/database.php';
+require_once ROOT . '../private_html/includes/func.php';
 
 if (is_loggedin())
 {
@@ -13,7 +13,7 @@ if (is_loggedin())
     exit;
 }
 
-send_header();
+admin_header();
 
 if (isset($_POST['submit']))
 {
@@ -22,9 +22,21 @@ if (isset($_POST['submit']))
     $password = $_POST['password'];
     $password2 = $_POST['password2'];
 
-    if (strlen($password) < 3 || $password != $password2  || $password == $username || !preg_match('/[a-zA-Z0-9 ]/', $username))
+    if (strlen($password) < 3)
     {
-        err ('Care to try again? :-)');
+        err ('Password is too short');
+        send_registration(htmlentities($username));
+    } elseif ($password != $password2)
+    {
+        err ('Passwords do not match');
+        send_registration(htmlentities($username));
+    } elseif ($password == $username)
+    {
+        err ('Password cannot equal your username');
+        send_registration(htmlentities($username));
+    } elseif (!preg_match('/[a-zA-Z0-9 ]/', $username))
+    {
+        err ('Usernames can only be alphanumeric (contains: A-Z,a-z,0-9)');
         send_registration(htmlentities($username));
     } else
     {
@@ -46,7 +58,7 @@ if (isset($_POST['submit']))
             $statement->execute(array($username, $hashed_password, time()));
 
             // Redirect them
-            echo '<div class="alert alert-success">Registration complete! If you are not automatically redirected, click <a href="/admin/">here</a></div>
+            echo '<div class="alert alert-success row-fluid" style="margin-left: 35%; width: 30%; text-align: center;">Registration complete! If you are not automatically redirected, click <a href="/admin/">here</a></div>
               <meta http-equiv="refresh" content="2; /admin/" /> ';
         }
     }
@@ -58,48 +70,73 @@ else
     send_registration();
 }
 
-send_footer();
+admin_footer();
 
 function send_registration($username = '')
 {
     echo '
-            <div class="row-fluid">
-
-                <div class="hero-unit">
-                    <div class="offset4">
-                        <p>Once you complete registration, you will be able to add plugins to your account.</p>
-
-                        <form action="" method="post" class="form-horizontal">
-                            <div class="control-group">
-                                <label class="control-label" for="username">Username</label>
-                                <div class="controls">
-                                    <input type="text" name="username" value="' . $username . '" />
-                                </div>
-                            </div>
-
-                            <div class="control-group">
-                                <label class="control-label" for="password">Password</label>
-                                <div class="controls">
-                                    <input type="password" name="password" />
-                                </div>
-                            </div>
-
-                            <div class="control-group">
-                                <label class="control-label" for="password2">Confirm password</label>
-                                <div class="controls">
-                                    <input type="password" name="password2" />
-                                </div>
-                            </div>
-
-                            <div class="control-group">
-                                <div class="controls">
-                                    <input type="submit" name="submit" value="Register" class="btn btn-success btn-large" />
-                                </div>
-                            </div>
-                        </form>
+        <div id="loginbox" style="height: 235px">
+            <form id="loginform" class="form-vertical" action="" method="post">
+				<p>You can add plugins once you have registered.</p>
+                <div class="control-group">
+                    <div class="controls">
+                        <div class="input-prepend">
+                            <span class="add-on"><i class="icon-user"></i></span><input type="text" name="username" placeholder="Username" />
+                        </div>
                     </div>
                 </div>
-
-            </div>
+                <div class="control-group">
+                    <div class="controls">
+                        <div class="input-prepend">
+                            <span class="add-on"><i class="icon-lock"></i></span><input type="password" name="password" placeholder="Password" />
+                        </div>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <div class="controls">
+                        <div class="input-prepend">
+                            <span class="add-on"><i class="icon-lock"></i></span><input type="password" name="password2" placeholder="Confirm password" />
+                        </div>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <span class="pull-left"><a href="login.php">Already have an account?</a></span>
+                    <span class="pull-right"><input type="submit" name="submit" class="btn btn-inverse" value="Register" /></span>
+                </div>
+            </form>
+        </div>
 ';
+}
+
+function admin_header()
+{
+    echo <<<END
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>MCStats :: Registration</title>
+		<meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link href="https://d2jz01fyat1phn.cloudfront.net/css/combined.css" rel="stylesheet" />
+        <link href="https://d2jz01fyat1phn.cloudfront.net/css/bootstrap-login.css" rel="stylesheet" />
+        <script src="https://d2jz01fyat1phn.cloudfront.net/javascript/jquery.js" type="text/javascript"></script>
+    </head>
+    <body>
+        <div id="logo">
+            <img src="https://d2jz01fyat1phn.cloudfront.net/img/logo.png" alt="" />
+        </div>
+
+
+END;
+
+}
+
+function admin_footer()
+{
+    echo <<<END
+    </body>
+</html>
+END;
+
 }

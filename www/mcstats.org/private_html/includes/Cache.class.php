@@ -45,6 +45,15 @@ class Cache
     }
 
     /**
+     * @return the prefix for cache values
+     */
+    public function getPrefix()
+    {
+        global $config;
+        return $config['cache']['prefix'];
+    }
+
+    /**
      * Connect to the caching engine
      */
     public function connect()
@@ -64,7 +73,7 @@ class Cache
             return null;
         }
 
-        return json_decode($this->handle->get($key));
+        return $this->handle->get($this->getPrefix() . $key);
     }
 
     /**
@@ -76,8 +85,6 @@ class Cache
      */
     public function set($key, $value, $expire = 0)
     {
-        global $config;
-
         if (!$this->isEnabled())
         {
             return FALSE;
@@ -89,7 +96,7 @@ class Cache
             $expire = strtotime('+30 minutes', getLastGraphEpoch());
         }
 
-        return $this->handle->set($key, json_encode($value), false, $expire);
+        return $this->handle->set($this->getPrefix() . $key, $value, false, $expire);
     }
 
 }

@@ -1,6 +1,6 @@
 <?php
 
-define('ROOT', '../public_html/');
+define('ROOT', '../private_html/');
 define('MAX_CHILDREN', 5);
 
 require_once ROOT . 'config.php';

@@ -1,12 +1,13 @@
 <?php
 define('ROOT', '../../');
 header('Access-Control-Allow-Origin: *');
+header('Content-type: application/json');
 
-require_once ROOT . 'config.php';
-require_once ROOT . 'includes/database.php';
-require_once ROOT . 'includes/func.php';
+require_once ROOT . '../private_html/config.php';
+require_once ROOT . '../private_html/includes/database.php';
+require_once ROOT . '../private_html/includes/func.php';
 
-header('Last-Modified: ' . gmdate('D, d M Y H:i:s', getLastGraphEpoch()) . ' GMT');
+insert_cache_headers();
 
 // Fine-tune this or allow customizations?
 $hours = 744;
@@ -137,7 +138,7 @@ switch ($graphName)
             }
 
             // now evict more data if necessary
-            if ($total > 10000) // TODO better magic number
+            if ($total > 5000 && count($response['data']) > 20) // TODO better magic numbers
             {
                 $removed_total = 0;
 
@@ -148,7 +149,7 @@ switch ($graphName)
                     $percent = ($value / $total) * 100;
 
                     // evict any data below 0.05%
-                    if ($percent <= 0.05)
+                    if ($percent <= 0.10)
                     {
                         unset($response['data'][$name]);
                     }

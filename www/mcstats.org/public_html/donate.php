@@ -2,42 +2,36 @@
 define('ROOT', './');
 session_start();
 
-require_once ROOT . 'config.php';
-require_once ROOT . 'includes/database.php';
-require_once ROOT . 'includes/func.php';
+require_once ROOT . '../private_html/config.php';
+require_once ROOT . '../private_html/includes/database.php';
+require_once ROOT . '../private_html/includes/func.php';
 
 /// Templating
 $page_title = 'MCStats :: Donate to MCStats';
-$container_class = 'container';
+$breadcrumbs = '<a href="/donate/" class="current">Donate</a>';
 send_header();
 
 echo '
 
-<div class="row" style="margin-left: 10%; text-align: center;">
-    <div class="span6" style="width: 80%;">
-        <h1 style="margin-bottom:30px; font-size:40px;">
-            Serving you rock solid stats.
-        </h1>
-    </div>
-</div>
-
-<div class="row" style="margin-left: 10%;">
-    <div class="span6 well" style="width: 80%;">
-        <p style="font-size: 16px;">
-            MCStats serves over <span style="font-weight:bold; font-size: 20px;">500 requests per second</span> 24 hours a day, 7 days a week
-        </p>
-        <p style="font-size: 16px;">
-            That is over <b><span style="font-size: 20px;">1.3 billion</span> requests per month</b> and over <b><span style="font-size: 20px;">45 million</span> requests each day</b> and it will only continue to rise.
-        </p>
-        <p>
-            Every single server is tracked. To get useful data for plugins, every server needs to be identified and from there
-            data is stored such as the plugins the server is using (that support MCStats), the amount of players online,
-            and even the Minecraft version the server is on.
-        </p>
-        <p>
-            And this is no simple task. It requires a lot of power and it also needs room for growth. Right now the service
-            is <b>entirely funded by myself, Hidendra</b>. MCStats has no sponsors or outside funding other than donations.
-        </p>';
+<div class="row-fluid">
+    <div class="widget-box span8 offset2">
+        <div class="widget-title"><span><i></i></span><h4 style="float: left; margin-left: 35%;">Serving you rock solid stats.</h4></div>
+        <div class="widget-content">
+            <p style="font-size: 16px;">
+                MCStats serves over <span style="font-weight:bold; font-size: 20px;">550 requests per second</span> 24 hours a day, 7 days a week
+            </p>
+            <p style="font-size: 16px;">
+                That is over <b><span style="font-size: 20px;">1.5 billion</span> requests per month</b> and over <b><span style="font-size: 20px;">50 million</span> requests each day</b> and it will only continue to rise.
+            </p>
+            <p>
+                Every single server is tracked. To get useful data for plugins, every server needs to be identified and from there
+                data is stored such as the plugins the server is using (that support MCStats), the amount of players online,
+                and even the Minecraft version the server is on.
+            </p>
+            <p>
+                This is no simple task. It requires a lot of power and it also needs room for growth. Right now the service
+                is <b>entirely funded by myself, Hidendra</b>. MCStats has no sponsors or outside funding other than occasional donations.
+            </p>';
 
 // appeal to their plugins they have if they are logged in
 if (is_loggedin() && ($pluginCount = count($plugins = get_accessible_plugins())) > 0)
@@ -49,18 +43,19 @@ if (is_loggedin() && ($pluginCount = count($plugins = get_accessible_plugins()))
     $plugin = $plugins[0];
 
     echo '
-        <p>
-            You have ' . $pluginCount . ' plugin' . ($pluginCount > 1 ? 's' : '') . ' that collect data from servers attached to MCStats / Plugin Metrics.
-            Even if you only have one plugin, or a dozen, you have still helped MCStats in a tremendous way by helping
-            it rise to where it is today. And I\'m sure this has also been mutual &mdash; this service has helped you
-            see live, real world statistics about your plugin that download counters can\'t give you.
-        </p>
+            <p>
+                You have ' . $pluginCount . ' plugin' . ($pluginCount > 1 ? 's' : '') . ' that collect' . ($pluginCount > 1 ? '' : 's') . ' data using MCStats.
+                Even if you only have one plugin, or a dozen, you have still helped MCStats in a tremendous way by helping
+                it rise to where it is today. And I\'m sure this has also been mutual &mdash; this service has helped you
+                see live, real world statistics about your plugin that download counters can\'t give you.
+            </p>
+        </div>
     </div>
 </div>
 <div class="row-fluid">
     <div style="text-align: center;">
         <p>
-            <img src="/signature/' . urlencode(htmlentities($plugin->getName())) . '.png" />
+            <img src="/signature/1.5/' . urlencode(htmlentities($plugin->getName())) . '.png" />
         </p>
 ';
 } else
@@ -76,7 +71,7 @@ if (is_loggedin() && ($pluginCount = count($plugins = get_accessible_plugins()))
 <div class="row">
     <div style="text-align: center;">
         <p>
-            <img src="/signature/all+servers.png" />
+            <img src="/signature/1.5/all+servers.png" />
         </p>
 ';
 }
@@ -99,6 +94,7 @@ echo '
         </form>
     </div>
 </div>
+<br/>
 
 ';
 

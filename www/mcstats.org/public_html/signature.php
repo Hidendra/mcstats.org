@@ -1,11 +1,16 @@
 <?php
+define('ROOT', './');
+header('Access-Control-Allow-Origin: *');
+
+require_once ROOT . '../private_html/config.php';
+require_once ROOT . '../private_html/includes/database.php';
+require_once ROOT . '../private_html/includes/func.php';
+
+ini_set('display_errors', 0);
+
+insert_cache_headers();
 
 define ('HOURS', 168);
-
-define ('ROOT', './');
-require_once ROOT . 'config.php';
-require_once ROOT . 'includes/database.php';
-require_once ROOT . 'includes/func.php';
 
 // set the search path for fonts
 putenv('GDFONTPATH=' . realpath('../fonts/'));
@@ -25,9 +30,9 @@ if (!isset($_GET['plugin']))
 }
 
 // Required requirements
-require 'pChart/pData.class.php';
-require 'pChart/pChart.class.php';
-require 'pChart/pCache.class.php';
+require ROOT . '../private_html/pChart/pData.class.php';
+require ROOT . '../private_html/pChart/pChart.class.php';
+require ROOT . '../private_html/pChart/pCache.class.php';
 
 // image modifier
 $scale = isset($_GET['scale']) ? $_GET['scale'] : 1;
@@ -87,7 +92,7 @@ foreach (DataGenerator::generateCustomChartData($globalstatistics, $playersColum
     $epoch = $data[0];
     $value = $data[1];
 
-    $graph_data[$epoch]['players'] = $value;
+    $playersX[] = $value;
 }
 
 foreach (DataGenerator::generateCustomChartData($globalstatistics, $serversColumnID, HOURS) as $data)
@@ -95,24 +100,8 @@ foreach (DataGenerator::generateCustomChartData($globalstatistics, $serversColum
     $epoch = $data[0];
     $value = $data[1];
 
-    $graph_data[$epoch]['servers'] = $value;
+    $serversX[] = $value;
 }
-
-foreach ($graph_data as $epoch => $data)
-{
-    // Ignore missing data
-    if (count($data) != 2)
-    {
-        continue;
-    }
-
-    // Add it
-    $playersX[] = $data['players'];
-    $serversX[] = $data['servers'];
-}
-
-// Free up some memory
-unset($graph_data);
 
 // Add the data to the graph
 $dataSet->AddPoint($playersX, 'Serie1');

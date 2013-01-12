@@ -1,5 +1,5 @@
 <?php
-define('ROOT', '../public_html/');
+define('ROOT', '../private_html/');
 
 require_once ROOT . 'config.php';
 require_once ROOT . 'includes/database.php';
