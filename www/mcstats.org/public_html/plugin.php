@@ -15,7 +15,12 @@ header('Cache-Control: public, s-maxage=' . (timeUntilNextGraph() - time()));
 
 if (!isset($_GET['plugin']))
 {
-    exit('ERR No plugin provided.');
+    $page_title = 'MCStats :: Invalid Plugin';
+    $breadcrumbs = '<a href="/" class="current">Invalid Plugin</a>';
+    send_header();
+    echo '<div class="alert alert-error" style="margin-top: 15px">Invalid plugin name provided!</div>';
+    send_footer();
+    exit;
 }
 
 // Load the plugin
@@ -24,7 +29,12 @@ $plugin = loadPlugin($_GET['plugin']);
 // Doesn't exist
 if ($plugin === NULL)
 {
-    exit('ERR Invalid plugin.');
+    $page_title = 'MCStats :: Invalid Plugin';
+    $breadcrumbs = '<a href="/" class="current">Invalid Plugin</a>';
+    send_header();
+    echo '<div class="alert alert-error" style="margin-top: 15px">Invalid plugin name provided!</div>';
+    send_footer();
+    exit;
 }
 
 // Get the plugin name
