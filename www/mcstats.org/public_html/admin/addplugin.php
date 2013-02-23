@@ -154,8 +154,7 @@ function send_add_plugin($plugin = '', $email = '', $dbo = '')
 
                 <div style="width: 50%;">
                     <p style="font-size:18px; font-weight:200; line-height:27px; text-align: center;">
-                        <b>BEFORE YOU CAN ADD YOUR PLUGIN:</b> Your plugin must have already sent data to MCStats at least once. Refer to <a href="https://github.com/Hidendra/Plugin-Metrics/wiki/Usage">the wiki</a> for integrating M
-CStats into your plugin.
+                        <b>BEFORE YOU CAN ADD YOUR PLUGIN:</b> Your plugin must have already sent data to MCStats at least once. Refer to <a href="https://github.com/Hidendra/Plugin-Metrics/wiki/Usage">the wiki</a> for integrating MCStats into your plugin.
                     </p>
 
                     <p style="font-size:18px; font-weight:200; line-height:27px; text-align: center;">
