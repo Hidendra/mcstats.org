@@ -152,6 +152,12 @@ class Graph
     private $scale;
 
     /**
+     * If the graph is halfwidth or not
+     * @var bool
+     */
+    private $halfwidth;
+
+    /**
      * The columns present in this graph
      * @var array
      */
@@ -169,7 +175,7 @@ class Graph
      */
     private $feedURL = '';
 
-    public function __construct($id = -1, $plugin = NULL, $type = GraphType::Line, $name = '', $displayName = '', $active = 0, $readonly = FALSE, $position = 1, $scale = 'linear')
+    public function __construct($id = -1, $plugin = NULL, $type = GraphType::Line, $name = '', $displayName = '', $active = 0, $readonly = FALSE, $position = 1, $scale = 'linear', $halfwidth = FALSE)
     {
         $this->id = $id;
         $this->plugin = $plugin;
@@ -180,6 +186,7 @@ class Graph
         $this->position = $position;
         $this->active = $active;
         $this->scale = $scale;
+        $this->halfwidth = $halfwidth;
 
         // If the display name is blank, use the internal name
         if ($displayName == '')
@@ -201,8 +208,8 @@ class Graph
     {
         global $master_db_handle;
 
-        $statement = $master_db_handle->prepare('UPDATE Graph SET DisplayName = ?, Type = ?, Active = ?, Readonly = ?, Position = ?, Scale = ? WHERE ID = ?');
-        $statement->execute(array($this->displayName, $this->type, $this->active, $this->readonly ? 1 : 0, $this->position, $this->scale, $this->id)); // TODO
+        $statement = $master_db_handle->prepare('UPDATE Graph SET DisplayName = ?, Type = ?, Active = ?, Readonly = ?, Position = ?, Scale = ?, Halfwidth = ? WHERE ID = ?');
+        $statement->execute(array($this->displayName, $this->type, $this->active, $this->readonly ? 1 : 0, $this->position, $this->scale, $this->halfwidth ? 1 : 0, $this->id)); // TODO
     }
 
     /**
@@ -732,6 +739,23 @@ class Graph
     public function getScale()
     {
         return $this->scale;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isHalfwidth()
+    {
+        return $this->halfwidth;
+    }
+
+    /**
+     * Set the halfwidth value for this graph
+     * @param $halfwidth
+     */
+    public function setHalfwidth($halfwidth)
+    {
+        $this->halfwidth = $halfwidth;
     }
 
     /**

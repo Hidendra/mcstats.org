@@ -114,8 +114,9 @@ END;
                     </ul>
                 </li>
                 <li class="submenu<?php if ($fileName == 'reports') echo ' active open'; ?>">
-                    <a href="#"><i class="icon icon-book"></i> <span>Reports</span> <span class="label">1</span></a>
+                    <a href="#"><i class="icon icon-book"></i> <span>Reports</span> <span class="label">2</span></a>
                     <ul>
+                        <li<?php if (isset($_GET['period']) && $_GET['period'] == 'december-2012') echo ' class="active"'; ?>><a href="/reports/january-2013/">January 2013</a></li>
                         <li<?php if (isset($_GET['period']) && $_GET['period'] == 'december-2012') echo ' class="active"'; ?>><a href="/reports/december-2012/">December 2012</a></li>
                     </ul>
                 </li>

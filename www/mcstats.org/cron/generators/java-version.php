@@ -35,7 +35,7 @@ function doGeneration($pluginId, $data)
         return;
     }
 
-    $graph = $plugin->getOrCreateGraph('Java Version', false, 0, GraphType::Donut, TRUE, 9013);
+    $graph = $plugin->getOrCreateGraph('Java Version', false, 1, GraphType::Donut, TRUE, 9013, TRUE);
     insertGraphDataScratch($graph, $pluginId, $fullName, $baseEpoch, $sum, $count, $avg, $max, $min, $variance, $stddev);
 }
 

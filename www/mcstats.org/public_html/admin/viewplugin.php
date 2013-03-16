@@ -31,7 +31,7 @@ else
     $pluginName = htmlentities($plugin->getName());
     $encodedName = urlencode($pluginName);
 
-    $breadcrumbs = '<a href="/admin/">Administration</a> <a href="/admin/plugin/' . $encodedName . '/view" class="current">Edit Plugin: ' . $pluginName . '</a>';
+    $breadcrumbs = '<a href="/admin/">Administration</a> <a href="/plugin/' . $encodedName . '">Plugin: ' . $pluginName . '</a> <a href="/admin/plugin/' . $encodedName . '/view" class="current">Edit Plugin</a>';
 
     // If not........
     if (!$ajax)
@@ -152,6 +152,16 @@ echo '
                                 <div class="controls">
                                     <label class="checkbox">
                                         <input type="checkbox" name="active[' . $id . ']" id="' . $id . '-active" value="1"' . ($isActive ? ' CHECKED' : '') . ($disabled ? ' disabled' : '') . '>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="control-group">
+                                <label class="control-label" for="' . $id . '-halfwidth">Half-width</label>
+
+                                <div class="controls">
+                                    <label class="checkbox">
+                                        <input type="checkbox" name="halfwidth[' . $id . ']" id="' . $id . '-halfwidth" value="1"' . ($graph->isHalfwidth() ? ' CHECKED' : '') . ($disabled ? ' disabled' : '') . '>
                                     </label>
                                 </div>
                             </div>

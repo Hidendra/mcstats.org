@@ -30,7 +30,7 @@
 
 <div class="row-fluid">
     <div class="alert alert-info span6 offset3 center" style="text-align: center;">
-        MySQL is currently doing things it shouldn't. Stay tuned!
+        Some misc overnight maintenance is being done. Apologies for the inconvenience, this should only be a one-time thing.
     </div>
 </div>
 

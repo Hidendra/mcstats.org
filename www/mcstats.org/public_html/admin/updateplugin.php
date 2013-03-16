@@ -64,6 +64,7 @@ if (isset($_POST['graph']))
         $active = isset($_POST['active'][$graphID]) ? $_POST['active'][$graphID] : 0;
         $scale = $_POST['scale'][$graphID];
         $position = $_POST['position'][$graphID];
+        $halfwidth = isset($_POST['halfwidth'][$graphID]) ? $_POST['halfwidth'][$graphID] : 0;
 
         // Validate active
         if ($active != 0 && $active != 1)
@@ -91,6 +92,7 @@ if (isset($_POST['graph']))
         $graph->setType($type);
         $graph->setActive($active);
         $graph->setScale($scale);
+        $graph->setHalfwidth($halfwidth);
 
         // Save the graph
         $graph->save();

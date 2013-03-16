@@ -113,14 +113,6 @@ function outputGraphs($plugin)
     /// Load all of the custom graphs for the plugin
     $activeGraphs = $plugin->getActiveGraphs();
 
-    // the 3 graphs to combine on the same row
-    // these graphs are expected to be together in similar order even if they are mixed up
-    $combineGraphs = array(
-        'Java Version', 'Operating System',
-        'System Arch', 'System Cores',
-        'Game Version', 'Server Software'
-    );
-
     /// Output a div for each one
     $index = 1;
     $floated = FALSE;
@@ -139,7 +131,7 @@ function outputGraphs($plugin)
         }
 
         $jsLoader = 'retrieveGraphData(CustomChart' . $index . 'Options, ' . ($activeGraph->getHighstocksClassName() == 'highcharts' ? 'HIGHCHARTS' : 'HIGHSTOCKS') . ', "' . $activeGraph->getFeedURL() . '");';
-        if (in_array($activeGraph->getName(), $combineGraphs))
+        if ($activeGraph->isHalfwidth())
         {
             $reset = FALSE;
             if (!$floated)

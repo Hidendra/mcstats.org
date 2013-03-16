@@ -27,7 +27,7 @@ function doGeneration($pluginId, $data)
         return;
     }
 
-    $graph = $plugin->getOrCreateGraph('Server Software', false, 1, GraphType::Pie, TRUE, 9002);
+    $graph = $plugin->getOrCreateGraph('Server Software', false, 1, GraphType::Pie, TRUE, 9002, TRUE);
     insertGraphDataScratch($graph, $pluginId, $software, $baseEpoch, $sum, $count, $avg, $max, $min, $variance, $stddev);
 }
 

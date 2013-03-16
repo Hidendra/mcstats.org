@@ -41,6 +41,12 @@ if ($plugin === NULL)
 $pluginName = htmlentities($plugin->getName());
 $encodedName = urlencode($pluginName); // encoded name, for use in signature url
 
+$more = '';
+
+if (is_loggedin() && in_array($plugin, get_accessible_plugins(false))) {
+    $more = '<li><a href="/admin/plugin/' . $encodedName . '/view">Edit in Admin Panel</a>';
+}
+
 /// Template hook
 $page_title = 'MCStats :: ' . $pluginName;
 $breadcrumbs = '<a href="/plugin/' . $encodedName . '" class="current">Plugin: ' . $pluginName . '</a>';
@@ -48,6 +54,7 @@ $sidebar_more = '
                 <li class="submenu active open">
                     <a href="#"><i class="icon icon-star"></i> <span>Plugin: <strong>' . $pluginName . '</strong></span></a>
                     <ul>
+                        ' . $more . '
                         <li><a>Added on: <strong>' . date('F d, Y', $plugin->getCreated()) . '</strong></a></li>
                         <li><a>Rank held for: <strong>' . epochToHumanString(time() - $plugin->getLastRankChange(), FALSE) . '</strong></a></li>
                         <li><a>Global starts: <strong>' . number_format($plugin->getGlobalHits()) . '</strong></a></li>
@@ -116,7 +123,7 @@ if (!$output)
     $statement = get_slave_db_handle()->prepare('select ColumnID, Sum from GraphData where Plugin = ? AND (ColumnID = ? OR ColumnID = ?) AND Epoch >= ? order by Epoch DESC limit 10');
 
     //
-    $statement->execute(array($plugin->getID(), $servers_column, $players_column, time() - SECONDS_IN_DAY));
+    $statement->execute(array($plugin->getID(), $servers_column, $players_column, time() - SECONDS_IN_DAY * 5));
     while ($row = $statement->fetch()) {
         if ($servers_column == $row['ColumnID']) {
             $servers_graph[] = $row['Sum'];

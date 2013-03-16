@@ -25,6 +25,11 @@ if (!isset($_GET['period'])) {
             $file = 'december_2012.php';
             $page_title = 'MCStats :: December 2012 Report';
             break;
+        case 'january-2013':
+            $name = 'January 2013';
+            $file = 'january_2013.php';
+            $page_title = 'MCStats :: January 2013 Report';
+            break;
     }
 
     if ($file == NULL) {

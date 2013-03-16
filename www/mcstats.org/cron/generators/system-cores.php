@@ -30,7 +30,7 @@ function doGeneration($pluginId, $data)
         return;
     }
 
-    $graph = $plugin->getOrCreateGraph('System Cores', false, 0, GraphType::Pie, TRUE, 9012);
+    $graph = $plugin->getOrCreateGraph('System Cores', false, 1, GraphType::Pie, TRUE, 9012, TRUE);
     insertGraphDataScratch($graph, $pluginId, $fullName, $baseEpoch, $sum, $count, $avg, $max, $min, $variance, $stddev);
 }
 

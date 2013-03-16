@@ -97,10 +97,10 @@ class DataGenerator
 
                 if (is_numeric($columnName) || is_double($columnName))
                 {
-                    $columnName = "\0" . $columnName;
+                    // $columnName = "\0" . $columnName;
                 }
 
-                $generatedData[] = array($columnName, $percent);
+                $generatedData[] = array($columnName . ' (' . $dataPoint . ')', $percent);
             }
 
             if (count($generatedData) == 0) {
@@ -165,13 +165,13 @@ class DataGenerator
 
                 if (is_numeric($columnName) || is_double($columnName))
                 {
-                    $columnName = "\0" . $columnName;
+                    // $columnName = "\0" . $columnName;
                 }
 
                 // explode the string on the delimiter
                 $expl = explode('~=~', $columnName);
 
-                $generatedData[$expl[0]][] = array("name" => $expl[1], "y" => $percent);
+                $generatedData[$expl[0]][] = array("name" => $expl[1] . ' (' . $dataPoint . ')', "y" => $percent);
             }
         }
 
