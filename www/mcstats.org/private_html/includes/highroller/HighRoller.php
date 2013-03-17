@@ -162,7 +162,7 @@ class HighRoller
      * @param chart the chart to generate, either highcharts or highstock
      * @return string - highcharts!
      */
-    function renderChart($renderTo, $chart = 'highcharts', $rawJavascript = '', $engine = 'jquery')
+    function renderChart($renderTo, $chart = 'highcharts', $rawJavascript = '', $engine = 'jquery', $graphType = '')
     {
         $options = new HighRollerOptions(); // change file/class name to new HighRollerGlobalOptions()
 
@@ -188,7 +188,11 @@ class HighRoller
         // $chartJS .= "\n\n    // HIGHROLLER - HIGHCHARTS '" . $this->title->text . "' " . $this->chart->type . " chart";
         $chartJS .= "\n    " . $this->chart->renderTo . "Options = " . $this->getChartOptionsObject() . ";";
         $chartJS .= $rawJavascript;
-        $chartJS .= "${renderTo}Obj = new Highcharts.$classname(" . $this->chart->renderTo . "Options);";
+
+        if ($graphType != GraphType::Map)
+        {
+            $chartJS .= "${renderTo}Obj = new Highcharts.$classname(" . $this->chart->renderTo . "Options);";
+        }
 
         // request rendering via feed URL if it was supplied
         if (!empty($this->feedurl))

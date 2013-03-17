@@ -2,7 +2,7 @@
 
                 <div class="row-fluid">
                     <div id="footer" class="span12">
-                        <p> MCStats backend created by Hidendra. Plugins are owned by their respective authors. </p>
+                        <p> MCStats service created & maintained by <a href="mailto:hidendra@mcstats.org">Hidendra</a>. Plugins are owned by their respective authors. </p>
                         <p>  <a href="/donate/"><i class="icon-heart"></i> Donate</a> | <a href="http://github.com/Hidendra/mcstats.org">github</a> | <a href="irc://irc.esper.net/metrics">irc.esper.net #metrics</a> </p>
                     </div>
                 </div>

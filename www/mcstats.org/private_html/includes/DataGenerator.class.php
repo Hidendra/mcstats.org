@@ -197,4 +197,27 @@ class DataGenerator
         return $generatedData;
     }
 
+    /**
+     * Generate data required for a geochart for a plugin
+     * @param $plugin Plugin
+     * @return the data
+     */
+    public function generateGeoChartData($plugin)
+    {
+        $data = array();
+        $locations = $plugin->getGraphByName('Server Locations');
+
+        $data[] = array('Country', 'Servers');
+
+        foreach ($locations->getColumns() as $id => $country) {
+            $count = $plugin->getTimelineCustomLast($id);
+
+            if ($count > 0) {
+                $data[] = array($country, $count);
+            }
+        }
+
+        return $data;
+    }
+
 }

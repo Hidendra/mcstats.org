@@ -203,6 +203,18 @@ function retrieveGraphData(options, framework, feedurl)
             }];
         }
 
+        else if (json.type == "Map") {
+            var renderTo = options.chart.renderTo;
+            var googOptions = {
+                backgroundColor: {
+                    fill: 'transparent'
+                }
+            };
+
+            var chart = new google.visualization.GeoChart(document.getElementById(renderTo));
+            chart.draw(google.visualization.arrayToDataTable(json.data), googOptions);
+        }
+
         else if (json.type == "Donut") {
             var colors = [ "#4572A7", "#AA4643", "#89A54E", "#80699B", "#3D96AE", "#DB843D", "#92A8CD", "#A47D7C","#B5CA92" ]; // Highcharts.getOptions().colors;
             var inner = [];
@@ -278,11 +290,13 @@ function retrieveGraphData(options, framework, feedurl)
             }
         }
 
-        // now regenerate the graph
-        if (framework == HIGHSTOCKS) {
-            new Highcharts.StockChart(options);
-        } else {
-            new Highcharts.Chart(options);
+        if (options.chart.type != "map") {
+            // now regenerate the graph
+            if (framework == HIGHSTOCKS) {
+                new Highcharts.StockChart(options);
+            } else {
+                new Highcharts.Chart(options);
+            }
         }
     });
 

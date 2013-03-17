@@ -26,7 +26,9 @@ $fileName = strtolower(substr($fileNameWithExt, 0, strpos($fileNameWithExt, '.')
         <link href="https://d2jz01fyat1phn.cloudfront.net/css/combined.css" rel="stylesheet" />
 
         <!-- jquery, main, bootstrap -->
-        <script src="https://d2jz01fyat1phn.cloudfront.net/javascript/bootstrap-combined-jquery.js" type="text/javascript"></script>
+        <script src="https://d2jz01fyat1phn.cloudfront.net/javascript/full-2013-3-17.js" type="text/javascript"></script>
+
+        <script type='text/javascript' src='https://www.google.com/jsapi'></script>
 
         <script type="text/javascript">
             // Google analytics
@@ -41,6 +43,8 @@ $fileName = strtolower(substr($fileNameWithExt, 0, strpos($fileNameWithExt, '.')
                 ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
                 var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
             })();
+
+            google.load('visualization', '1', {'packages': ['geochart']});
         </script>
     </head> <?php flush(); ?>
 

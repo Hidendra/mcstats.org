@@ -108,6 +108,14 @@ switch ($graphName)
             $response['type'] = GraphType::toString($graph->getType());
         }
 
+        else if ($graph->getType() == GraphType::Map)
+        {
+            $response['status'] = 'ok';
+            $response['data'] = DataGenerator::generateGeoChartData($plugin);
+            $response['name'] = htmlentities($graph->getName());
+            $response['type'] = GraphType::toString($graph->getType());
+        }
+
         // otherwise we need to generate data for every column
         else
         {

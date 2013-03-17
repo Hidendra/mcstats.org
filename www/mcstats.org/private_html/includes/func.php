@@ -128,6 +128,9 @@ function outputGraphs($plugin)
         if ($activeGraph->getType() == GraphType::Pie || $activeGraph->getType() == GraphType::Donut)
         {
             $height = '400px';
+        } else if ($activeGraph->getType() == GraphType::Map)
+        {
+            $height = '750px';
         }
 
         $jsLoader = 'retrieveGraphData(CustomChart' . $index . 'Options, ' . ($activeGraph->getHighstocksClassName() == 'highcharts' ? 'HIGHCHARTS' : 'HIGHSTOCKS') . ', "' . $activeGraph->getFeedURL() . '");';

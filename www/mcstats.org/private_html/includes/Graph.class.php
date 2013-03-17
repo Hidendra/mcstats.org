@@ -43,6 +43,11 @@ abstract class GraphType
      */
     const Donut = 6;
 
+    /**
+     * Geomap
+     */
+    const Map = 7;
+
     public static function toString($type)
     {
         switch ($type)
@@ -67,6 +72,9 @@ abstract class GraphType
 
             case GraphType::Donut:
                 return "Donut";
+
+            case GraphType::Map:
+                return "Map";
 
             default:
                 return 'UNDEFINED';
@@ -325,6 +333,11 @@ class Graph
             case GraphType::Donut:
                 $chart = new HighRollerPieChart();
                 break;
+
+            case GraphType::Map:
+                $chart = new HighRollerSplineChart();
+                $chart->chart->type = 'map';
+                break;
         }
 
         // Nothing we can do if it's still null
@@ -579,7 +592,7 @@ class Graph
 
         }
 
-        return $chart->renderChart($renderTo, $classname, $rawJavascript);
+        return $chart->renderChart($renderTo, $classname, $rawJavascript, 'jquery', $this->type);
     }
 
     /**
