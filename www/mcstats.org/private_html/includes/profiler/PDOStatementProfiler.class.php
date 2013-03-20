@@ -1,8 +1,7 @@
 <?php
 
 
-class PDOStatementProfiler extends PDOStatement
-{
+class PDOStatementProfiler extends PDOStatement {
     /**
      * The database handle
      * @var PDO
@@ -13,8 +12,7 @@ class PDOStatementProfiler extends PDOStatement
         $this->dbh = $dbh;
     }
 
-    public function execute(array $input_parameters = NULL)
-    {
+    public function execute(array $input_parameters = null) {
         $start = millitime();
         $ret = parent::execute($input_parameters);
         function_log('PDOStatement->execute()', millitime() - $start);

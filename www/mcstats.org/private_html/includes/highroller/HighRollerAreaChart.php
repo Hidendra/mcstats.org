@@ -22,11 +22,9 @@
  *
  */
 
-class HighRollerAreaChart extends HighRoller
-{
+class HighRollerAreaChart extends HighRoller {
 
-    function __construct()
-    {
+    function __construct() {
         parent::__construct();
         $this->chart->type = 'area';
 //    $this->chart->alignTicks = true;

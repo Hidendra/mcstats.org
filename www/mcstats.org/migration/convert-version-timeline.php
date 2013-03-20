@@ -20,7 +20,7 @@ foreach ($plugins as $plugin) {
     echo sprintf('[%d%%] Converting %s from VersionTimeline to the unified graphing format ..%s', floor(($index / $total) * 100), $plugin->getName(), PHP_EOL);
 
     // get or create the graph
-    $versiontrends = $plugin->getOrCreateGraph('Version Trends', false, 1, GraphType::Area, TRUE);
+    $versiontrends = $plugin->getOrCreateGraph('Version Trends', false, 1, GraphType::Area, true);
 
     $master_db_handle->beginTransaction();
     foreach ($plugin->getVersions() as $versionID => $versionName) {

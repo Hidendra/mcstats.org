@@ -6,8 +6,7 @@ const CACHE_UNTIL_NEXT_GRAPH = -25;
 /**
  * Handles caching, by default with memcached
  */
-class Cache
-{
+class Cache {
 
     /**
      * The handle to the caching object
@@ -15,14 +14,11 @@ class Cache
      */
     private $handle;
 
-    public function __construct($handle = null)
-    {
-        if ($handle === NULL && $this->isEnabled())
-        {
+    public function __construct($handle = null) {
+        if ($handle === null && $this->isEnabled()) {
             $this->handle = new Memcache();
             $this->handle->addServer('127.0.0.1', 11211);
-        } else
-        {
+        } else {
             $this->handle = $handle;
         }
     }
@@ -30,16 +26,14 @@ class Cache
     /**
      * Get the caching daemon handle
      */
-    public function handle()
-    {
+    public function handle() {
         return $this->handle;
     }
 
     /**
      * @return TRUE if caching is enabled, otherwise FALSE
      */
-    public function isEnabled()
-    {
+    public function isEnabled() {
         global $config;
         return $config['cache']['enabled'];
     }
@@ -47,8 +41,7 @@ class Cache
     /**
      * @return the prefix for cache values
      */
-    public function getPrefix()
-    {
+    public function getPrefix() {
         global $config;
         return $config['cache']['prefix'];
     }
@@ -56,8 +49,7 @@ class Cache
     /**
      * Connect to the caching engine
      */
-    public function connect()
-    {
+    public function connect() {
         // nothing needed for Memcache
     }
 
@@ -66,10 +58,8 @@ class Cache
      * @param $key string
      * @return object The result
      */
-    public function get($key)
-    {
-        if (!$this->isEnabled())
-        {
+    public function get($key) {
+        if (!$this->isEnabled()) {
             return null;
         }
 
@@ -83,16 +73,13 @@ class Cache
      * @param $expire int The number of seconds to expire in, 0 for forever
      * @return TRUE on success and FALSE on failure
      */
-    public function set($key, $value, $expire = 0)
-    {
-        if (!$this->isEnabled())
-        {
-            return FALSE;
+    public function set($key, $value, $expire = 0) {
+        if (!$this->isEnabled()) {
+            return false;
         }
 
         // Check for flags
-        if ($expire == CACHE_UNTIL_NEXT_GRAPH)
-        {
+        if ($expire == CACHE_UNTIL_NEXT_GRAPH) {
             $expire = strtotime('+30 minutes', getLastGraphEpoch());
         }
 

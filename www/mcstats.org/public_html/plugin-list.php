@@ -12,8 +12,7 @@ header('Cache-Control: public, s-maxage=' . (timeUntilNextGraph() - time()));
 // get the current page
 $currentPage = 1;
 
-if (isset($_GET['page']))
-{
+if (isset($_GET['page'])) {
     $currentPage = intval($_GET['page']);
 }
 
@@ -26,8 +25,7 @@ $totalPages = ceil(countPlugins(PLUGIN_ORDER_POPULARITY) / PLUGIN_LIST_RESULTS_P
 // offset is how many plugins to start after
 $offset = ($currentPage - 1) * PLUGIN_LIST_RESULTS_PER_PAGE;
 
-if ($currentPage > $totalPages)
-{
+if ($currentPage > $totalPages) {
     header('Location: /plugin-list/' . $totalPages . '/');
     exit;
 }
@@ -39,8 +37,7 @@ send_header();
 
 $output = $cache->get('plugin_list');
 
-if (!$output)
-{
+if (!$output) {
     ob_start();
 
     echo '
@@ -58,8 +55,7 @@ if (!$output)
 ';
 
     $step = 1;
-    foreach (loadPlugins(PLUGIN_ORDER_POPULARITY, PLUGIN_LIST_RESULTS_PER_PAGE, $offset) as $plugin)
-    {
+    foreach (loadPlugins(PLUGIN_ORDER_POPULARITY, PLUGIN_LIST_RESULTS_PER_PAGE, $offset) as $plugin) {
         if ($plugin->isHidden()) {
             continue;
         }
@@ -76,26 +72,19 @@ if (!$output)
         }
 
         // increase
-        if ($plugin->getRank() < $plugin->getLastRank())
-        {
+        if ($plugin->getRank() < $plugin->getLastRank()) {
             $rank .= ' <i class="fam-arrow-up" title="Increased from ' . $plugin->getLastRank() . ' (+' . ($plugin->getLastRank() - $plugin->getRank()) . ')"></i>';
-        }
-
-        // decrease
-        elseif ($plugin->getRank() > $plugin->getLastRank())
-        {
+        } // decrease
+        elseif ($plugin->getRank() > $plugin->getLastRank()) {
             $rank .= ' <i class="fam-arrow-down" title="Decreased from ' . $plugin->getLastRank() . ' (-' . ($plugin->getRank() - $plugin->getLastRank()) . ')"></i>';
-        }
-
-        // no change
-        else
-        {
+        } // no change
+        else {
             $rank .= ' <i class="fam-bullet-blue" title="No change"></i>';
         }
 
         echo '                          <tr id="plugin-list-item"> <td style="text-align: center;">' . $rank . ' </td> <td> <a href="/plugin/' . htmlentities($plugin->getName()) . '" target="_blank">' . $pluginName . '</a> </td> <td style="text-align: center;"> ' . $format . ' </td> </tr>
 ';
-        $step ++;
+        $step++;
     }
 
     echo '                          <tr>

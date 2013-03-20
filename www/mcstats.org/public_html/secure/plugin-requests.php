@@ -6,8 +6,7 @@ require_once ROOT . '../private_html/config.php';
 require_once ROOT . '../private_html/includes/database.php';
 require_once ROOT . '../private_html/includes/func.php';
 
-if (isset($_POST['submit']))
-{
+if (isset($_POST['submit'])) {
     require_once 'Mail.php'; // pear-Mail
     require_once 'Mail/mime.php';
 
@@ -20,8 +19,7 @@ if (isset($_POST['submit']))
     // load the plugin
     $plugin = loadPluginByID($pluginID);
 
-    if ($approved)
-    {
+    if ($approved) {
         $statement = $master_db_handle->prepare('UPDATE AuthorACL SET Pending = 0 WHERE Author = ? AND Plugin = ?');
         $statement->execute(array($authorID, $pluginID));
     } else {
@@ -34,13 +32,11 @@ if (isset($_POST['submit']))
     $statement->execute(array($authorID, $pluginID));
 
     // Should we send an email ?
-    if (!empty($email))
-    {
+    if (!empty($email)) {
         // email params
         $pluginName = htmlentities($plugin->getName());
         $subject = sprintf('Plugin approval for %s: %s', $pluginName, $approved ? 'Approved!' : 'Rejected');
-        if ($approved)
-        {
+        if ($approved) {
             $body = <<<END
             <p style="margin:0 0 9px;font-size: 16px;">
                 Hello,
@@ -118,9 +114,8 @@ $body
 END;
 
 
-
         // email them
-        $headers = array ('From' => 'Tyler Blair <noreply@mcstats.org>', 'To' => $email, 'Subject' => $subject);
+        $headers = array('From' => 'Tyler Blair <noreply@mcstats.org>', 'To' => $email, 'Subject' => $subject);
         $smtp = Mail::factory('smtp', array(
             'host' => 'ssl://smtp.gmail.com',
             'port' => '465',
@@ -139,8 +134,7 @@ END;
         // send the email
         $mail = $smtp->send($email, $mime->headers($headers), $mime->get());
 
-        if (PEAR::isError($mail))
-        {
+        if (PEAR::isError($mail)) {
             error_log('SMTP error: ' . $mail->getMessage());
         }
     }
@@ -185,8 +179,7 @@ $statement = get_slave_db_handle()->prepare('SELECT
                                     ORDER BY PluginRequest.Created ASC');
 $statement->execute();
 
-while ($row = $statement->fetch())
-{
+while ($row = $statement->fetch()) {
     $authorID = $row['AuthorID'];
     $authorName = $row['AuthorName'];
     $email = $row['Email'];
@@ -196,11 +189,9 @@ while ($row = $statement->fetch())
     // resolve the plugin
     $plugin = resolvePlugin($row);
 
-    if (strstr($dbo, 'http') !== FALSE || strstr($dbo, 'com') !== FALSE || strstr($dbo, 'org'))
-    {
+    if (strstr($dbo, 'http') !== false || strstr($dbo, 'com') !== false || strstr($dbo, 'org')) {
         $dbo_link = '<a href="' . htmlentities($dbo) . '" target="_blank">' . htmlentities($dbo) . '</a>';
-    } else
-    {
+    } else {
         $dbo_link = htmlentities($dbo);
     }
 
@@ -227,10 +218,10 @@ while ($row = $statement->fetch())
                     ' . htmlentities($email) . '
                 </td>
                 <td>
-                    ' . epochToHumanString(time() - $created, FALSE) . ' ago
+                    ' . epochToHumanString(time() - $created, false) . ' ago
                 </td>
                 <td>
-                    ' . epochToHumanString(time() - $plugin->getCreated(), FALSE) . ' ago
+                    ' . epochToHumanString(time() - $plugin->getCreated(), false) . ' ago
                 </td>
                 <td>
                     <form action="" method="POST">

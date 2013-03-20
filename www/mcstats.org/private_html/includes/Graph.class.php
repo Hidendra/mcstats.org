@@ -1,12 +1,13 @@
 <?php
-if (!defined('ROOT')) exit('For science.');
+if (!defined('ROOT')) {
+    exit('For science.');
+}
 
 /**
  * What type of graph to generate
  * Abstract is to prevent instantiation or inheritance
  */
-abstract class GraphType
-{
+abstract class GraphType {
 
     /**
      * A line graph
@@ -48,10 +49,8 @@ abstract class GraphType
      */
     const Map = 7;
 
-    public static function toString($type)
-    {
-        switch ($type)
-        {
+    public static function toString($type) {
+        switch ($type) {
             case GraphType::Line:
                 return "Line";
 
@@ -86,8 +85,7 @@ abstract class GraphType
 /**
  * The graph scale a graph should use
  */
-abstract class GraphScale
-{
+abstract class GraphScale {
 
     /**
      * Linear graph scale
@@ -102,8 +100,7 @@ abstract class GraphScale
 }
 
 /// TODO save()
-class Graph
-{
+class Graph {
 
     /**
      * The graph's internal id
@@ -183,8 +180,7 @@ class Graph
      */
     private $feedURL = '';
 
-    public function __construct($id = -1, $plugin = NULL, $type = GraphType::Line, $name = '', $displayName = '', $active = 0, $readonly = FALSE, $position = 1, $scale = 'linear', $halfwidth = FALSE)
-    {
+    public function __construct($id = -1, $plugin = null, $type = GraphType::Line, $name = '', $displayName = '', $active = 0, $readonly = false, $position = 1, $scale = 'linear', $halfwidth = false) {
         $this->id = $id;
         $this->plugin = $plugin;
         $this->type = $type;
@@ -197,13 +193,11 @@ class Graph
         $this->halfwidth = $halfwidth;
 
         // If the display name is blank, use the internal name
-        if ($displayName == '')
-        {
+        if ($displayName == '') {
             $this->displayName = $name;
         }
 
-        if ($this->id >= 0)
-        {
+        if ($this->id >= 0) {
             // Load the columns present in the graph
             $this->loadColumns();
         }
@@ -212,8 +206,7 @@ class Graph
     /**
      * Save the graph to the database
      */
-    public function save()
-    {
+    public function save() {
         global $master_db_handle;
 
         $statement = $master_db_handle->prepare('UPDATE Graph SET DisplayName = ?, Type = ?, Active = ?, Readonly = ?, Position = ?, Scale = ?, Halfwidth = ? WHERE ID = ?');
@@ -227,8 +220,7 @@ class Graph
      * @param $columnName string
      * @param $value int
      */
-    public function addCustomData($server, $columnName, $value)
-    {
+    public function addCustomData($server, $columnName, $value) {
         global $master_db_handle;
 
         // get the id for the column
@@ -250,22 +242,19 @@ class Graph
      * @param $columnName string
      * @return int
      */
-    public function getColumnID($columnName, $create = true)
-    {
+    public function getColumnID($columnName, $create = true) {
         global $master_db_handle;
 
         // It should already be in the database
         $statement = $master_db_handle->prepare('SELECT ID FROM CustomColumn WHERE Plugin = ? AND Graph = ? AND Name = ?');
         $statement->execute(array($this->plugin->getID(), $this->id, $columnName));
 
-        if ($row = $statement->fetch())
-        {
+        if ($row = $statement->fetch()) {
             $id = $row['ID'];
             return $id;
         }
 
-        if (!$create)
-        {
+        if (!$create) {
             return -1;
         }
 
@@ -281,10 +270,8 @@ class Graph
      * Get the highstocks class name to use
      * @return string
      */
-    public function getHighstocksClassName()
-    {
-        switch ($this->type)
-        {
+    public function getHighstocksClassName() {
+        switch ($this->type) {
             case GraphType::Pie:
             case GraphType::Donut:
                 return 'highcharts';
@@ -299,22 +286,19 @@ class Graph
      * The generated code should be placed inside <script> tags.
      * @return string javascript
      */
-    public function generateGraph($renderTo, $flags = array())
-    {
+    public function generateGraph($renderTo) {
         // Only generate the graph if we have plotters
-        if (count($this->series) == 0)
-        {
+        if (count($this->series) == 0) {
             return;
         }
 
         // We need to create a chart using the type
-        $chart = NULL;
+        $chart = null;
 
         // The graphing classname to use
         $classname = $this->getHighstocksClassName();
 
-        switch ($this->type)
-        {
+        switch ($this->type) {
             case GraphType::Line:
                 $chart = new HighRollerSplineChart();
                 break;
@@ -341,9 +325,8 @@ class Graph
         }
 
         // Nothing we can do if it's still null
-        if ($chart === NULL)
-        {
-            return NULL;
+        if ($chart === null) {
+            return null;
         }
 
         // Set chart options
@@ -369,8 +352,7 @@ class Graph
         );
 
         // Non-pie graph specifics
-        if ($this->type != GraphType::Pie && $this->type != GraphType::Donut)
-        {
+        if ($this->type != GraphType::Pie && $this->type != GraphType::Donut) {
             $chart->rangeSelector = array(
                 'selected' => (($this->type == GraphType::Column || $this->type == GraphType::Stacked_Column) ? 1 : 3),
                 'buttons' => array(
@@ -424,8 +406,7 @@ class Graph
             );
 
             // Should we make the graph log?
-            if ($this->scale == GraphScale::Logarithmic)
-            {
+            if ($this->scale == GraphScale::Logarithmic) {
                 $chart->yAxis['type'] = 'logarithmic';
                 $chart->yAxis['minorTickInterval'] = 'auto';
                 unset($chart->yAxis['min']);
@@ -433,22 +414,19 @@ class Graph
         }
 
         // Tooltip + plotOptions
-        if ($this->type != GraphType::Pie && $this->type != GraphType::Donut)
-        {
+        if ($this->type != GraphType::Pie && $this->type != GraphType::Donut) {
             $chart->tooltip = array(
                 'shared' => true,
                 'crosshairs' => true
             );
 
-            if ($this->type == GraphType::Percentage_Area)
-            {
+            if ($this->type == GraphType::Percentage_Area) {
                 $chart->plotOptions = array(
                     'areaspline' => array(
                         'stacking' => 'percent'
                     )
                 );
-            } elseif ($this->type == GraphType::Stacked_Column)
-            {
+            } elseif ($this->type == GraphType::Stacked_Column) {
                 $chart->plotOptions = array(
                     'column' => array(
                         'stacking' => 'normal'
@@ -466,16 +444,14 @@ class Graph
         }
 
         // Add each series to the chart
-        foreach ($this->series as $series)
-        {
+        foreach ($this->series as $series) {
             $chart->addSeries($series);
         }
 
         // Some raw javascript
         $rawJavascript = '';
 
-        if ($this->type != GraphType::Pie && $this->type != GraphType::Donut)
-        {
+        if ($this->type != GraphType::Pie && $this->type != GraphType::Donut) {
             // just sorts the series
             $rawJavascript = "
                     ${renderTo}Options.tooltip =
@@ -499,8 +475,7 @@ class Graph
                         }
                     };
                 ";
-        } else
-        { // Pie chart
+        } else { // Pie chart
             $rawJavascript = "
                 ${renderTo}Options.plotOptions =
                 {
@@ -534,8 +509,7 @@ class Graph
      * Check if the graph is read only or not
      * @return bool
      */
-    public function isReadOnly()
-    {
+    public function isReadOnly() {
         return $this->readonly;
     }
 
@@ -543,8 +517,7 @@ class Graph
      * Get the columns present in the graph
      * @return array
      */
-    public function getColumns()
-    {
+    public function getColumns() {
         return $this->columns;
     }
 
@@ -552,14 +525,12 @@ class Graph
      * Load the columns for this graph
      * @param $limit_results Only show the most used results, mainly just for displaying in /plugin/
      */
-    public function loadColumns($limit_results = false)
-    {
+    public function loadColumns($limit_results = false) {
         $this->columns = array();
         $statement = get_slave_db_handle()->prepare('SELECT ID, Name FROM CustomColumn WHERE Plugin = ? AND Graph = ? order by ID ASC');
         $statement->execute(array($this->plugin->getID(), $this->id));
 
-        while (($row = $statement->fetch()) != null)
-        {
+        while (($row = $statement->fetch()) != null) {
             $id = $row['ID'];
             $name = $row['Name'];
             $this->columns[$id] = $name;
@@ -570,8 +541,7 @@ class Graph
      * Add a raw series to the graph
      * @param $series HighRollerSeriesData
      */
-    public function addSeries($series)
-    {
+    public function addSeries($series) {
         $this->series[] = $series;
     }
 
@@ -579,13 +549,11 @@ class Graph
      * Set the name of the graph
      * @param $name string
      */
-    public function setName($name)
-    {
+    public function setName($name) {
         $this->name = $name;
 
         // Set the display name if the internal name is blank
-        if ($this->displayName == '')
-        {
+        if ($this->displayName == '') {
             $this->displayName = $name;
         }
     }
@@ -594,8 +562,7 @@ class Graph
      * Set the display name for the graph
      * @param $displayName string
      */
-    public function setDisplayName($displayName)
-    {
+    public function setDisplayName($displayName) {
         $this->displayName = $displayName;
     }
 
@@ -603,8 +570,7 @@ class Graph
      * Set the name of the graph
      * @param $name
      */
-    public function setType($type)
-    {
+    public function setType($type) {
         $this->type = $type;
     }
 
@@ -612,8 +578,7 @@ class Graph
      * Set if the graph is active or not
      * @param $active
      */
-    public function setActive($active)
-    {
+    public function setActive($active) {
         $this->active = $active;
     }
 
@@ -621,8 +586,7 @@ class Graph
      * Get the graph's scale
      * @param $scale string
      */
-    public function setScale($scale)
-    {
+    public function setScale($scale) {
         $this->scale = $scale;
     }
 
@@ -630,8 +594,7 @@ class Graph
      * Get the graph's internal id
      * @return int
      */
-    public function getID()
-    {
+    public function getID() {
         return $this->id;
     }
 
@@ -639,8 +602,7 @@ class Graph
      * Get the plugin this graph is for
      * @return Plugin
      */
-    public function getPlugin()
-    {
+    public function getPlugin() {
         return $this->plugin;
     }
 
@@ -648,8 +610,7 @@ class Graph
      * Get the graph's type
      * @return GraphType|int
      */
-    public function getType()
-    {
+    public function getType() {
         return $this->type;
     }
 
@@ -657,8 +618,7 @@ class Graph
      * Get the graph's name
      * @return string
      */
-    public function getName()
-    {
+    public function getName() {
         return $this->name;
     }
 
@@ -666,8 +626,7 @@ class Graph
      * Get the graph's display name
      * @return string
      */
-    public function getDisplayName()
-    {
+    public function getDisplayName() {
         return $this->displayName;
     }
 
@@ -675,8 +634,7 @@ class Graph
      * Check if the graph is currently active
      * @return bool
      */
-    public function isActive()
-    {
+    public function isActive() {
         return $this->active == 1;
     }
 
@@ -684,16 +642,14 @@ class Graph
      * Get the graph's scale
      * @return string
      */
-    public function getScale()
-    {
+    public function getScale() {
         return $this->scale;
     }
 
     /**
      * @return bool
      */
-    public function isHalfwidth()
-    {
+    public function isHalfwidth() {
         return $this->halfwidth;
     }
 
@@ -701,40 +657,35 @@ class Graph
      * Set the halfwidth value for this graph
      * @param $halfwidth
      */
-    public function setHalfwidth($halfwidth)
-    {
+    public function setHalfwidth($halfwidth) {
         $this->halfwidth = $halfwidth;
     }
 
     /**
      * @return int
      */
-    public function getPosition()
-    {
+    public function getPosition() {
         return $this->position;
     }
 
     /**
      * @param int $position
      */
-    public function setPosition($position)
-    {
+    public function setPosition($position) {
         $this->position = $position;
     }
 
     /**
      * @return string
      */
-    public function getFeedURL()
-    {
+    public function getFeedURL() {
         return $this->feedURL;
     }
 
     /**
      * @param string $feedURL
      */
-    public function setFeedURL($feedURL)
-    {
+    public function setFeedURL($feedURL) {
         $this->feedURL = $feedURL;
     }
 

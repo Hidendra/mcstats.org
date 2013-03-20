@@ -11,8 +11,7 @@ $countries = loadCountries();
 $baseEpoch = normalizeTime();
 $minimum = strtotime('-30 minutes', $baseEpoch);
 
-function doGeneration($pluginId, $data)
-{
+function doGeneration($pluginId, $data) {
     global $countries, $baseEpoch;
     $plugin = loadPluginByID($pluginId);
     $sum = $data['Sum'];
@@ -36,9 +35,9 @@ function doGeneration($pluginId, $data)
     }
 
     // Create the generic Map graph that shows a nice map ! :-)
-    $plugin->getOrCreateGraph('Map', false, 1, GraphType::Map, TRUE, 9600);
+    $plugin->getOrCreateGraph('Map', false, 1, GraphType::Map, true, 9600);
 
-    $graph = $plugin->getOrCreateGraph('Server Locations', false, 1, GraphType::Pie, TRUE, 9000);
+    $graph = $plugin->getOrCreateGraph('Server Locations', false, 1, GraphType::Pie, true, 9000);
     insertGraphDataScratch($graph, $pluginId, $fullName, $baseEpoch, $sum, $count, $avg, $max, $min, $variance, $stddev);
 }
 

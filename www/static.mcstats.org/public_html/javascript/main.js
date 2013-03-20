@@ -1,11 +1,10 @@
-
-$(document).ready(function() {
+$(document).ready(function () {
     // Hide the servers that are waiting to be hidden
     $(".hide-server").hide();
 
     // listen for graph generator updates
-    setInterval(function() {
-        $.get('/graph-generator.php', function(data) {
+    setInterval(function () {
+        $.get('/graph-generator.php', function (data) {
             var graphPercent = parseInt(data);
 
             // nothing generating
@@ -47,7 +46,7 @@ function loadPluginListPage(page) {
     $("#plugin-list-go").addClass("disabled");
 
     // load the json data
-    var json = $.getJSON("/api/1.0/list/" + page, function(data) {
+    $.getJSON("/api/1.0/list/" + page, function (data) {
         // var to the store the html in
         var html = "";
 
@@ -63,20 +62,17 @@ function loadPluginListPage(page) {
             }
 
             // increase
-            if (plugin.rank < plugin.lastrank)
-            {
+            if (plugin.rank < plugin.lastrank) {
                 rank += ' <i class="fam-arrow-up" title="Increased from ' + plugin.lastrank + ' (+' + (plugin.lastrank - plugin.rank) + ')"></i>';
             }
 
             // decrease
-            else  if (plugin.rank > plugin.lastrank)
-            {
+            else if (plugin.rank > plugin.lastrank) {
                 rank += ' <i class="fam-arrow-down" title="Decreased from ' + plugin.lastrank + ' (-' + (plugin.rank - plugin.lastrank) + ')"></i>';
             }
 
             // no change
-            else
-            {
+            else {
                 rank += ' <i class="fam-bullet-blue" title="No change"></i>';
             }
 
@@ -192,15 +188,16 @@ var HIGHSTOCKS = "highstocks";
  * @param framework
  * @param feedurl
  */
-function retrieveGraphData(options, framework, feedurl)
-{
-    $.getJSON(feedurl, function(json) {
+function retrieveGraphData(options, framework, feedurl) {
+    $.getJSON(feedurl, function (json) {
         // if the graph is a simple pie graph we've got our work cut out for us
         if (json.type == "Pie") {
-            options.series = [{
-                name: "",
-                data: json.data
-            }];
+            options.series = [
+                {
+                    name: "",
+                    data: json.data
+                }
+            ];
         }
 
         else if (json.type == "Map") {
@@ -216,7 +213,7 @@ function retrieveGraphData(options, framework, feedurl)
         }
 
         else if (json.type == "Donut") {
-            var colors = [ "#4572A7", "#AA4643", "#89A54E", "#80699B", "#3D96AE", "#DB843D", "#92A8CD", "#A47D7C","#B5CA92" ]; // Highcharts.getOptions().colors;
+            var colors = [ "#4572A7", "#AA4643", "#89A54E", "#80699B", "#3D96AE", "#DB843D", "#92A8CD", "#A47D7C", "#B5CA92" ]; // Highcharts.getOptions().colors;
             var inner = [];
             var outer = [];
             var colorIndex = 0;
@@ -226,13 +223,13 @@ function retrieveGraphData(options, framework, feedurl)
                 var length = 0;
 
                 for (oin in json.data[outName]) {
-                    length ++;
+                    length++;
                 }
 
                 var j = 0;
                 for (oin in json.data[outName]) {
                     var inobject = json.data[outName][oin];
-                    var brightness = 0.2 - (j / length) / 5 ;
+                    var brightness = 0.2 - (j / length) / 5;
                     sum += inobject.y;
 
                     outer.push({
@@ -240,7 +237,7 @@ function retrieveGraphData(options, framework, feedurl)
                         y: inobject.y,
                         color: Highcharts.Color(colors[colorIndex]).brighten(brightness).get()
                     });
-                    j ++;
+                    j++;
                 }
 
                 inner.push({
@@ -249,31 +246,34 @@ function retrieveGraphData(options, framework, feedurl)
                     color: colors[colorIndex]
                 });
 
-                colorIndex ++;
+                colorIndex++;
             }
 
-            options.series = [{
-                name: '',
-                data: inner,
-                size: '60%',
-                dataLabels: {
-                    formatter: function() {
-                        return this.y > 5 ? this.point.name : null;
-                    },
-                    color: 'white',
-                    distance: -30
-                }
-            }, {
-                name: '',
-                data: outer,
-                innerSize: '60%',
-                dataLabels: {
-                    formatter: function() {
-                        // display only if larger than 1
-                        return this.y > 1 ? '<b>'+ this.point.name +':</b> '+ this.y +'%'  : null;
+            options.series = [
+                {
+                    name: '',
+                    data: inner,
+                    size: '60%',
+                    dataLabels: {
+                        formatter: function () {
+                            return this.y > 5 ? this.point.name : null;
+                        },
+                        color: 'white',
+                        distance: -30
+                    }
+                },
+                {
+                    name: '',
+                    data: outer,
+                    innerSize: '60%',
+                    dataLabels: {
+                        formatter: function () {
+                            // display only if larger than 1
+                            return this.y > 1 ? '<b>' + this.point.name + ':</b> ' + this.y + '%' : null;
+                        }
                     }
                 }
-            }];
+            ];
         }
 
         // bit lengthier, we need to generate each column

@@ -11,33 +11,27 @@ ensure_loggedin();
 
 send_header();
 
-if (isset($_POST['submit']))
-{
+if (isset($_POST['submit'])) {
     // Process login info
     $currpassword = $_POST['currpassword'];
     $password = $_POST['password'];
     $password2 = $_POST['password2'];
 
-    if (strlen($password) < 3 || $password != $password2 || $password == $currpassword)
-    {
-        err ('Care to try again? :-)');
+    if (strlen($password) < 3 || $password != $password2 || $password == $currpassword) {
+        err('Care to try again? :-)');
         send_change_password();
-    } else
-    {
+    } else {
         // the unique key prevents duplicate usernames but check first
         $statement = $master_db_handle->prepare('SELECT Password FROM Author where ID = ?');
         $statement->execute(array($_SESSION['uid']));
 
-        if ($row = $statement->fetch())
-        {
+        if ($row = $statement->fetch()) {
             $newPassword = sha1($password);
 
-            if (sha1($currpassword) != $row['Password'])
-            {
-                err ('Invalid password.');
+            if (sha1($currpassword) != $row['Password']) {
+                err('Invalid password.');
                 send_change_password();
-            } else
-            {
+            } else {
                 $statement = $master_db_handle->prepare('UPDATE Author SET Password = ? WHERE ID = ?');
                 $statement->execute(array($newPassword, $_SESSION['uid']));
                 echo '<div class="alert alert-success">Password changed successfully! If you are not automatically redirected, click <a href="/admin/">here</a></div>
@@ -47,16 +41,13 @@ if (isset($_POST['submit']))
     }
 
 
-}
-else
-{
+} else {
     send_change_password();
 }
 
 send_footer();
 
-function send_change_password()
-{
+function send_change_password() {
     echo '
             <div class="row-fluid">
 

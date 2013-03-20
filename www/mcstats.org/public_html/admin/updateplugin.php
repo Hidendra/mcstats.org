@@ -7,8 +7,7 @@ require_once ROOT . '../private_html/config.php';
 require_once ROOT . '../private_html/includes/database.php';
 require_once ROOT . '../private_html/includes/func.php';
 
-if (!isset($_POST['submit']) || !isset($_GET['plugin']))
-{
+if (!isset($_POST['submit']) || !isset($_GET['plugin'])) {
     header('Location: /admin/');
     exit;
 }
@@ -17,8 +16,7 @@ if (!isset($_POST['submit']) || !isset($_GET['plugin']))
 $plugin = loadPlugin($_GET['plugin']);
 
 // Can we even admin it ?
-if (!can_admin_plugin($plugin))
-{
+if (!can_admin_plugin($plugin)) {
     header('Location: /admin/');
     exit;
 }
@@ -28,33 +26,28 @@ if (!can_admin_plugin($plugin))
 //// Screw them
 
 /// Author
-if (isset($_POST['authors']))
-{
+if (isset($_POST['authors'])) {
     // Strip out invalid characters
     $authorText = preg_replace('/[^a-zA-Z0-9_,\- ]+/', '', $_POST['authors']);
     $plugin->setAuthors($authorText);
 }
 
 // Graph data
-if (isset($_POST['graph']))
-{
+if (isset($_POST['graph'])) {
 
     // Iterate through each graph
     // Each graph adds its ID to the graph array so we can easily iterate through each
-    foreach ($_POST['graph'] as $graphID => $trash)
-    {
+    foreach ($_POST['graph'] as $graphID => $trash) {
         // Load the graph
         $graph = $plugin->getGraph($graphID);
 
         // No graph found, carry on
-        if ($graph === NULL)
-        {
+        if ($graph === null) {
             continue;
         }
 
         // don't allow editing for readonly graphs
-        if ($graph->isReadOnly())
-        {
+        if ($graph->isReadOnly()) {
             continue;
         }
 
@@ -67,23 +60,20 @@ if (isset($_POST['graph']))
         $halfwidth = isset($_POST['halfwidth'][$graphID]) ? $_POST['halfwidth'][$graphID] : 0;
 
         // Validate active
-        if ($active != 0 && $active != 1)
-        {
+        if ($active != 0 && $active != 1) {
             // Default to active
             $active = 1;
         }
 
         // Validate scale
-        if ($scale != GraphScale::Linear && $scale != GraphScale::Logarithmic)
-        {
+        if ($scale != GraphScale::Linear && $scale != GraphScale::Logarithmic) {
             // default to linear
             $scale = GraphScale::Linear;
         }
 
         // validate the position they want to set the graph to and if they're valid set it
         // TODO make these ranges easier to change ?
-        if ($position > 1 && $position < 9000)
-        {
+        if ($position > 1 && $position < 9000) {
             $graph->setPosition($position);
         }
 

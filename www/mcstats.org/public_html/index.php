@@ -28,9 +28,8 @@ $statement = get_slave_db_handle()->prepare('SELECT * FROM Plugin where LastUpda
 $statement->execute(array(normalizeTime() - SECONDS_IN_DAY));
 
 $pluginCount = 0;
-while ($row = $statement->fetch())
-{
-    $pluginCount ++;
+while ($row = $statement->fetch()) {
+    $pluginCount++;
 }
 
 // generally the time player count is is last 30-60 minutes, so get the real time for popover
@@ -60,9 +59,8 @@ echo <<<END
 
 END;
 
-$first = TRUE;
-foreach (loadPlugins(PLUGIN_ORDER_RANDOM_TOP100, 4) as $plugin)
-{
+$first = true;
+foreach (loadPlugins(PLUGIN_ORDER_RANDOM_TOP100, 4) as $plugin) {
     $name = htmlentities($plugin->getName());
     $encodedName = urlencode($name);
 
@@ -89,9 +87,9 @@ END;
 
     if (!$first) {
         echo '</div>';
-        $first = TRUE;
+        $first = true;
     } else {
-        $first = FALSE;
+        $first = false;
     }
 }
 

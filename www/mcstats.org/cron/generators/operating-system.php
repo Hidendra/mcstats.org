@@ -11,8 +11,7 @@ $countries = loadCountries();
 $baseEpoch = normalizeTime();
 $minimum = strtotime('-30 minutes', $baseEpoch);
 
-function doGeneration($pluginId, $data)
-{
+function doGeneration($pluginId, $data) {
     global $countries, $baseEpoch;
     $plugin = loadPluginByID($pluginId);
     $osname = $data['osname'];
@@ -35,7 +34,7 @@ function doGeneration($pluginId, $data)
         return;
     }
 
-    $graph = $plugin->getOrCreateGraph('Operating System', false, 1, GraphType::Donut, TRUE, 9010, TRUE);
+    $graph = $plugin->getOrCreateGraph('Operating System', false, 1, GraphType::Donut, true, 9010, true);
     insertGraphDataScratch($graph, $pluginId, $fullName, $baseEpoch, $sum, $count, $avg, $max, $min, $variance, $stddev);
 }
 

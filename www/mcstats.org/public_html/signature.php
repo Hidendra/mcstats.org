@@ -22,10 +22,9 @@ define('IMAGE_HEIGHT', 124);
 define('IMAGE_WIDTH', 478);
 
 // We will be outputting a PNG image!
-header ('Content-type: image/png');
+header('Content-type: image/png');
 
-if (!isset($_GET['plugin']))
-{
+if (!isset($_GET['plugin'])) {
     error_image('Error: No plugin provided');
 }
 
@@ -37,13 +36,11 @@ require ROOT . '../private_html/pChart/pCache.class.php';
 // image modifier
 $scale = isset($_GET['scale']) ? $_GET['scale'] : 1;
 
-if ($scale > 10 || $scale <= 0)
-{
+if ($scale > 10 || $scale <= 0) {
     define('REAL_IMAGE_HEIGHT', IMAGE_HEIGHT);
     define('REAL_IMAGE_WIDTH', IMAGE_WIDTH);
     error_image('Invalid modifier');
-} else
-{
+} else {
     define('REAL_IMAGE_HEIGHT', IMAGE_HEIGHT * $scale);
     define('REAL_IMAGE_WIDTH', IMAGE_WIDTH * $scale);
 }
@@ -61,8 +58,7 @@ $cacheKey = 'signature/' . $scale . '/' . $pluginName;
 $plugin = loadPlugin($pluginName);
 
 // Is the plugin invalid?
-if ($plugin == null)
-{
+if ($plugin == null) {
     // no plugin found
     error_image('Invalid plugin');
 }
@@ -87,16 +83,14 @@ $playersColumnID = $globalstatistics->getColumnID('Players');
 // server plot's column id
 $serversColumnID = $globalstatistics->getColumnID('Servers');
 
-foreach (DataGenerator::generateCustomChartData($globalstatistics, $playersColumnID, HOURS) as $data)
-{
+foreach (DataGenerator::generateCustomChartData($globalstatistics, $playersColumnID, HOURS) as $data) {
     $epoch = $data[0];
     $value = $data[1];
 
     $playersX[] = $value;
 }
 
-foreach (DataGenerator::generateCustomChartData($globalstatistics, $serversColumnID, HOURS) as $data)
-{
+foreach (DataGenerator::generateCustomChartData($globalstatistics, $serversColumnID, HOURS) as $data) {
     $epoch = $data[0];
     $value = $data[1];
 
@@ -118,8 +112,7 @@ $dataSet->SetYAxisName('');
 $dataSet->AddAllSeries();
 
 // Check caches
-if ($pCache->IsInCache($cacheKey, $dataSet->GetData()) === FALSE)
-{
+if ($pCache->IsInCache($cacheKey, $dataSet->GetData()) === false) {
 
     // Set us up the bomb
     $graph = new pChart(REAL_IMAGE_WIDTH, REAL_IMAGE_HEIGHT);
@@ -131,15 +124,13 @@ if ($pCache->IsInCache($cacheKey, $dataSet->GetData()) === FALSE)
     $graph->drawScale($dataSet->GetData(), $dataSet->GetDataDescription(), SCALE_START0, 150, 150, 150, true, 0, 0);
     // $graph->drawGrid(4, true, 230, 230, 230, 100);
 
-    if ($plugin->getID() == GLOBAL_PLUGIN_ID)
-    {
+    if ($plugin->getID() == GLOBAL_PLUGIN_ID) {
         $statement = get_slave_db_handle()->prepare('SELECT Sum(GlobalHits) FROM Plugin');
         $statement->execute();
 
         $serverStarts = $statement->fetch()[0];
         $serversLast24Hours = 0;
-    } else
-    {
+    } else {
         $serverStarts = $plugin->getGlobalHits();
         $serversLast24Hours = $plugin->countServersLastUpdated(time() - SECONDS_IN_DAY);
     }
@@ -157,10 +148,11 @@ if ($pCache->IsInCache($cacheKey, $dataSet->GetData()) === FALSE)
 
     // Get the center of the image
     $authors = $plugin->getAuthors();
-    if (!empty($authors))
+    if (!empty($authors)) {
         $title = $pluginName . ' - ' . $authors;
-    else
+    } else {
         $title = $pluginName;
+    }
 
     $tahoma = 'tahoma.ttf';
     $bounding_box = imagettfbbox(11, 0, $tahoma, $title);
@@ -172,7 +164,7 @@ if ($pCache->IsInCache($cacheKey, $dataSet->GetData()) === FALSE)
 
     // shameless advertising
     $graph->setFontProperties('pf_arma_five.ttf', 6);
-    $graph->drawTitle(63, REAL_IMAGE_HEIGHT - 9, 'mcstats.org', 210, 210, 210, -1, -1, TRUE);
+    $graph->drawTitle(63, REAL_IMAGE_HEIGHT - 9, 'mcstats.org', 210, 210, 210, -1, -1, true);
 
     // Stroke the image
     $graphImage = $graph->Render('__handle');
@@ -200,8 +192,7 @@ if ($pCache->IsInCache($cacheKey, $dataSet->GetData()) === FALSE)
 
     // Cache the image
     $pCache->WriteToCache($cacheKey, $dataSet->GetData(), $graph);
-} else
-{
+} else {
     $pCache->GetFromCache($cacheKey, $dataSet->GetData());
 }
 
@@ -210,8 +201,7 @@ if ($pCache->IsInCache($cacheKey, $dataSet->GetData()) === FALSE)
  *
  * @param $text
  */
-function error_image($text)
-{
+function error_image($text) {
     // allocate image
     $image = imagecreatetruecolor(REAL_IMAGE_WIDTH, REAL_IMAGE_HEIGHT);
 

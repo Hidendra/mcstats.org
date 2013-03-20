@@ -22,10 +22,9 @@ define('IMAGE_HEIGHT', 124);
 define('IMAGE_WIDTH', 478);
 
 // We will be outputting a PNG image!
-header ('Content-type: image/png');
+header('Content-type: image/png');
 
-if (!isset($_GET['plugin']))
-{
+if (!isset($_GET['plugin'])) {
     error_image('Error: No plugin provided');
 }
 
@@ -37,13 +36,11 @@ require ROOT . '../private_html/pChart/pCache.class.php';
 // image modifier
 $scale = isset($_GET['scale']) ? $_GET['scale'] : 1;
 
-if ($scale > 10 || $scale <= 0)
-{
+if ($scale > 10 || $scale <= 0) {
     define('REAL_IMAGE_HEIGHT', IMAGE_HEIGHT);
     define('REAL_IMAGE_WIDTH', IMAGE_WIDTH);
     error_image('Invalid modifier');
-} else
-{
+} else {
     define('REAL_IMAGE_HEIGHT', IMAGE_HEIGHT * $scale);
     define('REAL_IMAGE_WIDTH', IMAGE_WIDTH * $scale);
 }
@@ -56,8 +53,7 @@ $pluginName = urldecode($_GET['plugin']);
 $plugin = loadPlugin($pluginName);
 
 // Is the plugin invalid?
-if ($plugin == null)
-{
+if ($plugin == null) {
     // no plugin found
     error_image('Invalid plugin');
 }
@@ -87,16 +83,14 @@ $playersColumnID = $globalstatistics->getColumnID('Players');
 // server plot's column id
 $serversColumnID = $globalstatistics->getColumnID('Servers');
 
-foreach (DataGenerator::generateCustomChartData($globalstatistics, $playersColumnID, HOURS) as $data)
-{
+foreach (DataGenerator::generateCustomChartData($globalstatistics, $playersColumnID, HOURS) as $data) {
     $epoch = $data[0];
     $value = $data[1];
 
     $playersX[] = $value;
 }
 
-foreach (DataGenerator::generateCustomChartData($globalstatistics, $serversColumnID, HOURS) as $data)
-{
+foreach (DataGenerator::generateCustomChartData($globalstatistics, $serversColumnID, HOURS) as $data) {
     $epoch = $data[0];
     $value = $data[1];
 
@@ -118,8 +112,7 @@ $dataSet->SetYAxisName('');
 $dataSet->AddAllSeries();
 
 // Check caches
-if ($pCache->IsInCache($cacheKey, $dataSet->GetData()) === FALSE)
-{
+if ($pCache->IsInCache($cacheKey, $dataSet->GetData()) === false) {
     // Set us up the bomb
     $graph = new pChart(REAL_IMAGE_WIDTH, REAL_IMAGE_HEIGHT);
     $graph->setFontProperties('tahoma.ttf', 8);
@@ -157,8 +150,7 @@ if ($pCache->IsInCache($cacheKey, $dataSet->GetData()) === FALSE)
 
     // Cache the image
     $pCache->WriteToCache($cacheKey, $dataSet->GetData(), $graph);
-} else
-{
+} else {
     $pCache->GetFromCache($cacheKey, $dataSet->GetData());
 }
 
@@ -167,8 +159,7 @@ if ($pCache->IsInCache($cacheKey, $dataSet->GetData()) === FALSE)
  *
  * @param $text
  */
-function error_image($text)
-{
+function error_image($text) {
     // allocate image
     $image = imagecreatetruecolor(REAL_IMAGE_WIDTH, REAL_IMAGE_HEIGHT);
 

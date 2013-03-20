@@ -12,8 +12,7 @@ header('Cache-Control: public, s-maxage=' . (timeUntilNextGraph() - time()));
 // get the current page
 $currentPage = 1;
 
-if (isset($_GET['page']))
-{
+if (isset($_GET['page'])) {
     $currentPage = intval($_GET['page']);
 }
 
@@ -26,8 +25,7 @@ $totalPages = ceil(countPlugins(PLUGIN_ORDER_POPULARITY) / PLUGIN_LIST_RESULTS_P
 // offset is how many plugins to start after
 $offset = ($currentPage - 1) * PLUGIN_LIST_RESULTS_PER_PAGE;
 
-if ($currentPage > $totalPages)
-{
+if ($currentPage > $totalPages) {
     header('Location: /plugin-list/' . $totalPages . '/');
     exit;
 }
@@ -39,8 +37,7 @@ send_header();
 
 $output = $cache->get('global_stats');
 
-if (!$output)
-{
+if (!$output) {
     ob_start();
 
     // Load the global plugin

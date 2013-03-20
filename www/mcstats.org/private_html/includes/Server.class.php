@@ -1,8 +1,9 @@
 <?php
-if (!defined('ROOT')) exit('For science.');
+if (!defined('ROOT')) {
+    exit('For science.');
+}
 
-class Server
-{
+class Server {
 
     /**
      * Internal id for the stat
@@ -94,8 +95,7 @@ class Server
      * Get the key is prefixed to entries stored in the cache
      * @return string
      */
-    private function cacheKey()
-    {
+    private function cacheKey() {
         return 'server-' . $this->id;
     }
 
@@ -107,8 +107,7 @@ class Server
      * @param $expire Seconds to expire the cached value in. Defaults to the next caching interval
      * @return TRUE on success and FALSE on failure
      */
-    public function cacheSet($key, $value, $expire = CACHE_UNTIL_NEXT_GRAPH)
-    {
+    public function cacheSet($key, $value, $expire = CACHE_UNTIL_NEXT_GRAPH) {
         global $cache;
         return $cache->set($this->cacheKey() . $key, $value, $expire);
     }
@@ -119,8 +118,7 @@ class Server
      * @param $key
      * @return the object returned from the cache
      */
-    public function cacheGet($key)
-    {
+    public function cacheGet($key) {
         global $cache;
         return $cache->get($this->cacheKey() . $key);
     }
@@ -129,18 +127,16 @@ class Server
      * Check if the server is blacklisted
      * @return bool
      */
-    public function isBlacklisted()
-    {
+    public function isBlacklisted() {
         global $master_db_handle;
 
         $statement = get_slave_db_handle()->prepare('SELECT Server FROM ServerBlacklist WHERE Server = ?');
         $statement->execute(array($this->id));
 
-        return $statement->fetch() != FALSE;
+        return $statement->fetch() != false;
     }
 
-    public function addVersionHistory($version)
-    {
+    public function addVersionHistory($version) {
         global $master_db_handle;
 
         $statement = get_slave_db_handle()->prepare('SELECT ID FROM Versions WHERE Plugin = :Plugin AND Version = :Version');
@@ -148,8 +144,7 @@ class Server
 
         if ($row = $statement->fetch()) {
             $versionID = $row['ID'];
-        } else
-        {
+        } else {
             $statement = $master_db_handle->prepare('INSERT INTO Versions (Plugin, Version, Created) VALUES (:Plugin, :Version, :Created)');
             $statement->execute(array(':Plugin' => $this->plugin, ':Version' => $version, ':Created' => time()));
             $versionID = $master_db_handle->lastInsertId();
@@ -166,8 +161,7 @@ class Server
     /**
      * Save the server to the database
      */
-    public function save()
-    {
+    public function save() {
         global $master_db_handle;
 
         // set the last updated time to now
@@ -188,8 +182,7 @@ class Server
     /**
      * Update the plugin
      */
-    public function updatePlugin()
-    {
+    public function updatePlugin() {
         global $master_db_handle;
 
         // inserts or updates into the ServerPlugin table
@@ -207,8 +200,7 @@ class Server
      * Verify the server has the given plugin
      * $param $plugin int
      */
-    public function verifyPlugin($plugin)
-    {
+    public function verifyPlugin($plugin) {
         global $master_db_handle;
 
     }
@@ -228,13 +220,11 @@ class Server
         $statement->execute(array($columnName));
 
         // Did we get it?
-        if ($row = $statement->fetch())
-        {
+        if ($row = $statement->fetch()) {
             return $row['ID'];
         }
 
-        if ($attemptedToCreate)
-        {
+        if ($attemptedToCreate) {
             error_fquit("Failed to create custom column: $columnName");
         }
 
@@ -248,160 +238,133 @@ class Server
     /**
      * Increment the hits for the server
      */
-    public function incrementHits()
-    {
+    public function incrementHits() {
         $this->hits += 1;
         $this->modified = true;
     }
 
-    public function getID()
-    {
+    public function getID() {
         return $this->id;
     }
 
-    public function setID($id)
-    {
+    public function setID($id) {
         $this->id = $id;
         $this->modified = true;
     }
 
-    public function getPlugin()
-    {
+    public function getPlugin() {
         return $this->plugin;
     }
 
-    public function setPlugin($plugin)
-    {
+    public function setPlugin($plugin) {
         $this->plugin = $plugin;
         $this->modified = true;
     }
 
-    public function getCountry()
-    {
+    public function getCountry() {
         return $this->country;
     }
 
-    public function setCountry($country)
-    {
+    public function setCountry($country) {
         $this->country = $country;
         $this->modified = true;
     }
 
-    public function getGUID()
-    {
+    public function getGUID() {
         return $this->guid;
     }
 
-    public function setGUID($guid)
-    {
+    public function setGUID($guid) {
         $this->guid = $guid;
         $this->modified = true;
     }
 
-    public function getPlayers()
-    {
+    public function getPlayers() {
         return $this->players;
     }
 
-    public function setPlayers($players)
-    {
+    public function setPlayers($players) {
         $this->players = $players;
         $this->modified = true;
     }
 
-    public function getServerVersion()
-    {
+    public function getServerVersion() {
         return $this->serverVersion;
     }
 
-    public function setServerVersion($serverVersion)
-    {
+    public function setServerVersion($serverVersion) {
         $this->serverVersion = $serverVersion;
         $this->modified = true;
     }
 
-    public function getCurrentVersion()
-    {
+    public function getCurrentVersion() {
         return $this->currentVersion;
     }
 
-    public function setCurrentVersion($currentVersion)
-    {
+    public function setCurrentVersion($currentVersion) {
         $this->currentVersion = $currentVersion;
         $this->modified = true;
     }
 
-    public function getHits()
-    {
+    public function getHits() {
         return $this->hits;
     }
 
-    public function setHits($hits)
-    {
+    public function setHits($hits) {
         $this->hits = $hits;
         $this->modified = true;
     }
 
-    public function getCreated()
-    {
+    public function getCreated() {
         return $this->created;
     }
 
-    public function setCreated($created)
-    {
+    public function setCreated($created) {
         $this->created = $created;
         $this->modified = true;
     }
 
-    public function getUpdated()
-    {
+    public function getUpdated() {
         return $this->updated;
     }
 
-    public function setUpdated($updated)
-    {
+    public function setUpdated($updated) {
         $this->updated = $updated;
     }
 
-    public function setModified($modified)
-    {
+    public function setModified($modified) {
         $this->modified = $modified;
     }
 
-    public function isModified()
-    {
+    public function isModified() {
         return $this->modified;
     }
 
     /**
      * @return string
      */
-    public function getServerSoftware()
-    {
+    public function getServerSoftware() {
         return $this->serverSoftware;
     }
 
     /**
      * @param string $serverSoftware
      */
-    public function setServerSoftware($serverSoftware)
-    {
+    public function setServerSoftware($serverSoftware) {
         $this->serverSoftware = $serverSoftware;
     }
 
     /**
      * @return string
      */
-    public function getMinecraftVersion()
-    {
+    public function getMinecraftVersion() {
         return $this->minecraftVersion;
     }
 
     /**
      * @param string $minecraftVersion
      */
-    public function setMinecraftVersion($minecraftVersion)
-    {
+    public function setMinecraftVersion($minecraftVersion) {
         $this->minecraftVersion = $minecraftVersion;
     }
 

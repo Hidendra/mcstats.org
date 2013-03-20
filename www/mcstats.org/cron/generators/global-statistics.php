@@ -12,8 +12,7 @@ $running_processes = 0;
 $baseEpoch = normalizeTime();
 $minimum = strtotime('-30 minutes', $baseEpoch);
 
-function doGeneration($pluginId, $data)
-{
+function doGeneration($pluginId, $data) {
     global $baseEpoch;
     $plugin = loadPluginByID($pluginId);
     $sum = $data['Sum'];
@@ -28,7 +27,7 @@ function doGeneration($pluginId, $data)
         return;
     }
 
-    $graph = $plugin->getOrCreateGraph('Global Statistics', false, 1, GraphType::Area, TRUE, 1);
+    $graph = $plugin->getOrCreateGraph('Global Statistics', false, 1, GraphType::Area, true, 1);
 
     // players
     insertGraphDataScratch($graph, $pluginId, 'Players', $baseEpoch, $sum, $count, $avg, $max, $min, $variance, $stddev);

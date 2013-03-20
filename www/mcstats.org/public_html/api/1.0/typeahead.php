@@ -12,8 +12,7 @@ insert_cache_headers();
 // Our json encoded response
 $response = array();
 
-if (!isset($_REQUEST['q']))
-{
+if (!isset($_REQUEST['q'])) {
     $response['msg'] = 'No query provided';
     $response['status'] = 'err';
     exit(json_encode($response));
@@ -25,8 +24,7 @@ $statement = get_slave_db_handle()->prepare('SELECT Name FROM Plugin WHERE Name 
 $statement->execute(array('%' . $query . '%'));
 
 $matchness = array();
-while ($row = $statement->fetch())
-{
+while ($row = $statement->fetch()) {
     $name = $row['Name'];
     $matchness[$name] = levenshtein($query, $name);
 }
@@ -34,8 +32,7 @@ while ($row = $statement->fetch())
 asort($matchness);
 $matchness = array_slice($matchness, 0, 10);
 
-foreach($matchness as $name => $lev)
-{
+foreach ($matchness as $name => $lev) {
     $response[] = $name;
 }
 

@@ -12,8 +12,7 @@ $plugin2_name = $_GET['plugin2'];
 $plugin1 = loadPlugin($plugin1_name);
 $plugin2 = loadPlugin($plugin2_name);
 
-if ($plugin1 == null || $plugin2 == null)
-{
+if ($plugin1 == null || $plugin2 == null) {
     exit('Invalid plugins provided.');
 }
 
@@ -37,24 +36,20 @@ printf("%s servers have EitherOf ( %s , %s ) in the last hour. <br/>", number_fo
 printf("%s servers have OneOf ( %s , %s ) in the last hour. <br/>", number_format($one_of), $plugin1->getName(), $plugin2->getName());
 printf("%s servers have BothOf ( %s , %s ) in the last hour. <br/>", number_format($both_of), $plugin1->getName(), $plugin2->getName());
 
-function count_servers($plugins, $min_epoch, $matches_required = -1 /* Match any of the plugins */)
-{
+function count_servers($plugins, $min_epoch, $matches_required = -1 /* Match any of the plugins */) {
     $plugin_ids = array();
 
-    foreach ($plugins as $plugin)
-    {
+    foreach ($plugins as $plugin) {
         $plugin_ids[] = $plugin->getID();
     }
 
-    if ($matches_required == -1)
-    {
+    if ($matches_required == -1) {
         $statement = get_slave_db_handle()->prepare('
         select count(*) from (
           select 1 from ServerPlugin where Plugin IN ( ' . implode(',', $plugin_ids) . ' ) AND Updated >= ? group by Server
         ) V');
         $statement->execute(array($min_epoch));
-    } else
-    {
+    } else {
         $statement = get_slave_db_handle()->prepare('
         select count(*) from (
           select 1 from ServerPlugin where Plugin IN ( ' . implode(',', $plugin_ids) . ' ) AND Updated >= ? group by Server having count(Plugin) = ?

@@ -42,7 +42,7 @@ while ($data = $statement->fetch()) {
         continue;
     }
 
-    $graph = $plugin->getOrCreateGraph('Version Trends', false, 1, GraphType::Area, TRUE, 9003);
+    $graph = $plugin->getOrCreateGraph('Version Trends', false, 1, GraphType::Area, true, 9003);
     $columnID = $graph->getColumnID($version);
 
     // these can be NULL IFF there is only one data point (e.g one server) in the sample

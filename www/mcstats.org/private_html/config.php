@@ -15,18 +15,18 @@ $config['email']['password'] = '';
 
 // Master database configuration
 $config['database']['master'] = array(
-    'hostname'  => '127.0.0.1',
-    'dbname'    => 'metrics',
-    'username'  => 'metrics',
-    'password'  => ''
+    'hostname' => '127.0.0.1',
+    'dbname' => 'metrics',
+    'username' => 'metrics',
+    'password' => ''
 );
 
 // Slave database configuration
 // Most select queries are offloaded to the slave instead
 $config['database']['slave'] = array(
-    'enabled'   => FALSE,
-    'hostname'  => '10.10.1.8',
-    'dbname'    => 'metrics',
-    'username'  => 'metrics',
-    'password'  => ''
+    'enabled' => false,
+    'hostname' => '10.10.1.8',
+    'dbname' => 'metrics',
+    'username' => 'metrics',
+    'password' => ''
 );

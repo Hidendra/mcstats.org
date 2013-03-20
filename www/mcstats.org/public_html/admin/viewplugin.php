@@ -13,19 +13,14 @@ ensure_loggedin();
 $ajax = isset($_GET['ajax']) || isset($_SERVER['HTTP_X_PJAX']) || isset($_SERVER['X-PJAX']);
 
 /// Check for the plugin in $_GET
-if (!isset($_GET['plugin']))
-{
-    err ('No plugin provided.');
-}
-
-else
-{
+if (!isset($_GET['plugin'])) {
+    err('No plugin provided.');
+} else {
     // Load the provided plugin
     $plugin = loadPlugin($_GET['plugin']);
 
-    if ($plugin === NULL)
-    {
-        err ('Invalid plugin.');
+    if ($plugin === null) {
+        err('Invalid plugin.');
     }
 
     $pluginName = htmlentities($plugin->getName());
@@ -34,71 +29,64 @@ else
     $breadcrumbs = '<a href="/admin/">Administration</a> <a href="/plugin/' . $encodedName . '">Plugin: ' . $pluginName . '</a> <a href="/admin/plugin/' . $encodedName . '/view" class="current">Edit Plugin</a>';
 
     // If not........
-    if (!$ajax)
-    {
+    if (!$ajax) {
         send_header();
     }
 
     /// Can we access it?
-    if (!can_admin_plugin($plugin))
-    {
-        err ('You do not have ownership access of that plugin!');
-    }
+    if (!can_admin_plugin($plugin)) {
+        err('You do not have ownership access of that plugin!');
+    } else {
+        ?>
 
-    else
-    {
-?>
-
-<?php
-    if (!$ajax)
-    {
-        echo '
+        <?php
+        if (!$ajax) {
+            echo '
 
                         <div class="row-fluid">
 ';
-    }
-?>
+        }
+        ?>
 
-                    <div class="span6 offset3">
+        <div class="span6 offset3">
 
-                        <form action="/admin/plugin/<?php echo $plugin->getName(); ?>/update" method="post" class="form-horizontal">
-                            <legend>
-                                Basic information
-                            </legend>
+            <form action="/admin/plugin/<?php echo $plugin->getName(); ?>/update" method="post" class="form-horizontal">
+                <legend>
+                    Basic information
+                </legend>
 
-                            <div class="control-group">
-                                <label class="control-label" for="name">Plugin name</label>
+                <div class="control-group">
+                    <label class="control-label" for="name">Plugin name</label>
 
-                                <div class="controls">
-                                    <input type="text" name="name" value="<?php echo $plugin->getName(); ?>" id="name" disabled />
-                                </div>
-                            </div>
+                    <div class="controls">
+                        <input type="text" name="name" value="<?php echo $plugin->getName(); ?>" id="name" disabled/>
+                    </div>
+                </div>
 
-                            <div class="control-group">
-                                <label class="control-label" for="authors">Authors</label>
+                <div class="control-group">
+                    <label class="control-label" for="authors">Authors</label>
 
-                                <div class="controls">
-                                    <input type="text" name="authors" value="<?php echo $plugin->getAuthors(); ?>" id="authors" />
-                                </div>
-                            </div>
-<?php
+                    <div class="controls">
+                        <input type="text" name="authors" value="<?php echo $plugin->getAuthors(); ?>" id="authors"/>
+                    </div>
+                </div>
+                <?php
 
-$graphs = $plugin->getAllGraphs();
-$index = 0;
-foreach ($graphs as $graph)
-{
-    $index ++ ; // start at 1 as well
+                $graphs = $plugin->getAllGraphs();
+                $index = 0;
+                foreach ($graphs as $graph) {
+                    $index++; // start at 1 as well
 
-    // convenient data so we aren't constantly using accessors
-    $id = $graph->getID();
-    $name = htmlentities($graph->getName());
-    $displayName = htmlentities($graph->getDisplayName());
-    $type = $graph->getType();
-    $isActive = $graph->isActive();
-    $scale = $graph->getScale();
-    $position = $graph->getPosition();
-    $disabled = $graph->isReadOnly() ? TRUE : FALSE;
-echo '
+                    // convenient data so we aren't constantly using accessors
+                    $id = $graph->getID();
+                    $name = htmlentities($graph->getName());
+                    $displayName = htmlentities($graph->getDisplayName());
+                    $type = $graph->getType();
+                    $isActive = $graph->isActive();
+                    $scale = $graph->getScale();
+                    $position = $graph->getPosition();
+                    $disabled = $graph->isReadOnly() ? true : false;
+                    echo '
                             <legend>
                                 Custom graph #' . $index . '
                             </legend>
@@ -180,32 +168,30 @@ echo '
                             </div>
 
 ';
-}
-?>
-                            <div class="form-actions" style="padding-left: 0; text-align: center; width: 320px;">
-                                <input type="submit" name="submit" value="Save changes" class="btn btn-primary" />
-                                <a href="/admin/" class="btn">Cancel</a>
-                            </div>
-
-                        </form>
-
-                    </div>
-
-                <?php
-                if (!$ajax)
-                {
-                    echo '
-                </div>';
                 }
                 ?>
+                <div class="form-actions" style="padding-left: 0; text-align: center; width: 320px;">
+                    <input type="submit" name="submit" value="Save changes" class="btn btn-primary"/>
+                    <a href="/admin/" class="btn">Cancel</a>
+                </div>
+
+            </form>
+
+        </div>
+
+        <?php
+        if (!$ajax) {
+            echo '
+                </div>';
+        }
+        ?>
 
 
-<?php
+    <?php
     }
 
 }
 
-if (!$ajax)
-{
+if (!$ajax) {
     send_footer();
 }

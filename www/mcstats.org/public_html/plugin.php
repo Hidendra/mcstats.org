@@ -13,8 +13,7 @@ require_once ROOT . '../private_html/includes/func.php';
 // Cache until the next interval
 header('Cache-Control: public, s-maxage=' . (timeUntilNextGraph() - time()));
 
-if (!isset($_GET['plugin']))
-{
+if (!isset($_GET['plugin'])) {
     $page_title = 'MCStats :: Invalid Plugin';
     $breadcrumbs = '<a href="/" class="current">Invalid Plugin</a>';
     send_header();
@@ -27,8 +26,7 @@ if (!isset($_GET['plugin']))
 $plugin = loadPlugin($_GET['plugin']);
 
 // Doesn't exist
-if ($plugin === NULL)
-{
+if ($plugin === null) {
     $page_title = 'MCStats :: Invalid Plugin';
     $breadcrumbs = '<a href="/" class="current">Invalid Plugin</a>';
     send_header();
@@ -56,7 +54,7 @@ $sidebar_more = '
                     <ul>
                         ' . $more . '
                         <li><a>Added on: <strong>' . date('F d, Y', $plugin->getCreated()) . '</strong></a></li>
-                        <li><a>Rank held for: <strong>' . epochToHumanString(time() - $plugin->getLastRankChange(), FALSE) . '</strong></a></li>
+                        <li><a>Rank held for: <strong>' . epochToHumanString(time() - $plugin->getLastRankChange(), false) . '</strong></a></li>
                         <li><a>Global starts: <strong>' . number_format($plugin->getGlobalHits()) . '</strong></a></li>
                     </ul>
                 </li>
@@ -68,44 +66,33 @@ send_header();
 
 $output = $cache->get('plugin/' . $plugin->getName());
 
-if (!$output)
-{
+if (!$output) {
     ob_start();
 
     $rank = $plugin->getRank();
     $rank_class = '';
     $rank_change = '';
     $rank_graph = '';
-    if ($rank == '')
-    {
+    if ($rank == '') {
         $rank = '<i>Not ranked</i>';
-    } else
-    {
+    } else {
         // bolden the rank if they're in the top-10
-        if (is_numeric($rank) && $rank <= 10)
-        {
+        if (is_numeric($rank) && $rank <= 10) {
             $rank = '<b>' . $rank . '</b>';
         }
 
         // increase
-        if ($plugin->getRank() < $plugin->getLastRank())
-        {
+        if ($plugin->getRank() < $plugin->getLastRank()) {
             $rank_class = 'peity_bar_good';
             $rank_change = '+' . ($plugin->getLastRank() - $plugin->getRank());
             $rank_graph = '1,2,3,4,5,6,7,8';
-        }
-
-        // decrease
-        elseif ($plugin->getRank() > $plugin->getLastRank())
-        {
+        } // decrease
+        elseif ($plugin->getRank() > $plugin->getLastRank()) {
             $rank_class = 'peity_bar_bad';
             $rank_change = '-' . ($plugin->getRank() - $plugin->getLastRank());
             $rank_graph = '8,7,6,5,4,3,2,1';
-        }
-
-        // no change
-        else
-        {
+        } // no change
+        else {
             $rank_class = 'peity_line_neutral';
             $rank_change = '&plusmn;0';
             $rank_graph = '4,4,4,4,4,4,4,4';
@@ -141,8 +128,12 @@ if (!$output)
         $players_class = $players_graph[0] > $players_graph[1] ? 'peity_line_good' : 'peity_line_bad';
         $players_diff = $players_graph[0] - $players_graph[1];
 
-        if ($servers_diff > 0) $servers_diff = '+' . $servers_diff;
-        if ($players_diff > 0) $players_diff = '+' . $players_diff;
+        if ($servers_diff > 0) {
+            $servers_diff = '+' . $servers_diff;
+        }
+        if ($players_diff > 0) {
+            $players_diff = '+' . $players_diff;
+        }
 
         //
         $current_servers = number_format($servers_graph[0]);

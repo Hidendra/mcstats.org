@@ -11,8 +11,7 @@ $countries = loadCountries();
 $baseEpoch = normalizeTime();
 $minimum = strtotime('-30 minutes', $baseEpoch);
 
-function doGeneration($pluginId, $data)
-{
+function doGeneration($pluginId, $data) {
     global $countries, $baseEpoch;
     $plugin = loadPluginByID($pluginId);
     $auth_mode = $data['online_mode'];
@@ -35,7 +34,7 @@ function doGeneration($pluginId, $data)
         return;
     }
 
-    $graph = $plugin->getOrCreateGraph('Auth Mode', false, 1, GraphType::Pie, TRUE, 9011);
+    $graph = $plugin->getOrCreateGraph('Auth Mode', false, 1, GraphType::Pie, true, 9011);
     insertGraphDataScratch($graph, $pluginId, $fullName, $baseEpoch, $sum, $count, $avg, $max, $min, $variance, $stddev);
 }
 

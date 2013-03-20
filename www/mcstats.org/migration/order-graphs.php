@@ -12,9 +12,8 @@ $converted = 0;
 $plugins = loadPlugins(PLUGIN_ORDER_ALPHABETICAL);
 $total = count($plugins);
 
-foreach ($plugins as $plugin)
-{
+foreach ($plugins as $plugin) {
     echo sprintf('[%d%%] Ordering graphs for %s ..%s', floor(($converted / $total) * 100), $plugin->getName(), PHP_EOL);
     $plugin->orderGraphs();
-    $converted ++;
+    $converted++;
 }

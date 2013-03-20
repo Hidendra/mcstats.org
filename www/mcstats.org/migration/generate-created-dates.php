@@ -50,10 +50,9 @@ foreach ($plugins as $plugin) {
 }
 
 // wait for all of the processes to finish
-while ($running_processes > 0)
-{
+while ($running_processes > 0) {
     pcntl_wait($status);
-    $running_processes --;
+    $running_processes--;
 }
 
 echo sprintf('Converted %d plugins%s', count($plugins), PHP_EOL);

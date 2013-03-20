@@ -12,8 +12,7 @@ insert_cache_headers();
 // Our json encoded response
 $response = array();
 
-if (!isset($_GET['plugin']))
-{
+if (!isset($_GET['plugin'])) {
     $response['msg'] = 'No plugin provided';
     $response['status'] = 'err';
     exit(json_encode($response));
@@ -21,8 +20,7 @@ if (!isset($_GET['plugin']))
 
 $plugin = loadPlugin($_GET['plugin']);
 
-if ($plugin === NULL)
-{
+if ($plugin === null) {
     $response['msg'] = 'Invalid plugin';
     $response['status'] = 'err';
     exit(json_encode($response));

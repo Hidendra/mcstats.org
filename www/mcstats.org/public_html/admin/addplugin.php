@@ -13,51 +13,42 @@ $breadcrumbs = '<a href="/admin/">Administration</a> <a href="/admin/add-plugin/
 
 send_header();
 
-if (isset($_POST['submit']))
-{
+if (isset($_POST['submit'])) {
     $pluginName = $_POST['pluginName'];
     $dbo = $_POST['dbo'];
     $email = $_POST['email'];
 
     $plugin = loadPlugin($pluginName);
 
-    if ($plugin === NULL)
-    {
+    if ($plugin === null) {
         err('Invalid plugin.');
         send_add_plugin(htmlentities($pluginName), htmlentities($email), $dbo);
-    } else
-    {
+    } else {
         // check if they already have access to it
         $accessible = get_accessible_plugins();
-        $hasPlugin = FALSE;
+        $hasPlugin = false;
 
-        foreach ($accessible as $accessiblePlugin)
-        {
-            if ($plugin->getID() == $accessiblePlugin->getID())
-            {
-                $hasPlugin = TRUE;
+        foreach ($accessible as $accessiblePlugin) {
+            if ($plugin->getID() == $accessiblePlugin->getID()) {
+                $hasPlugin = true;
                 $plugin = $accessiblePlugin;
                 break;
             }
         }
 
-        if ($hasPlugin && $plugin->getPendingAccess() !== TRUE)
-        {
+        if ($hasPlugin && $plugin->getPendingAccess() !== true) {
             err(sprintf('You already own the plugin <b>%s</b>!', htmlentities($plugin->getName())));
             send_add_plugin(htmlentities($plugin->getName()), htmlentities($email), $dbo);
-        } else
-        {
+        } else {
             $uid = $_SESSION['uid'];
             $statement = get_slave_db_handle()->prepare('SELECT Created FROM PluginRequest WHERE Author = ? AND Plugin = ?');
             $statement->execute(array($uid, $plugin->getID()));
 
-            if ($row = $statement->fetch())
-            {
+            if ($row = $statement->fetch()) {
                 $created = $row['Created'];
                 err(sprintf('Your ownership request for <b>%s</b> is still pending approval, which was submitted at <b>%s</b>', htmlentities($plugin->getName()), date('H:i T D, F d', $created)));
                 send_add_plugin(htmlentities($plugin->getName()), htmlentities($email), htmlentities($dbo));
-            } else
-            {
+            } else {
                 $statement = $master_db_handle->prepare('INSERT INTO PluginRequest (Author, Plugin, Email, DBO, Created) VALUES (?, ?, ?, ?, UNIX_TIMESTAMP())');
                 $statement->execute(array($uid, $plugin->getID(), $email, $dbo));
                 $statement = $master_db_handle->prepare('INSERT INTO AuthorACL (Author, Plugin, Pending) VALUES (?, ?, 1)');
@@ -67,16 +58,13 @@ if (isset($_POST['submit']))
             }
         }
     }
-}
-else
-{
+} else {
     send_add_plugin();
 }
 
 send_footer();
 
-function send_add_plugin($plugin = '', $email = '', $dbo = '')
-{
+function send_add_plugin($plugin = '', $email = '', $dbo = '') {
     echo '
             <script type="text/javascript">
                 $(document).ready(function() {

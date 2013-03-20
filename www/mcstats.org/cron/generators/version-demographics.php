@@ -36,7 +36,7 @@ while ($data = $statement->fetch()) {
     $variance = $data['Variance'];
     $stddev = $data['StdDev'];
 
-    $graph = $plugin->getOrCreateGraph('Version Demographics', false, 1, GraphType::Percentage_Area, TRUE, 9004);
+    $graph = $plugin->getOrCreateGraph('Version Demographics', false, 1, GraphType::Percentage_Area, true, 9004);
     $columnID = $graph->getColumnID($version);
 
     // these can be NULL IFF there is only one data point (e.g one server) in the sample

@@ -9,8 +9,7 @@ require_once ROOT . '../private_html/includes/func.php';
 
 admin_header();
 
-if (isset($_POST['submit']))
-{
+if (isset($_POST['submit'])) {
     // Process login info
     $username = $_POST['username'];
     $password = $_POST['password'];
@@ -18,17 +17,13 @@ if (isset($_POST['submit']))
     // At the moment we only we basic authentication
     $real_username = check_login($username, $password);
 
-    if ($real_username === FALSE)
-    {
+    if ($real_username === false) {
         /// Throw out an error first
         echo '<div class="alert alert-error row-fluid" style="margin-left: 35%; width: 30%; text-align: center;">The username or password you have entered is incorrect.</div>';
 
         /// Resend the login form
         send_login();
-    }
-
-    else
-    {
+    } else {
         echo '<div class="alert alert-success row-fluid" style="margin-left: 35%; width: 30%; text-align: center;">You have now been logged in. If you are not automatically redirected, click <a href="/admin/">here</a></div>
               <meta http-equiv="refresh" content="2; /admin/" /> ';
 
@@ -36,17 +31,14 @@ if (isset($_POST['submit']))
         $_SESSION['username'] = $real_username;
     }
 
-}
-else
-{
+} else {
     send_login();
 }
 
 admin_footer();
 
-function send_login()
-{
-echo '
+function send_login() {
+    echo '
         <div id="loginbox">
             <form id="loginform" class="form-vertical" action="" method="post">
 				<p>Enter username and password to continue.</p>
@@ -74,8 +66,7 @@ echo '
 ';
 }
 
-function admin_header()
-{
+function admin_header() {
     echo <<<END
 
 <!DOCTYPE html>
@@ -98,9 +89,8 @@ END;
 
 }
 
-function admin_footer()
-{
-echo <<<END
+function admin_footer() {
+    echo <<<END
     </body>
 </html>
 END;

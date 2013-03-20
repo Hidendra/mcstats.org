@@ -12,11 +12,9 @@ insert_cache_headers();
 // Our json encoded response
 $response = array();
 
-if (!isset($_GET['page']))
-{
+if (!isset($_GET['page'])) {
     $page = 1;
-} else
-{
+} else {
     $page = intval($_GET['page']);
 }
 
@@ -26,8 +24,7 @@ $response['maxPages'] = ceil($totalPlugins / PLUGIN_LIST_RESULTS_PER_PAGE);
 
 // offset is how many plugins to start after
 $offset = ($page - 1) * PLUGIN_LIST_RESULTS_PER_PAGE;
-foreach (loadPlugins(PLUGIN_ORDER_POPULARITY, PLUGIN_LIST_RESULTS_PER_PAGE, $offset) as $plugin)
-{
+foreach (loadPlugins(PLUGIN_ORDER_POPULARITY, PLUGIN_LIST_RESULTS_PER_PAGE, $offset) as $plugin) {
     if ($plugin->isHidden()) {
         continue;
     }

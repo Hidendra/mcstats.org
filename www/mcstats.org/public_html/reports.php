@@ -16,7 +16,7 @@ if (!isset($_GET['period'])) {
 } else {
     $period = $_GET['period'];
 
-    $file = NULL;
+    $file = null;
     $name = '';
 
     switch ($period) {
@@ -32,7 +32,7 @@ if (!isset($_GET['period'])) {
             break;
     }
 
-    if ($file == NULL) {
+    if ($file == null) {
         $breadcrumbs = '<a href="#" class="current">Error</a>';
         send_header();
         echo '<p>Invalid period.</p>';

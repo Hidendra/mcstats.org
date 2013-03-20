@@ -22,33 +22,28 @@
  *
  */
 
-class HighRollerSeriesData
-{
+class HighRollerSeriesData {
 
     public $name;
     public $data = array();
 
-    public function addName($name)
-    {
+    public function addName($name) {
         $this->name = $name;
         $this->id = $name;
         return $this;
     }
 
-    public function addType($type)
-    {
+    public function addType($type) {
         $this->type = $type;
         return $this;
     }
 
-    public function addData($data)
-    {
+    public function addData($data) {
         $this->data = $data;
         return $this;
     }
 
-    public function addColor($color)
-    {
+    public function addColor($color) {
         $this->color = $color;
         return $this;
     }

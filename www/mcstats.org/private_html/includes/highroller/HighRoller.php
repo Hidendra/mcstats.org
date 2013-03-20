@@ -52,8 +52,7 @@
  *
  */
 
-class HighRoller
-{
+class HighRoller {
 
     public $chart;
     public $title;
@@ -63,8 +62,7 @@ class HighRoller
     public $series = array();
     public $feedurl = '';
 
-    function __construct()
-    {
+    function __construct() {
 
         $this->chart = new HighRollerChart();
         $this->title = new HighRollerTitle();
@@ -80,8 +78,7 @@ class HighRoller
      * @param $location - path to your highcharts JS
      * @return string - html script tag markup with your source location
      */
-    public static function setHighChartsLocation($location)
-    {
+    public static function setHighChartsLocation($location) {
         return $scriptTag = "<!-- High Roller - High Charts Location-->
   <script type='text/javascript' src='" . $location . "'></script>";
 
@@ -92,8 +89,7 @@ class HighRoller
      * @param $location - path to your highcharts theme file
      * @return string - html script tag markup with your source location
      */
-    public static function setHighChartsThemeLocation($location)
-    {
+    public static function setHighChartsThemeLocation($location) {
         return $scriptTag = "<!-- High Roller - High Charts Theme Location-->
   <script type='text/javascript' src='" . $location . "'></script>";
 
@@ -105,8 +101,7 @@ class HighRoller
      * @param $value - mixed, value you wish to assign to the property
      * @return HighRoller
      */
-    public function setProperty($objName, $propertyName, $value)
-    {
+    public function setProperty($objName, $propertyName, $value) {
         $this->$objName->$propertyName = $value;
         return $this;
     }
@@ -115,8 +110,7 @@ class HighRoller
      * @param $chartdata - array, data provided in 1 of 3 HighCharts supported array formats (array, assoc array or mult-dimensional array)
      * @return void
      */
-    public function addData($chartdata)
-    {
+    public function addData($chartdata) {
         if (!is_array($chartdata)) {
             die("HighRoller::addData() - data format must be an array.");
         }
@@ -127,24 +121,24 @@ class HighRoller
      * @param $chartdata - array, data provided in 1 of 3 HighCharts supported array formats (array, assoc array or mult-dimensional array)
      * @return void
      */
-    public function addSeries($chartData)
-    {
+    public function addSeries($chartData) {
         if (!is_object($chartData)) {
             die("HighRoller::addSeries() - series input format must be an object.");
         }
 
         if (is_object($this->series)) { // if series is an object
             $this->series = array($chartData);
-        } else if (is_array($this->series)) { // else
-            array_push($this->series, $chartData);
+        } else {
+            if (is_array($this->series)) { // else
+                array_push($this->series, $chartData);
+            }
         }
     }
 
     /** enable auto-step calc for xAxis labels for very large data sets.
      * @return void
      */
-    public function enableAutoStep()
-    {
+    public function enableAutoStep() {
 
         if (is_array($this->series)) {
             $count = count($this->series[0]->data);
@@ -162,20 +156,21 @@ class HighRoller
      * @param chart the chart to generate, either highcharts or highstock
      * @return string - highcharts!
      */
-    function renderChart($renderTo, $chart = 'highcharts', $rawJavascript = '', $engine = 'jquery', $graphType = '')
-    {
+    function renderChart($renderTo, $chart = 'highcharts', $rawJavascript = '', $engine = 'jquery', $graphType = '') {
         $options = new HighRollerOptions(); // change file/class name to new HighRollerGlobalOptions()
 
-        if ($engine == 'mootools')
+        if ($engine == 'mootools') {
             $chartJS = 'window.addEvent(\'domready\', function() {';
-        else
+        } else {
             $chartJS = '$(document).ready(function() {';
+        }
 
         // determine the classname to use
-        if ($chart == 'highstock')
+        if ($chart == 'highstock') {
             $classname = 'StockChart';
-        else
+        } else {
             $classname = 'Chart';
+        }
 
         /*
         $chartJS .= "\n\n    // HIGHROLLER - HIGHCHARTS UTC OPTIONS ";
@@ -189,14 +184,12 @@ class HighRoller
         $chartJS .= "\n    " . $this->chart->renderTo . "Options = " . $this->getChartOptionsObject() . ";";
         $chartJS .= $rawJavascript;
 
-        if ($graphType != GraphType::Map)
-        {
+        if ($graphType != GraphType::Map) {
             $chartJS .= "${renderTo}Obj = new Highcharts.$classname(" . $this->chart->renderTo . "Options);";
         }
 
         // request rendering via feed URL if it was supplied
-        if (!empty($this->feedurl))
-        {
+        if (!empty($this->feedurl)) {
             $chartJS .= 'retrieveGraphData(' . $renderTo . 'Options, ' . ($chart == 'highcharts' ? 'HIGHCHARTS' : 'HIGHSTOCKS') . ', "' . $this->feedurl . '");' . "\n";
         }
 
@@ -209,8 +202,7 @@ class HighRoller
     /** returns valid Highcharts javascript object containing your HighRoller options, for manipulation between the markup script tags on your page`
      * @return string - highcharts options object!
      */
-    function getChartOptionsObject()
-    {
+    function getChartOptionsObject() {
         return trim(json_encode($this, JSON_NUMERIC_CHECK));
     }
 
@@ -218,8 +210,7 @@ class HighRoller
      * @param $varname - name of your javascript object holding getChartOptionsObject()
      * @return string - a new Highcharts.Chart() object with the highroller chart options object
      */
-    function renderChartOptionsObject($varname)
-    {
+    function renderChartOptionsObject($varname) {
         return "new Highcharts.Chart(" . $varname . ")";
     }
 
@@ -249,13 +240,11 @@ class HighRoller
  *
  */
 
-class HighRollerAxisLabel
-{
+class HighRollerAxisLabel {
 
     public $style;
 
-    function __construct()
-    {
+    function __construct() {
         $this->style = new HighRollerStyle();
     }
 
@@ -285,13 +274,11 @@ class HighRollerAxisLabel
  *
  */
 
-class HighRollerAxisTitle
-{
+class HighRollerAxisTitle {
 
     public $style;
 
-    function __construct()
-    {
+    function __construct() {
         $this->style = new HighRollerStyle();
     }
 
@@ -321,14 +308,12 @@ class HighRollerAxisTitle
  *
  */
 
-class HighRollerBackgroundColors
-{
+class HighRollerBackgroundColors {
 
     public $linearGradient;
     public $stops;
 
-    function __construct()
-    {
+    function __construct() {
 
     }
 
@@ -358,15 +343,13 @@ class HighRollerBackgroundColors
  *
  */
 
-class HighRollerChart
-{
+class HighRollerChart {
 
     public $renderTo;
 
 //  public $animation;
 
-    function __construct()
-    {
+    function __construct() {
         $this->renderTo = null;
 //    $this->animation = new HighRollerChartAnimation();
     }
@@ -397,11 +380,9 @@ class HighRollerChart
  *
  */
 
-class HighRollerChartAnimation
-{
+class HighRollerChartAnimation {
 
-    function __construct()
-    {
+    function __construct() {
     }
 
 }
@@ -431,11 +412,9 @@ class HighRollerChartAnimation
  *
  */
 
-class HighRollerCredits
-{
+class HighRollerCredits {
 
-    function __construct()
-    {
+    function __construct() {
 
     }
 
@@ -465,11 +444,9 @@ class HighRollerCredits
  *
  */
 
-class HighRollerDataLabels
-{
+class HighRollerDataLabels {
 
-    function __construct()
-    {
+    function __construct() {
         $this->style = new HighRollerStyle();
     }
 
@@ -499,11 +476,9 @@ class HighRollerDataLabels
  *
  */
 
-class HighRollerDateTimeLabelFormats
-{
+class HighRollerDateTimeLabelFormats {
 
-    function __construct()
-    {
+    function __construct() {
 
     }
 
@@ -533,13 +508,11 @@ class HighRollerDateTimeLabelFormats
  *
  */
 
-class HighRollerEngine
-{
+class HighRollerEngine {
 
     public $type;
 
-    function __construct()
-    {
+    function __construct() {
         $this->type = "jquery";
     }
 
@@ -569,13 +542,11 @@ class HighRollerEngine
  *
  */
 
-class HighRollerFormatter
-{
+class HighRollerFormatter {
 
     public $formatter;
 
-    function __construct()
-    {
+    function __construct() {
         $this->formatter = "";
     }
 
@@ -606,14 +577,12 @@ class HighRollerFormatter
  *
  */
 
-class HighRollerLegend
-{
+class HighRollerLegend {
 
     public $style;
     public $backgroundColor = null;
 
-    function __construct()
-    {
+    function __construct() {
         $this->style = new HighRollerStyle();
     }
 
@@ -643,13 +612,11 @@ class HighRollerLegend
  *
  */
 
-class HighRollerOptions
-{
+class HighRollerOptions {
 
     public $global;
 
-    function __construct()
-    {
+    function __construct() {
         $this->global = new HighRollerOptionsGlobal();
     }
 
@@ -679,13 +646,11 @@ class HighRollerOptions
  *
  */
 
-class HighRollerOptionsGlobal
-{
+class HighRollerOptionsGlobal {
 
     public $useUTC;
 
-    function __construct()
-    {
+    function __construct() {
         $this->useUTC = true;
     }
 
@@ -715,11 +680,9 @@ class HighRollerOptionsGlobal
  *
  */
 
-class HighRollerPlotLines
-{
+class HighRollerPlotLines {
 
-    function __construct()
-    {
+    function __construct() {
         $this->label = new HighRollerAxisLabel();
     }
 
@@ -750,34 +713,38 @@ class HighRollerPlotLines
  *
  */
 
-class HighRollerPlotOptions
-{
+class HighRollerPlotOptions {
 
     public $series;
 
-    function __construct($chartType)
-    {
+    function __construct($chartType) {
         $this->series = new HighRollerSeriesOptions();
         if ($chartType == 'area') {
             $this->area = null;
-        }
-        else if ($chartType == 'bar') {
-            $this->bar = null;
-        }
-        else if ($chartType == 'column') {
-            $this->column = null;
-        }
-        else if ($chartType == 'line') {
-            $this->line = null;
-        }
-        else if ($chartType == 'pie') {
-            $this->pie = null;
-        }
-        else if ($chartType == 'scatter') {
-            $this->scatter = null;
-        }
-        else if ($chartType == 'spline') {
-            $this->spline = null;
+        } else {
+            if ($chartType == 'bar') {
+                $this->bar = null;
+            } else {
+                if ($chartType == 'column') {
+                    $this->column = null;
+                } else {
+                    if ($chartType == 'line') {
+                        $this->line = null;
+                    } else {
+                        if ($chartType == 'pie') {
+                            $this->pie = null;
+                        } else {
+                            if ($chartType == 'scatter') {
+                                $this->scatter = null;
+                            } else {
+                                if ($chartType == 'spline') {
+                                    $this->spline = null;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -807,14 +774,12 @@ class HighRollerPlotOptions
  *
  */
 
-class HighRollerPlotOptionsByChartType
-{
+class HighRollerPlotOptionsByChartType {
 
     public $dataLabels;
     public $formatter;
 
-    function __construct($type)
-    {
+    function __construct($type) {
         $this->dataLabels = new HighRollerDataLabels();
         $this->formatter = new HighRollerFormatter();
     }
@@ -845,11 +810,9 @@ class HighRollerPlotOptionsByChartType
  *
  */
 
-class HighRollerSeries
-{
+class HighRollerSeries {
 
-    function __construct()
-    {
+    function __construct() {
     }
 
 }
@@ -878,13 +841,11 @@ class HighRollerSeries
  *
  */
 
-class HighRollerSeriesOptions
-{
+class HighRollerSeriesOptions {
 
     public $dataLabels;
 
-    function __construct()
-    {
+    function __construct() {
         $this->dataLabels = new HighRollerDataLabels();
     }
 
@@ -914,11 +875,9 @@ class HighRollerSeriesOptions
  *
  */
 
-class HighRollerStyle
-{
+class HighRollerStyle {
 
-    function __construct()
-    {
+    function __construct() {
 
     }
 }
@@ -947,15 +906,13 @@ class HighRollerStyle
  *
  */
 
-class HighRollerTitle
-{
+class HighRollerTitle {
 
     public $text;
 
 //  public $style;
 
-    function __construct()
-    {
+    function __construct() {
 //    $this->style = new HighRollerStyle();
     }
 
@@ -985,13 +942,11 @@ class HighRollerTitle
  *
  */
 
-class HighRollerToolTip
-{
+class HighRollerToolTip {
 
     public $backgroundColor = null;
 
-    function __construct()
-    {
+    function __construct() {
 
     }
 
@@ -1022,8 +977,7 @@ class HighRollerToolTip
  *
  */
 
-class HighRollerXAxis
-{
+class HighRollerXAxis {
 
     public $labels;
     public $title;
@@ -1031,8 +985,7 @@ class HighRollerXAxis
     public $plotLines = array(); // @TODO instantiating a new plotLines object isn't working, setting as an array
     public $formatter;
 
-    function __construct()
-    {
+    function __construct() {
         $this->labels = new HighRollerXAxisLabels();
         $this->title = new HighRollerAxisTitle();
         $this->dateTimeLabelFormats = new HighRollerDateTimeLabelFormats();
@@ -1065,13 +1018,11 @@ class HighRollerXAxis
  *
  */
 
-class HighRollerXAxisLabels
-{
+class HighRollerXAxisLabels {
 
     public $style;
 
-    function __construct()
-    {
+    function __construct() {
         $this->style = new HighRollerStyle();
     }
 
@@ -1101,16 +1052,14 @@ class HighRollerXAxisLabels
  *
  */
 
-class HighRollerYAxis
-{
+class HighRollerYAxis {
 
     public $labels;
     public $title;
     public $plotLines = array(); // @TODO instantiating a new plotLines object isn't working, setting as an array
     public $formatter;
 
-    function __construct()
-    {
+    function __construct() {
         $this->labels = new HighRollerAxisLabel();
         $this->title = new HighRollerAxisTitle();
         $this->plotLines = array(); // @TODO need to revisit why declaring this as an empty class or a hydrated class isn't working    $this->dateTimeLabelFormats = new HighRollerDateTimeLabelFormats();

@@ -25,15 +25,13 @@ arsort($counts);
 
 $rank = 0;
 $lastChange = normalizeTime();
-foreach ($counts as $pluginId => $count)
-{
+foreach ($counts as $pluginId => $count) {
     $plugin = $plugins[$pluginId];
 
     $newRank = ++$rank;
 
     // did their rank change ?
-    if ($newRank != $plugin->getRank())
-    {
+    if ($newRank != $plugin->getRank()) {
         $plugin->setLastRankChange($lastChange);
     }
 
@@ -41,5 +39,5 @@ foreach ($counts as $pluginId => $count)
     $plugin->setRank($newRank);
     $plugin->save();
 
-    echo sprintf ('%d: %s%s', $rank, $plugin->getName(), PHP_EOL);
+    echo sprintf('%d: %s%s', $rank, $plugin->getName(), PHP_EOL);
 }

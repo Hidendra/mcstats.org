@@ -22,11 +22,9 @@
  *
  */
 
-class HighRollerAreaSplineChart extends HighRoller
-{
+class HighRollerAreaSplineChart extends HighRoller {
 
-    function __construct()
-    {
+    function __construct() {
         parent::__construct();
         $this->chart->type = 'areaspline';
 //    $this->xAxis = new HighRollerXAxis();

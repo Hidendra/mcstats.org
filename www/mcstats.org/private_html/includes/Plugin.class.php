@@ -1,11 +1,12 @@
 <?php
-if (!defined('ROOT')) exit('For science.');
+if (!defined('ROOT')) {
+    exit('For science.');
+}
 
 // Minimum countries required to display 'Others'
 define('MINIMUM_FOR_OTHERS', 15);
 
-class Plugin
-{
+class Plugin {
     /**
      * Internal id
      * @var integer
@@ -91,24 +92,20 @@ class Plugin
      * Where [ 1, 9000, 9001 ] are enforced graphs, it will become
      * [ 1, 2, 3, 4, 9000, 90001 ]
      */
-    public function orderGraphs()
-    {
+    public function orderGraphs() {
         $graphs = $this->getActiveGraphs();
 
         $count = count($graphs);
 
         // do they even have any custom graphs ?
-        if ($count == 3)
-        {
+        if ($count == 3) {
             return;
         }
 
         $current = 2; // the position to use
-        foreach ($graphs as $graph)
-        {
+        foreach ($graphs as $graph) {
             // ignore predefined graphs
-            if ($graph->isReadOnly())
-            {
+            if ($graph->isReadOnly()) {
                 continue;
             }
 
@@ -121,8 +118,7 @@ class Plugin
      * Get the key is prefixed to entries stored in the cache
      * @return string
      */
-    private function cacheKey()
-    {
+    private function cacheKey() {
         return 'plugin-' . $this->id;
     }
 
@@ -133,21 +129,18 @@ class Plugin
      * @param $name
      * @return Graph
      */
-    public function getOrCreateGraph($name, $attemptedToCreate = false, $active = 0, $type = GraphType::Line, $readonly = FALSE, $position = 2, $halfwidth = FALSE)
-    {
+    public function getOrCreateGraph($name, $attemptedToCreate = false, $active = 0, $type = GraphType::Line, $readonly = false, $position = 2, $halfwidth = false) {
         global $master_db_handle;
 
         // Try to get it from the database
         $statement = $master_db_handle->prepare('SELECT ID, Plugin, Type, Active, Readonly, Name, DisplayName, Scale, Halfwidth, Position FROM Graph WHERE Plugin = ? AND Name = ?');
         $statement->execute(array($this->id, $name));
 
-        if ($row = $statement->fetch())
-        {
+        if ($row = $statement->fetch()) {
             return new Graph($row['ID'], $this, $row['Type'], $row['Name'], $row['DisplayName'], $row['Active'], $row['Readonly'], $row['Position'], $row['Scale'], $row['Halfwidth'] == 1);
         }
 
-        if ($attemptedToCreate)
-        {
+        if ($attemptedToCreate) {
             error_fquit('Failed to create graph for "' . $name . '"');
         }
 
@@ -165,7 +158,7 @@ class Plugin
         ));
 
         // reselect it
-        return $this->getOrCreateGraph($name, TRUE, $active, $readonly);
+        return $this->getOrCreateGraph($name, true, $active, $readonly);
     }
 
     /**
@@ -174,20 +167,18 @@ class Plugin
      * @param $name
      * @return Graph The Graph object and if it does not exist, NULL
      */
-    public function getGraphByName($name)
-    {
+    public function getGraphByName($name) {
         global $master_db_handle;
 
         // Try to get it from the database
         $statement = $master_db_handle->prepare('SELECT ID, Plugin, Type, Active, Readonly, Name, DisplayName, Scale, Halfwidth, Position FROM Graph WHERE Plugin = ? AND Name = ?');
         $statement->execute(array($this->id, $name));
 
-        if ($row = $statement->fetch())
-        {
+        if ($row = $statement->fetch()) {
             return new Graph($row['ID'], $this, $row['Type'], $row['Name'], $row['DisplayName'], $row['Active'], $row['Readonly'], $row['Position'], $row['Scale'], $row['Halfwidth'] == 1);
         }
 
-        return NULL;
+        return null;
     }
 
     /**
@@ -195,27 +186,24 @@ class Plugin
      * @param $id integer
      * @return Graph if found, otherwise NULL
      */
-    public function getGraph($id)
-    {
+    public function getGraph($id) {
         global $master_db_handle;
 
         $statement = $master_db_handle->prepare('SELECT ID, Plugin, Type, Active, Readonly, Name, DisplayName, Scale, Halfwidth, Position FROM Graph WHERE ID = ?');
         $statement->execute(array($id));
 
-        if ($row = $statement->fetch())
-        {
+        if ($row = $statement->fetch()) {
             return new Graph($row['ID'], $this, $row['Type'], $row['Name'], $row['DisplayName'], $row['Active'], $row['Readonly'], $row['Position'], $row['Scale'], $row['Halfwidth'] == 1);
         }
 
-        return NULL;
+        return null;
     }
 
     /**
      * Gets all of the active graphs for the plugin
      * @return Graph[]
      */
-    public function getActiveGraphs()
-    {
+    public function getActiveGraphs() {
         global $master_db_handle;
 
         // The graphs to return
@@ -224,8 +212,7 @@ class Plugin
         $statement = $master_db_handle->prepare('SELECT ID, Plugin, Type, Active, Readonly, Name, DisplayName, Scale, Halfwidth, Position FROM Graph WHERE Plugin = ? AND Active = 1 ORDER BY Position ASC');
         $statement->execute(array($this->id));
 
-        while ($row = $statement->fetch())
-        {
+        while ($row = $statement->fetch()) {
             $graphs[] = new Graph($row['ID'], $this, $row['Type'], $row['Name'], $row['DisplayName'], $row['Active'], $row['Readonly'], $row['Position'], $row['Scale'], $row['Halfwidth'] == 1);
         }
 
@@ -236,8 +223,7 @@ class Plugin
      * Gets all of the graphs for the plugin
      * @return Graph[]
      */
-    public function getAllGraphs()
-    {
+    public function getAllGraphs() {
         global $master_db_handle;
 
         // The graphs to return
@@ -246,8 +232,7 @@ class Plugin
         $statement = $master_db_handle->prepare('SELECT ID, Plugin, Type, Active,Readonly,  Name, DisplayName, Scale, Halfwidth, Position FROM Graph WHERE Plugin = ? ORDER BY Active DESC, Position ASC');
         $statement->execute(array($this->id));
 
-        while ($row = $statement->fetch())
-        {
+        while ($row = $statement->fetch()) {
             $graphs[] = new Graph($row['ID'], $this, $row['Type'], $row['Name'], $row['DisplayName'], $row['Active'], $row['Readonly'], $row['Position'], $row['Scale'], $row['Halfwidth'] == 1);
         }
 
@@ -262,8 +247,7 @@ class Plugin
      * @param $expire Seconds to expire the cached value in. Defaults to the next caching interval
      * @return TRUE on success and FALSE on failure
      */
-    public function cacheSet($key, $value, $expire = CACHE_UNTIL_NEXT_GRAPH)
-    {
+    public function cacheSet($key, $value, $expire = CACHE_UNTIL_NEXT_GRAPH) {
         global $cache;
         return $cache->set($this->cacheKey() . $key, $value, $expire);
     }
@@ -274,8 +258,7 @@ class Plugin
      * @param $key
      * @return the object returned from the cache
      */
-    public function cacheGet($key)
-    {
+    public function cacheGet($key) {
         global $cache;
         return $cache->get($this->cacheKey() . $key);
     }
@@ -285,8 +268,7 @@ class Plugin
      * @param $guid
      * @param $attemptedToCreate
      */
-    public function getOrCreateServer($guid, $attemptedToCreate = false)
-    {
+    public function getOrCreateServer($guid, $attemptedToCreate = false) {
         global $master_db_handle;
 
         // Try to select it first
@@ -297,12 +279,10 @@ class Plugin
         $statement->execute(array(':GUID' => $guid));
 
         // The server object
-        $server = NULL;
+        $server = null;
 
-        while ($row = $statement->fetch())
-        {
-            if ($server === NULL)
-            {
+        while ($row = $statement->fetch()) {
+            if ($server === null) {
                 $server = new Server();
                 $server->setID($row['ID']);
                 $server->setPlugin($this->id);
@@ -317,8 +297,7 @@ class Plugin
                 $server->setModified(false);
             }
 
-            if ($row['Plugin'] == $this->id)
-            {
+            if ($row['Plugin'] == $this->id) {
                 $server->setCurrentVersion($row['Version']);
                 $server->setUpdated($row['Updated']);
                 $server->setModified(false);
@@ -327,8 +306,7 @@ class Plugin
         }
 
         // Do we need to add the plugin?
-        if ($server !== NULL)
-        {
+        if ($server !== null) {
             $statement = $master_db_handle->prepare('INSERT INTO ServerPlugin (Server, Plugin, Version, Updated) VALUES (:Server, :Plugin, :Version, :Updated)');
             $statement->execute(array(':Server' => $server->getID(), ':Plugin' => $this->id, ':Version' => '', ':Updated' => time()));
 
@@ -340,8 +318,7 @@ class Plugin
         }
 
         // Did we already try to create it?
-        if ($attemptedToCreate)
-        {
+        if ($attemptedToCreate) {
             error_fquit($this->name . ': Failed to create server for "' . $guid . '"');
         }
 
@@ -350,23 +327,21 @@ class Plugin
         $statement->execute(array(':GUID' => $guid, ':Players' => 0, ':Country' => 'ZZ', ':ServerVersion' => '', ':Hits' => 0, ':Created' => time()));
 
         // reselect it
-        return $this->getOrCreateServer($guid, TRUE);
+        return $this->getOrCreateServer($guid, true);
     }
 
     /**
      * Get an array of possible versions
      * @return array
      */
-    public function getVersions()
-    {
+    public function getVersions() {
         $db_handle = get_slave_db_handle();
 
         $versions = array();
         $statement = $db_handle->prepare('SELECT ID, Version FROM Versions WHERE Plugin = ? ORDER BY Created DESC');
         $statement->execute(array($this->id));
 
-        while (($row = $statement->fetch()) != null)
-        {
+        while (($row = $statement->fetch()) != null) {
             $versions[$row['ID']] = $row['Version'];
         }
 
@@ -378,16 +353,14 @@ class Plugin
      * @return array, [id] => name
      * @deprecated
      */
-    public function getCustomColumns()
-    {
+    public function getCustomColumns() {
         $db_handle = get_slave_db_handle();
 
         $columns = array();
         $statement = $db_handle->prepare('SELECT ID, Name FROM CustomColumn WHERE Plugin = ?');
         $statement->execute(array($this->id));
 
-        while (($row = $statement->fetch()) != null)
-        {
+        while (($row = $statement->fetch()) != null) {
             $id = $row['ID'];
             $name = $row['Name'];
             $columns[$id] = $name;
@@ -403,13 +376,11 @@ class Plugin
      * @return int
      * @deprecated
      */
-    public function sumCustomData($columnID, $min, $max = -1, $table = 'CustomData')
-    {
+    public function sumCustomData($columnID, $min, $max = -1, $table = 'CustomData') {
         $db_handle = get_slave_db_handle();
 
         // use time() if $max is -1
-        if ($max == -1)
-        {
+        if ($max == -1) {
             $max = time();
         }
 
@@ -426,16 +397,14 @@ class Plugin
      * @param $maxEpoch int
      * @return array keyed by the epoch
      */
-    function getTimelineCustom($columnID, $minEpoch)
-    {
+    function getTimelineCustom($columnID, $minEpoch) {
         $db_handle = get_slave_db_handle();
 
         $ret = array();
         $statement = $db_handle->prepare('SELECT Sum, Epoch FROM GraphData WHERE Plugin = ? AND ColumnID = ? AND Epoch >= ?');
         $statement->execute(array($this->id, $columnID, $minEpoch));
 
-        while ($row = $statement->fetch())
-        {
+        while ($row = $statement->fetch()) {
             $ret[$row['Epoch']] = $row['Sum'];
         }
 
@@ -448,8 +417,7 @@ class Plugin
      * @param $maxEpoch int
      * @return array keyed by the epoch
      */
-    function getTimelineCustomLast($columnID)
-    {
+    function getTimelineCustomLast($columnID) {
         $db_handle = get_slave_db_handle();
 
         $epoch = getLastGraphEpoch();
@@ -465,13 +433,11 @@ class Plugin
      * Sum all of the current player counts for servers that have pinged the server in the last hour
      * @param $after integer
      */
-    public function sumPlayersOfServersLastUpdated($min, $max = -1)
-    {
+    public function sumPlayersOfServersLastUpdated($min, $max = -1) {
         $db_handle = get_slave_db_handle();
 
         // use time() if $max is -1
-        if ($max == -1)
-        {
+        if ($max == -1) {
             $max = time();
         }
 
@@ -490,12 +456,10 @@ class Plugin
      * @param $max
      * @return integer
      */
-    public function countVersionChanges($version, $min, $max = -1)
-    {
+    public function countVersionChanges($version, $min, $max = -1) {
         $db_handle = get_slave_db_handle();
 
-        if ($max == -1)
-        {
+        if ($max == -1) {
             $max = time();
         }
 
@@ -509,8 +473,7 @@ class Plugin
     /**
      * Get a count of all of the servers using this plugin
      */
-    public function countServers()
-    {
+    public function countServers() {
         $db_handle = get_slave_db_handle();
 
         $statement = $db_handle->prepare('SELECT COUNT(*) FROM ServerPlugin WHERE Plugin = ?');
@@ -524,8 +487,7 @@ class Plugin
      * Count all of the servers that were updated after the given epoch
      * @param $after integer
      */
-    public function countServersLastUpdated($min)
-    {
+    public function countServersLastUpdated($min) {
         $db_handle = get_slave_db_handle();
 
         $statement = $db_handle->prepare('SELECT COUNT(*) FROM ServerPlugin WHERE Plugin = ? AND Updated >= ?');
@@ -539,13 +501,11 @@ class Plugin
      * Count all of the servers that were updated after the given epoch
      * @param $after integer
      */
-    public function countServersLastUpdatedFromCountry($country, $min, $max = -1)
-    {
+    public function countServersLastUpdatedFromCountry($country, $min, $max = -1) {
         $db_handle = get_slave_db_handle();
 
         // use time() if $max is -1
-        if ($max == -1)
-        {
+        if ($max == -1) {
             $max = time();
         }
 
@@ -558,8 +518,7 @@ class Plugin
         return $row != null ? $row[0] : 0;
     }
 
-    public function countServersUsingVersion($version)
-    {
+    public function countServersUsingVersion($version) {
         $db_handle = get_slave_db_handle();
         $weekAgo = time() - SECONDS_IN_DAY;
 
@@ -576,13 +535,11 @@ class Plugin
      * @param $maxEpoch int
      * @return array keyed by the epoch
      */
-    function getTimelineCountry($minEpoch, $maxEpoch = -1)
-    {
+    function getTimelineCountry($minEpoch, $maxEpoch = -1) {
         $db_handle = get_slave_db_handle();
 
         // use time() if $max is -1
-        if ($maxEpoch == -1)
-        {
+        if ($maxEpoch == -1) {
             $maxEpoch = time();
         }
 
@@ -591,8 +548,7 @@ class Plugin
         $statement = $db_handle->prepare('SELECT Country, Servers, Epoch FROM CountryTimeline WHERE Plugin = ? AND Epoch >= ? AND Epoch <= ? ORDER BY Epoch DESC');
         $statement->execute(array($this->id, $minEpoch, $maxEpoch));
 
-        while ($row = $statement->fetch())
-        {
+        while ($row = $statement->fetch()) {
             $ret[$row['Epoch']][$row['Country']] = $row['Servers'];
         }
 
@@ -605,8 +561,7 @@ class Plugin
      * @param $maxEpoch int
      * @return array keyed by the epoch
      */
-    function getTimelineCountryLast()
-    {
+    function getTimelineCountryLast() {
         $db_handle = get_slave_db_handle();
 
         $ret = array();
@@ -615,8 +570,7 @@ class Plugin
         $statement = $db_handle->prepare('SELECT Country, Servers FROM CountryTimeline WHERE Plugin = ? AND Epoch = ?');
         $statement->execute(array($this->id, $epoch));
 
-        while ($row = $statement->fetch())
-        {
+        while ($row = $statement->fetch()) {
             $country = $row['Country'];
             $servers = $row['Servers'];
 
@@ -632,13 +586,11 @@ class Plugin
      * @param $maxEpoch int
      * @return array keyed by the epoch
      */
-    function getTimelinePlayers($minEpoch, $maxEpoch = -1)
-    {
+    function getTimelinePlayers($minEpoch, $maxEpoch = -1) {
         $db_handle = get_slave_db_handle();
 
         // use time() if $max is -1
-        if ($maxEpoch == -1)
-        {
+        if ($maxEpoch == -1) {
             $maxEpoch = time();
         }
 
@@ -647,8 +599,7 @@ class Plugin
         $statement = $db_handle->prepare('SELECT Players, Epoch FROM PlayerTimeline WHERE Plugin = ? AND Epoch >= ? AND Epoch <= ? ORDER BY Epoch ASC');
         $statement->execute(array($this->id, $minEpoch, $maxEpoch));
 
-        while ($row = $statement->fetch())
-        {
+        while ($row = $statement->fetch()) {
             $ret[$row['Epoch']] = $row['Players'];
         }
 
@@ -661,13 +612,11 @@ class Plugin
      * @param $maxEpoch int
      * @return array keyed by the epoch
      */
-    function getTimelineServers($minEpoch, $maxEpoch = -1)
-    {
+    function getTimelineServers($minEpoch, $maxEpoch = -1) {
         $db_handle = get_slave_db_handle();
 
         // use time() if $max is -1
-        if ($maxEpoch == -1)
-        {
+        if ($maxEpoch == -1) {
             $maxEpoch = time();
         }
 
@@ -676,8 +625,7 @@ class Plugin
         $statement = $db_handle->prepare('SELECT Servers, Epoch FROM ServerTimeline WHERE Plugin = ? AND Epoch >= ? AND Epoch <= ? ORDER BY Epoch ASC');
         $statement->execute(array($this->id, $minEpoch, $maxEpoch));
 
-        while ($row = $statement->fetch())
-        {
+        while ($row = $statement->fetch()) {
             $ret[$row['Epoch']] = $row['Servers'];
         }
 
@@ -690,13 +638,11 @@ class Plugin
      * @param $maxEpoch int
      * @return array keyed by the epoch
      */
-    function getTimelineVersion($versionID, $minEpoch, $maxEpoch = -1)
-    {
+    function getTimelineVersion($versionID, $minEpoch, $maxEpoch = -1) {
         $db_handle = get_slave_db_handle();
 
         // use time() if $max is -1
-        if ($maxEpoch == -1)
-        {
+        if ($maxEpoch == -1) {
             $maxEpoch = time();
         }
 
@@ -705,8 +651,7 @@ class Plugin
         $statement = $db_handle->prepare('SELECT Count, Epoch FROM VersionTimeline WHERE Plugin = ? AND Version = ? AND Epoch >= ? AND Epoch <= ? ORDER BY Epoch ASC');
         $statement->execute(array($this->id, $versionID, $minEpoch, $maxEpoch));
 
-        while ($row = $statement->fetch())
-        {
+        while ($row = $statement->fetch()) {
             $ret[$row['Epoch']] = $row['Count'];
         }
 
@@ -716,8 +661,7 @@ class Plugin
     /**
      * Create the plugin in the database
      */
-    public function create()
-    {
+    public function create() {
         global $master_db_handle;
 
         // Prepare it
@@ -731,8 +675,7 @@ class Plugin
     /**
      * Save the plugin to the database
      */
-    public function save()
-    {
+    public function save() {
         global $master_db_handle;
 
         // Prepare it
@@ -757,111 +700,92 @@ class Plugin
     /**
      * Increment the global hits for the plugin and save
      */
-    public function incrementGlobalHits()
-    {
+    public function incrementGlobalHits() {
         $this->globalHits += 1;
         $this->save();
     }
 
-    public function getID()
-    {
+    public function getID() {
         return $this->id;
     }
 
-    public function setID($id)
-    {
+    public function setID($id) {
         $this->id = $id;
     }
 
-    public function getName()
-    {
+    public function getName() {
         return $this->name;
     }
 
-    public function setName($name)
-    {
+    public function setName($name) {
         $this->name = $name;
     }
 
-    public function getAuthors()
-    {
+    public function getAuthors() {
         return $this->authors;
     }
 
-    public function setAuthors($author)
-    {
+    public function setAuthors($author) {
         $this->authors = $author;
     }
 
-    public function isHidden()
-    {
+    public function isHidden() {
         return $this->hidden;
     }
 
-    public function setHidden($hidden)
-    {
+    public function setHidden($hidden) {
         $this->hidden = $hidden;
     }
 
-    public function getGlobalHits()
-    {
+    public function getGlobalHits() {
         return $this->globalHits;
     }
 
-    public function setGlobalHits($globalHits)
-    {
+    public function setGlobalHits($globalHits) {
         $this->globalHits = $globalHits;
     }
 
-    public function getParent()
-    {
+    public function getParent() {
         return $this->parent;
     }
 
-    public function setParent($parent)
-    {
+    public function setParent($parent) {
         $this->parent = $parent;
     }
 
     /**
      * @return
      */
-    public function getCreated()
-    {
+    public function getCreated() {
         return $this->created;
     }
 
     /**
      * @param  $created
      */
-    public function setCreated($created)
-    {
+    public function setCreated($created) {
         $this->created = $created;
     }
 
     /**
      * @return boolean
      */
-    public function getPendingAccess()
-    {
+    public function getPendingAccess() {
         return $this->pendingAccess;
     }
 
     /**
      * @param boolean $pendingAccess
      */
-    public function setPendingAccess($pendingAccess)
-    {
+    public function setPendingAccess($pendingAccess) {
         $this->pendingAccess = $pendingAccess;
     }
 
     /**
      * @return
      */
-    public function getServerCount()
-    {
-        if ($this->serverCount == -1)
-        {
+    public function getServerCount() {
+        if ($this->serverCount == -1) {
             $this->serverCount = $this->countServersLastUpdated(normalizeTime() - SECONDS_IN_DAY);
         }
 
@@ -871,72 +795,63 @@ class Plugin
     /**
      * @param  $serverCount
      */
-    public function setServerCount($serverCount)
-    {
+    public function setServerCount($serverCount) {
         $this->serverCount = $serverCount;
     }
 
     /**
      * @return
      */
-    public function getLastUpdated()
-    {
+    public function getLastUpdated() {
         return $this->lastUpdated;
     }
 
     /**
      * @param  $lastUpdated
      */
-    public function setLastUpdated($lastUpdated)
-    {
+    public function setLastUpdated($lastUpdated) {
         $this->lastUpdated = $lastUpdated;
     }
 
     /**
      * @return
      */
-    public function getRank()
-    {
+    public function getRank() {
         return $this->rank;
     }
 
     /**
      * @param  $rank
      */
-    public function setRank($rank)
-    {
+    public function setRank($rank) {
         $this->rank = $rank;
     }
 
     /**
      * @return
      */
-    public function getLastRank()
-    {
+    public function getLastRank() {
         return $this->lastRank;
     }
 
     /**
      * @param  $lastRank
      */
-    public function setLastRank($lastRank)
-    {
+    public function setLastRank($lastRank) {
         $this->lastRank = $lastRank;
     }
 
     /**
      * @return
      */
-    public function getLastRankChange()
-    {
+    public function getLastRankChange() {
         return $this->lastRankChange;
     }
 
     /**
      * @param  $lastRankChange
      */
-    public function setLastRankChange($lastRankChange)
-    {
+    public function setLastRankChange($lastRankChange) {
         $this->lastRankChange = $lastRankChange;
     }
 

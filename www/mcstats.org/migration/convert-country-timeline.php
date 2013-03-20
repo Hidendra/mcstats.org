@@ -19,14 +19,13 @@ $countries = loadCountries();
 
 $statement = $master_db_handle->prepare('INSERT INTO GraphData (Plugin, ColumnID, Sum, Count, Avg, Max, Min, Variance, StdDev, Epoch)
                                             SELECT Plugin, :ColumnID, Servers, 0, 0, 0, 0, 0, 0, Epoch FROM CountryTimeline where Plugin = :Plugin AND Country = :ShortCode');
-foreach ($plugins as $plugin)
-{
+foreach ($plugins as $plugin) {
 
     $index++;
     echo sprintf('[%d%%] Converting %s from CountryTimeline to the unified graphing format ..%s', floor(($index / $total) * 100), $plugin->getName(), PHP_EOL);
 
     // get or create the graph
-    $serverlocations = $plugin->getOrCreateGraph('Server Locations', false, 1, GraphType::Pie, TRUE);
+    $serverlocations = $plugin->getOrCreateGraph('Server Locations', false, 1, GraphType::Pie, true);
 
     $master_db_handle->beginTransaction();
     foreach ($countries as $shortCode => $countryName) {

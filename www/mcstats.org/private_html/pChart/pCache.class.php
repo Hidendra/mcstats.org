@@ -32,44 +32,42 @@
 */
 
 /* pCache class definition */
-class pCache
-{
+class pCache {
     var $HashKey = "";
     var $CacheFolder = "Cache/";
 
     /* Create the pCache object */
-    function pCache($CacheFolder = "Cache/")
-    {
+    function pCache($CacheFolder = "Cache/") {
         $this->CacheFolder = $CacheFolder;
     }
 
     /* This function is clearing the cache folder */
-    function ClearCache()
-    {
+    function ClearCache() {
         if ($handle = opendir($this->CacheFolder)) {
             while (false !== ($file = readdir($handle))) {
-                if ($file != "." && $file != "..")
+                if ($file != "." && $file != "..") {
                     unlink($this->CacheFolder . $file);
+                }
             }
             closedir($handle);
         }
     }
 
     /* This function is checking if we have an offline version of this chart */
-    function IsInCache($ID, $Data, $Hash = "")
-    {
-        if ($Hash == "")
+    function IsInCache($ID, $Data, $Hash = "") {
+        if ($Hash == "") {
             $Hash = $this->GetHash($ID, $Data);
+        }
 
-        if (file_exists($this->CacheFolder . $Hash))
-            return (TRUE);
-        else
-            return (FALSE);
+        if (file_exists($this->CacheFolder . $Hash)) {
+            return (true);
+        } else {
+            return (false);
+        }
     }
 
     /* This function is making a copy of drawn chart in the cache folder */
-    function WriteToCache($ID, $Data, $Picture)
-    {
+    function WriteToCache($ID, $Data, $Picture) {
         $Hash = $this->GetHash($ID, $Data);
         $FileName = $this->CacheFolder . $Hash;
 
@@ -77,18 +75,17 @@ class pCache
     }
 
     /* This function is removing any cached copy of this chart */
-    function DeleteFromCache($ID, $Data)
-    {
+    function DeleteFromCache($ID, $Data) {
         $Hash = $this->GetHash($ID, $Data);
         $FileName = $this->CacheFolder . $Hash;
 
-        if (file_exists($FileName))
+        if (file_exists($FileName)) {
             unlink($FileName);
+        }
     }
 
     /* This function is retrieving the cached picture if applicable */
-    function GetFromCache($ID, $Data)
-    {
+    function GetFromCache($ID, $Data) {
         $Hash = $this->GetHash($ID, $Data);
         if ($this->IsInCache("", "", $Hash)) {
             $FileName = $this->CacheFolder . $Hash;
@@ -100,13 +97,13 @@ class pCache
     }
 
     /* This function is building the graph unique hash key */
-    function GetHash($ID, $Data)
-    {
+    function GetHash($ID, $Data) {
         $mKey = "$ID";
         foreach ($Data as $key => $Values) {
             $tKey = "";
-            foreach ($Values as $Serie => $Value)
+            foreach ($Values as $Serie => $Value) {
                 $tKey = $tKey . $Serie . $Value;
+            }
             $mKey = $mKey . md5($tKey);
         }
         return (md5($mKey));

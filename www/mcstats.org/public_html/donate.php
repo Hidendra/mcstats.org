@@ -34,8 +34,7 @@ echo '
             </p>';
 
 // appeal to their plugins they have if they are logged in
-if (is_loggedin() && ($pluginCount = count($plugins = get_accessible_plugins())) > 0)
-{
+if (is_loggedin() && ($pluginCount = count($plugins = get_accessible_plugins())) > 0) {
     // shuffle the plugins
     shuffle($plugins);
 
@@ -58,8 +57,7 @@ if (is_loggedin() && ($pluginCount = count($plugins = get_accessible_plugins()))
             <img src="/signature/1.5/' . urlencode(htmlentities($plugin->getName())) . '.png" />
         </p>
 ';
-} else
-{
+} else {
     echo '
         <p>
             MCStats is unrivaled in stat collection for Minecraft plugins. Many of the plugin authors who decided to use

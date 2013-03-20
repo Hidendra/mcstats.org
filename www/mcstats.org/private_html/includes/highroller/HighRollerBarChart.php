@@ -22,11 +22,9 @@
  *
  */
 
-class HighRollerBarChart extends HighRoller
-{
+class HighRollerBarChart extends HighRoller {
 
-    function __construct()
-    {
+    function __construct() {
         parent::__construct();
         $this->chart->type = 'bar';
 //    $this->xAxis = new HighRollerXAxis();

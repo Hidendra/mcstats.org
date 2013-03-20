@@ -17,29 +17,24 @@ $count_customdata = get_slave_db_handle()->prepare('SELECT COUNT(*) FROM GraphDa
 $delete_column = $master_db_handle->prepare('DELETE FROM CustomColumn where ID = ?');
 $delete_graph = $master_db_handle->prepare('DELETE FROM Graph where ID = ?');
 
-foreach ($plugins as $plugin)
-{
+foreach ($plugins as $plugin) {
     echo sprintf('[%d%%] Cleaning up Graph / CustomColumn objects for %s ..%s', floor(($converted / $total) * 100), $plugin->getName(), PHP_EOL);
 
     // walk through each graph
-    foreach ($plugin->getAllGraphs() as $graph)
-    {
+    foreach ($plugin->getAllGraphs() as $graph) {
         // first check each column
-        foreach ($graph->getColumns() as $columnID => $columnName)
-        {
+        foreach ($graph->getColumns() as $columnID => $columnName) {
             // get the amount of generated data in the last 7 days
             $count_customdata->execute(array($columnID, time() - SECONDS_IN_WEEK));
 
             $count = 0;
 
-            if ($row = $count_customdata->fetch())
-            {
+            if ($row = $count_customdata->fetch()) {
                 $count = $row[0];
             }
 
             // if the count is too low simply remove the column -- either a test plugin or something never used
-            if ($count <= 2)
-            {
+            if ($count <= 2) {
                 echo sprintf('  => Deleting Column [ID: %d Name: "%s"] from Plugin "%s"%s', $columnID, $columnName, $plugin->getName(), PHP_EOL);
                 $delete_column->execute(array($columnID));
             }
@@ -49,11 +44,9 @@ foreach ($plugins as $plugin)
         $graph->loadColumns();
 
         // if the graph now has 0 (active) columns it is invalid
-        if (count($graph->getColumns()) == 0)
-        {
+        if (count($graph->getColumns()) == 0) {
             // only delete it if it is a custom graph
-            if ($graph->getPosition() > 1 && $graph->getPosition() < 9000)
-            {
+            if ($graph->getPosition() > 1 && $graph->getPosition() < 9000) {
                 echo sprintf('  => Deleting Graph [ID: %d Name: "%s"] from Plugin "%s"%s', $graph->getID(), $graph->getName(), $plugin->getName(), PHP_EOL);
                 $delete_graph->execute(array($graph->getID()));
             }
@@ -61,5 +54,5 @@ foreach ($plugins as $plugin)
 
     }
 
-    $converted ++;
+    $converted++;
 }

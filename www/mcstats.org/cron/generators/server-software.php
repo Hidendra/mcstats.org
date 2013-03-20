@@ -10,8 +10,7 @@ require_once ROOT . 'includes/func.php';
 $baseEpoch = normalizeTime();
 $minimum = strtotime('-30 minutes', $baseEpoch);
 
-function doGeneration($pluginId, $data)
-{
+function doGeneration($pluginId, $data) {
     global $baseEpoch;
     $plugin = loadPluginByID($pluginId);
     $sum = $data['Sum'];
@@ -27,7 +26,7 @@ function doGeneration($pluginId, $data)
         return;
     }
 
-    $graph = $plugin->getOrCreateGraph('Server Software', false, 1, GraphType::Pie, TRUE, 9002, TRUE);
+    $graph = $plugin->getOrCreateGraph('Server Software', false, 1, GraphType::Pie, true, 9002, true);
     insertGraphDataScratch($graph, $pluginId, $software, $baseEpoch, $sum, $count, $avg, $max, $min, $variance, $stddev);
 }
 

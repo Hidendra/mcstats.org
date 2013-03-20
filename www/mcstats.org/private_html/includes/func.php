@@ -1,5 +1,7 @@
 <?php
-if (!defined('ROOT')) exit('For science.');
+if (!defined('ROOT')) {
+    exit('For science.');
+}
 
 // Include classes
 require 'Server.class.php';
@@ -80,20 +82,17 @@ function insertGraphDataScratch($graph, $plugin, $columnName, $epoch, $sum, $cou
  *
  * @return the percent complete of generation. If NULL the generator is not currently running
  */
-function graph_generator_percentage()
-{
+function graph_generator_percentage() {
     $path = ROOT . '../generator.txt';
 
-    if (!file_exists($path))
-    {
-        return NULL;
+    if (!file_exists($path)) {
+        return null;
     }
 
     $handle = fopen($path, 'r');
 
-    if ($handle === FALSE)
-    {
-        return NULL;
+    if ($handle === false) {
+        return null;
     }
 
     // percent is only ever at most 3 bytes so only read that
@@ -108,16 +107,14 @@ function graph_generator_percentage()
  * Output all of the graphs for a given plugin
  * @param $plugin
  */
-function outputGraphs($plugin)
-{
+function outputGraphs($plugin) {
     /// Load all of the custom graphs for the plugin
     $activeGraphs = $plugin->getActiveGraphs();
 
     /// Output a div for each one
     $index = 1;
-    $floated = FALSE;
-    foreach ($activeGraphs as $activeGraph)
-    {
+    $floated = false;
+    foreach ($activeGraphs as $activeGraph) {
         // TODO not hardcoded ? heh
         $activeGraph->setFeedURL(sprintf('https://mcstats.org/api/1.0/%s/graph/%s', urlencode(htmlentities($plugin->getName())), urlencode(htmlentities($activeGraph->getName()))));
 
@@ -125,25 +122,22 @@ function outputGraphs($plugin)
         $safeName = urlencode($safeHTMLName);
 
         $height = '450px';
-        if ($activeGraph->getType() == GraphType::Pie || $activeGraph->getType() == GraphType::Donut)
-        {
+        if ($activeGraph->getType() == GraphType::Pie || $activeGraph->getType() == GraphType::Donut) {
             $height = '400px';
-        } else if ($activeGraph->getType() == GraphType::Map)
-        {
-            $height = '750px';
+        } else {
+            if ($activeGraph->getType() == GraphType::Map) {
+                $height = '750px';
+            }
         }
 
         $jsLoader = 'retrieveGraphData(CustomChart' . $index . 'Options, ' . ($activeGraph->getHighstocksClassName() == 'highcharts' ? 'HIGHCHARTS' : 'HIGHSTOCKS') . ', "' . $activeGraph->getFeedURL() . '");';
-        if ($activeGraph->isHalfwidth())
-        {
-            $reset = FALSE;
-            if (!$floated)
-            {
-                $floated = TRUE;
+        if ($activeGraph->isHalfwidth()) {
+            $reset = false;
+            if (!$floated) {
+                $floated = true;
                 echo '<div class="row-fluid">';
-            } else
-            {
-                $reset = TRUE;
+            } else {
+                $reset = true;
             }
             echo <<<END
                         <div class="span6">
@@ -157,15 +151,12 @@ function outputGraphs($plugin)
                         </div>
 
 END;
-            if ($reset)
-            {
+            if ($reset) {
                 echo '</div>';
-                $floated = FALSE;
+                $floated = false;
             }
-        } else
-        {
-            if ($floated)
-            {
+        } else {
+            if ($floated) {
                 echo '</div>';
             }
 
@@ -182,7 +173,7 @@ END;
 
         }
 
-        $index ++;
+        $index++;
     }
 
     /// Flush before sending / generating graph data
@@ -191,13 +182,10 @@ END;
     /// MULTIPLE CUSTOM GRAPHS YEAH TO THE POWER OF FUCK YEAH
     // ITERATE THROUGH THE ACTIVE GRAPHS
     $index = 1; // WE GIVE A UNIQUE NUMBER TO EACH CHART
-    foreach ($activeGraphs as $activeGraph)
-    {
+    foreach ($activeGraphs as $activeGraph) {
         // ADD ALL OF THE SERIES PLOTS TO THE CHART
-        if ($activeGraph->getType() != GraphType::Pie && $activeGraph->getType() != GraphType::Donut)
-        {
-            foreach ($activeGraph->getColumns() as $id => $columnName)
-            {
+        if ($activeGraph->getType() != GraphType::Pie && $activeGraph->getType() != GraphType::Donut) {
+            foreach ($activeGraph->getColumns() as $id => $columnName) {
                 // GENERATE SOME DATA DIRECTLY TO THE CHART!
                 $series = new HighRollerSeriesData();
                 // $activeGraph->addSeries($series->addName($columnName)->addData(DataGenerator::generateCustomChartData($activeGraph, $id)));
@@ -222,13 +210,10 @@ END;
  * Log an error and force end the process
  * @param $message
  */
-function error_fquit($message)
-{
-    if (PHP_SAPI == 'cli')
-    {
+function error_fquit($message) {
+    if (PHP_SAPI == 'cli') {
         echo $message . PHP_EOL;
-    } else
-    {
+    } else {
         error_log($message);
         exit;
     }
@@ -238,23 +223,25 @@ function error_fquit($message)
  * Gets seconds since crons last ran
  * @return integer
  */
-function getTimeLast()
-{
+function getTimeLast() {
     $timelast = -1;
     $statement = get_slave_db_handle()->prepare('SELECT UNIX_TIMESTAMP(NOW()) - MAX(Epoch) FROM GraphData');
     $statement->execute();
-    if ($row = $statement->fetch()) $timelast = (int)$row[0];
+    if ($row = $statement->fetch()) {
+        $timelast = (int)$row[0];
+    }
     // max 2 hours
-    if($timelast > 7200) $timelast = 0;
-    return($timelast);
+    if ($timelast > 7200) {
+        $timelast = 0;
+    }
+    return ($timelast);
 }
 
 /**
  * Get the epoch of the last graph that was generated
  * @return int
  */
-function getLastGraphEpoch()
-{
+function getLastGraphEpoch() {
     $statement = get_slave_db_handle()->prepare('SELECT MAX(Epoch) FROM GraphData');
     $statement->execute();
     $row = $statement->fetch();
@@ -266,13 +253,11 @@ function getLastGraphEpoch()
  *
  * @param $statement PDOStatement
  */
-function check_statement($statement)
-{
+function check_statement($statement) {
     $errorInfo = $statement->errorInfo();
 
     // If the first element is 0, it's good
-    if ($errorInfo[0] == 0)
-    {
+    if ($errorInfo[0] == 0) {
         return;
     }
 
@@ -284,8 +269,7 @@ function check_statement($statement)
  * Get the epoch of the closest hour (downwards, never up)
  * @return float
  */
-function getLastHour()
-{
+function getLastHour() {
     return strtotime(date('F d Y H:00'));
 }
 
@@ -293,8 +277,7 @@ function getLastHour()
  * Calculate the time until the next graph will be calculated
  * @return int the unix timestamp of the next graph
  */
-function timeUntilNextGraph()
-{
+function timeUntilNextGraph() {
     global $config;
 
     $interval = $config['graph']['interval'];
@@ -306,12 +289,10 @@ function timeUntilNextGraph()
  *
  * @param $time if < 0, the time() will be used
  */
-function normalizeTime($time = -1)
-{
+function normalizeTime($time = -1) {
     global $config;
 
-    if ($time < 0)
-    {
+    if ($time < 0) {
         $time = time();
     }
 
@@ -329,15 +310,13 @@ function normalizeTime($time = -1)
  * Sum the amount of servers that have reported since the last update
  * @return int
  */
-function sumServersSinceLastUpdated()
-{
+function sumServersSinceLastUpdated() {
     $baseEpoch = normalizeTime();
     $minimum = strtotime('-30 minutes', $baseEpoch);
     $statement = get_slave_db_handle()->prepare('select COUNT(distinct Server) AS Count from ServerPlugin where Updated >= ?');
     $statement->execute(array($minimum));
 
-    if ($row = $statement->fetch())
-    {
+    if ($row = $statement->fetch()) {
         return $row['Count'];
     }
 
@@ -348,15 +327,13 @@ function sumServersSinceLastUpdated()
  * Sum the amount of players that have reported since the last update
  * @return int
  */
-function sumPlayersSinceLastUpdated()
-{
+function sumPlayersSinceLastUpdated() {
     $baseEpoch = normalizeTime();
     $minimum = strtotime('-30 minutes', $baseEpoch);
     $statement = get_slave_db_handle()->prepare('SELECT SUM(dev.Players) AS Count FROM (SELECT DISTINCT Server, Server.Players from ServerPlugin LEFT OUTER JOIN Server ON Server.ID = ServerPlugin.Server WHERE ServerPlugin.Updated >= ?) dev;');
     $statement->execute(array($minimum));
 
-    if ($row = $statement->fetch())
-    {
+    if ($row = $statement->fetch()) {
         return $row['Count'];
     }
 
@@ -369,17 +346,13 @@ function sumPlayersSinceLastUpdated()
  * @param $key string
  * @return string
  */
-function getPostArgument($key)
-{
+function getPostArgument($key) {
     // FIXME change to $_POST
     // check
-    if (!isset($_POST[$key]))
-    {
-        if (PHP_SAPI == 'cli')
-        {
-            return NULL;
-        } else
-        {
+    if (!isset($_POST[$key])) {
+        if (PHP_SAPI == 'cli') {
+            return null;
+        } else {
             exit('ERR Missing arguments');
         }
     }
@@ -398,8 +371,7 @@ function getPostArgument($key)
  * }
  * @return array
  */
-function extractCustomData()
-{
+function extractCustomData() {
     global $config;
     $start = millitime();
 
@@ -409,8 +381,7 @@ function extractCustomData()
     // Array of data to return
     $data = array();
 
-    foreach ($_POST as $key => $value)
-    {
+    foreach ($_POST as $key => $value) {
         // verify we have a number as the key
         if (!is_numeric($value)) {
             continue;
@@ -420,8 +391,7 @@ function extractCustomData()
         $r_index = strrpos($key, $separator);
 
         // Did we not match one?
-        if ($r_index === FALSE)
-        {
+        if ($r_index === false) {
             continue;
         }
 
@@ -446,12 +416,10 @@ function extractCustomData()
  *
  * @return array
  */
-function extractCustomDataLegacy()
-{
+function extractCustomDataLegacy() {
     $custom = array();
 
-    foreach ($_POST as $key => $value)
-    {
+    foreach ($_POST as $key => $value) {
         // verify we have a number as the key
         if (!is_numeric($value)) {
             continue;
@@ -466,13 +434,11 @@ function extractCustomDataLegacy()
         $columnName = str_replace('_', ' ', substr($key, 6));
         $columnName = mb_convert_encoding($columnName, 'ISO-8859-1', 'UTF-8');
 
-        if (strstr($columnName, 'Protections') !== FALSE)
-        {
+        if (strstr($columnName, 'Protections') !== false) {
             $columnName = str_replace('?', 'i', $columnName);
         }
 
-        if (!in_array($columnName, $custom))
-        {
+        if (!in_array($columnName, $custom)) {
             $custom[$columnName] = $value;
         }
     }
@@ -485,15 +451,13 @@ function extractCustomDataLegacy()
  *
  * @return string[], e.g ["CA"] = "Canada"
  */
-function loadCountries()
-{
+function loadCountries() {
     $countries = array();
 
     $statement = get_slave_db_handle()->prepare('SELECT ShortCode, FullName FROM Country LIMIT 300'); // hard limit of 300
     $statement->execute();
 
-    while ($row = $statement->fetch())
-    {
+    while ($row = $statement->fetch()) {
         $shortCode = $row['ShortCode'];
         $fullName = $row['FullName'];
 
@@ -509,8 +473,7 @@ function loadCountries()
  * @param $row
  * @return Plugin
  */
-function resolvePlugin($row)
-{
+function resolvePlugin($row) {
     $plugin = new Plugin();
     $plugin->setID($row['ID']);
     $plugin->setParent($row['Parent']);
@@ -537,12 +500,10 @@ define ('PLUGIN_ORDER_RANDOM_TOP100', 4);
  * Count the number of plugins in the database
  * @param int $order the order / ruleset to count
  */
-function countPlugins($order = PLUGIN_ORDER_POPULARITY)
-{
+function countPlugins($order = PLUGIN_ORDER_POPULARITY) {
     $db_handle = get_slave_db_handle();
 
-    switch ($order)
-    {
+    switch ($order) {
         case PLUGIN_ORDER_ALPHABETICAL:
             $query = 'SELECT * FROM Plugin WHERE Parent = -1';
             break;
@@ -560,7 +521,7 @@ function countPlugins($order = PLUGIN_ORDER_POPULARITY)
             break;
 
         default:
-            error_log ('Unimplemented loadPlugins () order => ' . $order);
+            error_log('Unimplemented loadPlugins () order => ' . $order);
             exit('Unimplemented loadPlugins () order => ' . $order);
     }
 
@@ -568,9 +529,8 @@ function countPlugins($order = PLUGIN_ORDER_POPULARITY)
     $statement->execute(array(normalizeTime() - SECONDS_IN_DAY));
 
     $pluginCount = 0;
-    while ($row = $statement->fetch())
-    {
-        $pluginCount ++;
+    while ($row = $statement->fetch()) {
+        $pluginCount++;
     }
     return $pluginCount;
 }
@@ -580,13 +540,11 @@ function countPlugins($order = PLUGIN_ORDER_POPULARITY)
  *
  * @return Plugin[]
  */
-function loadPlugins($order = PLUGIN_ORDER_POPULARITY, $limit = -1, $start = -1)
-{
+function loadPlugins($order = PLUGIN_ORDER_POPULARITY, $limit = -1, $start = -1) {
     $db_handle = get_slave_db_handle();
     $plugins = array();
 
-    switch ($order)
-    {
+    switch ($order) {
         case PLUGIN_ORDER_ALPHABETICAL:
             $query = 'SELECT ID, Parent, Name, Author, Hidden, GlobalHits, Created, Rank, LastRank, LastRankChange, LastUpdated, ServerCount30 FROM Plugin WHERE Parent = -1 ORDER BY Name ASC';
             break;
@@ -604,23 +562,22 @@ function loadPlugins($order = PLUGIN_ORDER_POPULARITY, $limit = -1, $start = -1)
             break;
 
         default:
-            error_log ('Unimplemented loadPlugins () order => ' . $order);
+            error_log('Unimplemented loadPlugins () order => ' . $order);
             exit('Unimplemented loadPlugins () order => ' . $order);
     }
 
-    if ($start != -1 && is_numeric($start))
-    {
+    if ($start != -1 && is_numeric($start)) {
         $query .= ' LIMIT ' . $start . ',' . $limit;
-    } else if ($limit != -1 && is_numeric($limit))
-    {
-        $query .= ' LIMIT ' . $limit;
+    } else {
+        if ($limit != -1 && is_numeric($limit)) {
+            $query .= ' LIMIT ' . $limit;
+        }
     }
 
     $statement = $db_handle->prepare($query);
     $statement->execute(array(normalizeTime() - SECONDS_IN_DAY));
 
-    while ($row = $statement->fetch())
-    {
+    while ($row = $statement->fetch()) {
         $plugins[] = resolvePlugin($row);
     }
 
@@ -633,22 +590,18 @@ function loadPlugins($order = PLUGIN_ORDER_POPULARITY, $limit = -1, $start = -1)
  * @param $plugin string The plugin's name
  * @return Plugin if it exists otherwise NULL
  */
-function loadPlugin($plugin)
-{
+function loadPlugin($plugin) {
     $statement = get_slave_db_handle()->prepare('SELECT ID, Parent, Name, Author, Hidden, GlobalHits, Created, Rank, LastRank, LastRankChange, LastUpdated, ServerCount30 FROM Plugin WHERE Name = :Name');
     $statement->execute(array(':Name' => $plugin));
 
-    if ($row = $statement->fetch())
-    {
+    if ($row = $statement->fetch()) {
         $plugin = resolvePlugin($row);
 
         // check for parent
-        if ($plugin->getParent() != -1)
-        {
+        if ($plugin->getParent() != -1) {
             $parent = loadPluginByID($plugin->getParent());
 
-            if ($parent != null)
-            {
+            if ($parent != null) {
                 return $parent;
             }
         }
@@ -656,7 +609,7 @@ function loadPlugin($plugin)
         return $plugin;
     }
 
-    return NULL;
+    return null;
 }
 
 // array of plugin objects
@@ -668,8 +621,7 @@ $plugins = array();
  * @param $plugin integer
  * @return Plugin if it exists otherwise NULL
  */
-function loadPluginByID($id)
-{
+function loadPluginByID($id) {
     global $plugins;
 
     if (isset($plugins[$id])) {
@@ -679,13 +631,12 @@ function loadPluginByID($id)
     $statement = get_slave_db_handle()->prepare('SELECT ID, Parent, Name, Author, Hidden, GlobalHits, Created, Rank, LastRank, LastRankChange, LastUpdated, ServerCount30 FROM Plugin WHERE ID = :ID');
     $statement->execute(array(':ID' => $id));
 
-    if ($row = $statement->fetch())
-    {
+    if ($row = $statement->fetch()) {
         $plugins[$id] = resolvePlugin($row);
         return $plugins[$id];
     }
 
-    return NULL;
+    return null;
 }
 
 /////////////////////////////////
@@ -699,24 +650,21 @@ function loadPluginByID($id)
  * @param $haystack
  * @return bool TRUE if the haystack ends with the given needle
  */
-function str_endswith($needle, $haystack)
-{
-    return strrpos($haystack, $needle) === strlen($haystack)-strlen($needle);
+function str_endswith($needle, $haystack) {
+    return strrpos($haystack, $needle) === strlen($haystack) - strlen($needle);
 }
 
 /**
  * Sender the header html file to the user
  */
-function send_header()
-{
+function send_header() {
     include ROOT . '../private_html/assets/template/header.php';
 }
 
 /**
  * Send the footer html file to the user
  */
-function send_footer()
-{
+function send_footer() {
     include ROOT . '../private_html/assets/template/footer.php';
 }
 
@@ -730,8 +678,7 @@ function send_footer()
  *
  * @param $msg the error to send
  */
-function err($msg)
-{
+function err($msg) {
     echo '
     <div class="row-fluid" style="margin-left: 25%; text-align: center;">
         <div class="alert alert-error span6" style="width: 50%; padding-bottom: 0;">
@@ -747,8 +694,7 @@ function err($msg)
  *
  * @param $msg the error to send
  */
-function success($msg)
-{
+function success($msg) {
     echo '
     <div class="row-fluid" style="margin-left: 25%; text-align: center;">
         <div class="alert alert-success span6" style="width: 50%; padding-bottom: 0;">
@@ -765,32 +711,28 @@ function success($msg)
  * @param $plugin Plugin or string
  * @return TRUE if the player can administrate the plugin
  */
-function can_admin_plugin($plugin)
-{
-    if ($plugin instanceof Plugin)
-    {
+function can_admin_plugin($plugin) {
+    if ($plugin instanceof Plugin) {
         $plugin_obj = $plugin;
-    } else if ($plugin instanceof string)
-    {
-        $plugin_obj = loadPlugin($plugin);
-    }
-
-    // is it null??
-    if ($plugin_obj == null)
-    {
-        return FALSE;
-    }
-
-    // iterate through our accessible plugins
-    foreach (get_accessible_plugins() as $a_plugin)
-    {
-        if ($a_plugin->getName() == $plugin_obj->getName())
-        {
-            return $a_plugin->getPendingAccess() !== TRUE;
+    } else {
+        if ($plugin instanceof string) {
+            $plugin_obj = loadPlugin($plugin);
         }
     }
 
-    return FALSE;
+    // is it null??
+    if ($plugin_obj == null) {
+        return false;
+    }
+
+    // iterate through our accessible plugins
+    foreach (get_accessible_plugins() as $a_plugin) {
+        if ($a_plugin->getName() == $plugin_obj->getName()) {
+            return $a_plugin->getPendingAccess() !== true;
+        }
+    }
+
+    return false;
 }
 
 /**
@@ -799,16 +741,14 @@ function can_admin_plugin($plugin)
  * @param $selectFromPendingPool If returned plugins can include plugins from the pending pool
  * @return array Plugin
  */
-function get_accessible_plugins($selectFromPendingPool = TRUE)
-{
-    global $_SESSION , $master_db_handle;
+function get_accessible_plugins($selectFromPendingPool = true) {
+    global $_SESSION, $master_db_handle;
 
     // The plugins we can access
     $plugins = array();
 
     // Make sure they are plugged in
-    if (!is_loggedin())
-    {
+    if (!is_loggedin()) {
         return $plugins;
     }
 
@@ -816,10 +756,8 @@ function get_accessible_plugins($selectFromPendingPool = TRUE)
     $statement = $master_db_handle->prepare('SELECT Plugin, ID, Name, Parent, Plugin.Author, Hidden, GlobalHits, Created, Pending, Rank, LastRank, LastRankChange, LastUpdated, ServerCount30 FROM AuthorACL LEFT OUTER JOIN Plugin ON Plugin.ID = Plugin WHERE AuthorACL.Author = ? ORDER BY Name ASC');
     $statement->execute(array($_SESSION['uid']));
 
-    while ($row = $statement->fetch())
-    {
-        if ($selectFromPendingPool == FALSE && $row['Pending'] == 1)
-        {
+    while ($row = $statement->fetch()) {
+        if ($selectFromPendingPool == false && $row['Pending'] == 1) {
             continue;
         }
 
@@ -839,23 +777,20 @@ function get_accessible_plugins($selectFromPendingPool = TRUE)
  * @param $password
  * @return string their correct username if the login is correct, otherwise FALSE
  */
-function check_login($username, $password)
-{
-    global $master_db_handle , $_SESSION;
+function check_login($username, $password) {
+    global $master_db_handle, $_SESSION;
 
     // Create the query
     $statement = $master_db_handle->prepare('SELECT ID, Name, Password FROM Author WHERE Name = ?');
     $statement->execute(array($username));
 
-    if ($row = $statement->fetch())
-    {
+    if ($row = $statement->fetch()) {
         $real_username = $row['Name'];
         $hashed_password = $row['Password'];
 
         // Verify the password
-        if (sha1($password) != $hashed_password)
-        {
-            return FALSE;
+        if (sha1($password) != $hashed_password) {
+            return false;
         }
 
         // Set some stuff
@@ -865,15 +800,14 @@ function check_login($username, $password)
         return $real_username;
     }
 
-    return FALSE;
+    return false;
 }
 
 /**
  * Check if the user is logged in
  * @return bool TRUE if the user is logged in
  */
-function is_loggedin()
-{
+function is_loggedin() {
     global $_SESSION;
     return isset($_SESSION['loggedin']);
 }
@@ -881,12 +815,10 @@ function is_loggedin()
 /**
  * Ensure the user is logged in
  */
-function ensure_loggedin()
-{
+function ensure_loggedin() {
     global $_SESSION;
 
-    if (!isset($_SESSION['loggedin']))
-    {
+    if (!isset($_SESSION['loggedin'])) {
         header('Location: /admin/login.php');
         exit;
     }
@@ -897,13 +829,10 @@ function ensure_loggedin()
  * Profiling
  */
 
-function function_log($functionName, $elapsed, $desc = '')
-{
-    if (PHP_SAPI == 'cli')
-    {
+function function_log($functionName, $elapsed, $desc = '') {
+    if (PHP_SAPI == 'cli') {
         echo " => $functionName: {$elapsed}ms" . ($desc == '' ? '' : " : $desc") . PHP_EOL;
-    } else
-    {
+    } else {
         error_log(" => $functionName: {$elapsed}ms" . ($desc == '' ? '' : " : $desc"));
     }
 }
@@ -912,10 +841,9 @@ function function_log($functionName, $elapsed, $desc = '')
  * Get the current time in milliseconds
  * @return long
  */
-function millitime()
-{
-    $timeparts = explode(" ",microtime());
-    return bcadd(($timeparts[0]*1000),bcmul($timeparts[1],1000));
+function millitime() {
+    $timeparts = explode(" ", microtime());
+    return bcadd(($timeparts[0] * 1000), bcmul($timeparts[1], 1000));
 }
 
 /**
@@ -923,8 +851,7 @@ function millitime()
  * @param $seconds
  * @param $outputSeconds TRUE if seconds should be included in the output
  */
-function epochToHumanString($epoch, $outputSeconds = TRUE)
-{
+function epochToHumanString($epoch, $outputSeconds = true) {
     $seconds = $epoch;
 
     $days = round($seconds / 86400);
@@ -961,14 +888,13 @@ function epochToHumanString($epoch, $outputSeconds = TRUE)
     return $ret;
 }
 
-function insert_cache_headers()
-{
+function insert_cache_headers() {
     global $config;
     header('Expires: ' . gmdate('D, d M Y H:i:s \G\M\T', getLastGraphEpoch() + (60 * $config['graph']['interval'])));
     header('Last-Modified: ' . gmdate('D, d M Y H:i:s \G\M\T', getLastGraphEpoch()));
 
     if (isset($_SERVER['HTTP_IF_MODIFIED_SINCE'])) {
-        if (strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']) >= getLastGraphEpoch() && graph_generator_percentage() === NULL) {
+        if (strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']) >= getLastGraphEpoch() && graph_generator_percentage() === null) {
             header('HTTP/1.1 304 Not Modified');
             exit;
         }
