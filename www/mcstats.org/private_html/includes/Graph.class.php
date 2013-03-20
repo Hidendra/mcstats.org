@@ -398,17 +398,6 @@ class Graph
                         'type' => 'month',
                         'count' => 1,
                         'text' => '1m'
-                    ), array(
-                        'type' => 'month',
-                        'count' => 6,
-                        'text' => '6m'
-                    ), array(
-                        'type' => 'year',
-                        'count' => 1,
-                        'text' => '1y'
-                    ), array(
-                        'type' => 'all',
-                        'text' => 'all'
                     )
                 )
             );
@@ -422,21 +411,6 @@ class Graph
                 ),
                 'gridLineWidth' => 0
             );
-
-            // Calculate the minimum value
-            // TODO functionize
-            $min = PHP_INT_MAX;
-
-            foreach ($this->series as $series)
-            {
-                foreach ($series->data as &$a)
-                {
-                    foreach ($a as $epoch => $value)
-                    {
-                        $min = min($min, $value);
-                    }
-                }
-            }
 
             $chart->yAxis = array(
                 'min' => 0,
@@ -497,50 +471,13 @@ class Graph
             $chart->addSeries($series);
         }
 
-        $isPlayerChart = $renderTo == 'GlobalServerChart' || $renderTo == 'PlayerServerChart';
-        if ($isPlayerChart)
-        {
-            $flags = array(array(
-                'type' => 'flags',
-                'name' => '',
-                'data' => array (
-                    array (
-                        'x' => 1341257400000,
-                        'title' => '!',
-                        'text' => 'minecraft.net login server outage'
-                    )
-                ),
-                'color' => '#5F86B3',
-                'fillColor' => '#5F86B3',
-                'style' => array (
-                    'color' => 'white'
-                ),
-                'states' => array (
-                    'hover' => array (
-                        'fillColor' => '#395C84'
-                    )
-                ),
-                'onSeries' => 'Players',
-                'shape' => 'squarepin',
-                'width' => 12
-            ));
-        }
-
-        foreach ($flags as $flag)
-        {
-            $chart->series[] = $flag;
-        }
-
         // Some raw javascript
         $rawJavascript = '';
 
         if ($this->type != GraphType::Pie && $this->type != GraphType::Donut)
         {
-
-            if (!$isPlayerChart)
-            {
-                // just sorts the series
-                $rawJavascript = "
+            // just sorts the series
+            $rawJavascript = "
                     ${renderTo}Options.tooltip =
                     {
                         \"shared\": true,
@@ -555,17 +492,15 @@ class Graph
                             });
 
                             $.each(sortedPoints , function(i, point) {
-                                s += point.point.tooltipFormatter('<span style=\"color:{series.color}\">{series.name}</span>: <b>{point.y}</b>" . ($this->type == GraphType::Percentage_Area ? "(' + Highcharts.numberFormat(this.percentage, 1) + '%)" : "") . "<br/>');
+                                s += point.point.tooltipFormatter('<div style=\"color:{series.color}\">{series.name}</div>: <b>{point.y}</b>" . ($this->type == GraphType::Percentage_Area ? "(' + Highcharts.numberFormat(this.percentage, 1) + '%)" : "") . "<br/>');
                             });
 
                             return s;
                         }
                     };
                 ";
-            }
         } else
         { // Pie chart
-
             $rawJavascript = "
                 ${renderTo}Options.plotOptions =
                 {
