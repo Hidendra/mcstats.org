@@ -5,6 +5,7 @@ session_start();
 require_once ROOT . '../private_html/config.php';
 require_once ROOT . '../private_html/includes/database.php';
 require_once ROOT . '../private_html/includes/func.php';
+cacheCurrentPage();
 
 /// Templating
 $page_title = 'MCStats :: Why MCStats?';
@@ -47,7 +48,7 @@ echo <<<END
                         should strive for with transparency.
                     </p>
                     <p style="text-align: center;">
-                        <img src="/plugin-preview/2.0/all+servers.png" />
+                        <img src="http://api.mcstats.org/plugin-preview/2.0/all+servers.png" />
                     </p>
                     <p style="font-size: 16px;">
                         <b>IRC:</b> <code>irc.esper.net #metrics</code>

@@ -6,9 +6,16 @@ require_once ROOT . 'config.php';
 require_once ROOT . 'includes/database.php';
 require_once ROOT . 'includes/func.php';
 
-foreach (loadPlugins(PLUGIN_ORDER_ALPHABETICAL) as $plugin) {
-    $plugin->setServerCount($plugin->countServersLastUpdated(normalizeTime() - SECONDS_IN_DAY));
-    $plugin->save();
+$baseEpoch = normalizeTime();
+$minimum = strtotime('-30 minutes', $baseEpoch);
 
-    echo sprintf('%d: %s%s', $plugin->getServerCount(), $plugin->getName(), PHP_EOL);
-}
+$master_db_handle->exec('UPDATE Plugin set ServerCount30 = 0');
+$statement = $master_db_handle->prepare('UPDATE Plugin dest, (SELECT
+            Plugin,
+            COUNT(*) AS Count
+        FROM ServerPlugin
+        LEFT OUTER JOIN Server ON Server.ID = ServerPlugin.Server
+        WHERE Updated >= ?
+        GROUP BY Plugin) src
+SET dest.ServerCount30 = src.Count where dest.ID = src.Plugin');
+$statement->execute(array($minimum));

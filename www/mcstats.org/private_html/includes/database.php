@@ -39,12 +39,23 @@ function try_connect_database($dbtype = 'master') {
     try {
         // Profiling:
         // return new PDOProfiler("mysql:host={$db['hostname']};dbname={$db['dbname']}", $db['username'], $db['password']);
-        return new PDO("mysql:host={$db['hostname']};dbname={$db['dbname']}", $db['username'], $db['password']);
+        return new PDO("mysql:host={$db['hostname']};dbname={$db['dbname']}", $db['username'], $db['password'], array(
+            PDO::ATTR_PERSISTENT => true
+        ));
     } catch (PDOException $e) {
         error_log('Error while connecting to the database ' . $dbtype . ': <br/><b>' . $e->getMessage() . '</b>');
         exit('An error occurred while connecting to the database (' . $dbtype . '). This has been logged.');
     }
 }
+
+// Mongo database handle
+$mongo_handle = new Mongo('mongodb://10.10.1.60:27017');
+$mongo = $mongo_handle->selectDB('mcstats');
+$m_graphdata = new MongoCollection($mongo, 'graphdata');
+$m_statistic = new MongoCollection($mongo, 'statistic');
+
+$cursor = $m_statistic->find();
+$statistic = $cursor->getNext();
 
 // Attempt to connect to the master database
 $master_db_handle = try_connect_database();

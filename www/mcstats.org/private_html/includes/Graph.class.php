@@ -203,6 +203,10 @@ class Graph {
         }
     }
 
+    public function isOfficial() {
+        return $this->position == 1 || $this->position >= 1000;
+    }
+
     /**
      * Save the graph to the database
      */
@@ -242,20 +246,13 @@ class Graph {
      * @param $columnName string
      * @return int
      */
-    public function getColumnID($columnName, $create = true) {
+    public function getColumnID($columnName) {
         global $master_db_handle;
 
-        // It should already be in the database
-        $statement = $master_db_handle->prepare('SELECT ID FROM CustomColumn WHERE Plugin = ? AND Graph = ? AND Name = ?');
-        $statement->execute(array($this->plugin->getID(), $this->id, $columnName));
-
-        if ($row = $statement->fetch()) {
-            $id = $row['ID'];
-            return $id;
-        }
-
-        if (!$create) {
-            return -1;
+        foreach ($this->columns as $id => $name) {
+            if ($name == $columnName) {
+                return $id;
+            }
         }
 
         $statement = $master_db_handle->prepare('INSERT INTO CustomColumn (Plugin, Graph, Name) VALUES (:Plugin, :Graph, :Name)');
@@ -263,6 +260,7 @@ class Graph {
 
         // Now get the last inserted id
         $id = $master_db_handle->lastInsertId();
+        $this->columns[$id] = $columnName;
         return $id;
     }
 

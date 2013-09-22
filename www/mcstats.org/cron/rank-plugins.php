@@ -14,6 +14,10 @@ $counts = array();
 
 // count servers
 foreach (loadPlugins(PLUGIN_ORDER_ALPHABETICAL) as $plugin) {
+    if ($plugin->isHidden()) {
+        continue;
+    }
+
     $count = $plugin->countServersLastUpdated(normalizeTime() - SECONDS_IN_DAY);
     $plugins[$plugin->getID()] = $plugin;
     $counts[$plugin->getID()] = $count;

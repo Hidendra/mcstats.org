@@ -6,6 +6,8 @@ require_once ROOT . '../private_html/config.php';
 require_once ROOT . '../private_html/includes/database.php';
 require_once ROOT . '../private_html/includes/func.php';
 
+cacheCurrentPage();
+
 // Cache until the next interval
 header('Cache-Control: public, s-maxage=' . (timeUntilNextGraph() - time()));
 
@@ -35,12 +37,7 @@ $page_title = 'MCStats :: Plugin List';
 $breadcrumbs = '<a href="/plugin-list/" class="current">Plugin List</a>';
 send_header();
 
-$output = $cache->get('plugin_list');
-
-if (!$output) {
-    ob_start();
-
-    echo '
+echo '
 
             <div class="row-fluid">
 
@@ -54,40 +51,40 @@ if (!$output) {
                         <tbody>
 ';
 
-    $step = 1;
-    foreach (loadPlugins(PLUGIN_ORDER_POPULARITY, PLUGIN_LIST_RESULTS_PER_PAGE, $offset) as $plugin) {
-        if ($plugin->isHidden()) {
-            continue;
-        }
-
-        $rank = $plugin->getRank();
-
-        $pluginName = htmlentities($plugin->getName());
-        $format = number_format($plugin->getServerCount());
-
-        if ($rank <= 10) {
-            $rank = '<b>' . $rank . '</b>';
-            $pluginName = '<b>' . $pluginName . '</b>';
-            $format = '<b>' . $format . '</b>';
-        }
-
-        // increase
-        if ($plugin->getRank() < $plugin->getLastRank()) {
-            $rank .= ' <i class="fam-arrow-up" title="Increased from ' . $plugin->getLastRank() . ' (+' . ($plugin->getLastRank() - $plugin->getRank()) . ')"></i>';
-        } // decrease
-        elseif ($plugin->getRank() > $plugin->getLastRank()) {
-            $rank .= ' <i class="fam-arrow-down" title="Decreased from ' . $plugin->getLastRank() . ' (-' . ($plugin->getRank() - $plugin->getLastRank()) . ')"></i>';
-        } // no change
-        else {
-            $rank .= ' <i class="fam-bullet-blue" title="No change"></i>';
-        }
-
-        echo '                          <tr id="plugin-list-item"> <td style="text-align: center;">' . $rank . ' </td> <td> <a href="/plugin/' . htmlentities($plugin->getName()) . '" target="_blank">' . $pluginName . '</a> </td> <td style="text-align: center;"> ' . $format . ' </td> </tr>
-';
-        $step++;
+$step = 1;
+foreach (loadPlugins(PLUGIN_ORDER_POPULARITY, PLUGIN_LIST_RESULTS_PER_PAGE, $offset) as $plugin) {
+    if ($plugin->isHidden()) {
+        continue;
     }
 
-    echo '                          <tr>
+    $rank = $plugin->getRank();
+
+    $pluginName = htmlentities($plugin->getName());
+    $format = number_format($plugin->getServerCount());
+
+    if ($rank <= 10) {
+        $rank = '<b>' . $rank . '</b>';
+        $pluginName = '<b>' . $pluginName . '</b>';
+        $format = '<b>' . $format . '</b>';
+    }
+
+    // increase
+    if ($plugin->getRank() < $plugin->getLastRank()) {
+        $rank .= ' <i class="fam-arrow-up" title="Increased from ' . $plugin->getLastRank() . ' (+' . ($plugin->getLastRank() - $plugin->getRank()) . ')"></i>';
+    } // decrease
+    elseif ($plugin->getRank() > $plugin->getLastRank()) {
+        $rank .= ' <i class="fam-arrow-down" title="Decreased from ' . $plugin->getLastRank() . ' (-' . ($plugin->getRank() - $plugin->getLastRank()) . ')"></i>';
+    } // no change
+    else {
+        $rank .= ' <i class="fam-bullet-blue" title="No change"></i>';
+    }
+
+    echo '                          <tr id="plugin-list-item"> <td style="text-align: center;">' . $rank . ' </td> <td> <a href="/plugin/' . htmlentities($plugin->getName()) . '" target="_blank">' . $pluginName . '</a> </td> <td style="text-align: center;"> ' . $format . ' </td> </tr>
+';
+    $step++;
+}
+
+echo '                          <tr>
                                     <td style="text-align: center;" id="plugin-list-page-number"> <span id="plugin-list-current-page">' . $currentPage . '</span>/<span id="plugin-list-max-pages">' . $totalPages . '</span> </td>
                                     <td style="text-align: center;"> <a href="#" class="btn btn-mini" id="plugin-list-back" onclick="movePluginListBack()" style="' . ($currentPage == 1 ? 'display: none; ' : '') . 'margin: 0;"><i class="icon-arrow-left"></i> Back</a> <a href="#" class="btn btn-mini" id="plugin-list-forward" onclick="movePluginListForward()" style="' . ($currentPage == $totalPages ? 'display: none; ' : '') . 'margin: 0;">Forward <i class="icon-arrow-right"></i></a> </td>
                                     <td style="text-align: center;"> <input class="input-mini" type="text" value="' . $currentPage . '" id="plugin-list-goto-page" style="height: 12px; margin: 0; width: 20px; text-align: center;" /> <a href="#" class="btn btn-mini" id="plugin-list-go" onclick="loadPluginListPage($(\'#plugin-list-goto-page\').val());">Go <i class="icon-share-alt"></i></a> </td>
@@ -95,19 +92,12 @@ if (!$output) {
 
                         </tbody>';
 
-    echo '
+echo '
                     </table>
                 </div>
 ';
 
-    echo '  </div>';
-
-    $output = ob_get_contents();
-    ob_end_clean();
-    $cache->set('plugin_list', $output, CACHE_UNTIL_NEXT_GRAPH);
-}
-
-echo $output;
+echo '  </div>';
 
 /// Templating
 send_footer();

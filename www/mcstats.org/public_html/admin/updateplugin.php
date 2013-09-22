@@ -47,7 +47,7 @@ if (isset($_POST['graph'])) {
         }
 
         // don't allow editing for readonly graphs
-        if ($graph->isReadOnly()) {
+        if ($graph->isReadOnly() || $graph->isOfficial()) {
             continue;
         }
 
@@ -71,13 +71,10 @@ if (isset($_POST['graph'])) {
             $scale = GraphScale::Linear;
         }
 
-        // validate the position they want to set the graph to and if they're valid set it
-        // TODO make these ranges easier to change ?
-        if ($position > 1 && $position < 9000) {
+        if ($position > 1 && $position < 1000) {
             $graph->setPosition($position);
         }
 
-        // Set them onto the graph
         $graph->setDisplayName($displayName);
         $graph->setType($type);
         $graph->setActive($active);

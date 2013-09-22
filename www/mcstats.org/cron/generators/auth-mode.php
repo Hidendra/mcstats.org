@@ -35,7 +35,7 @@ function doGeneration($pluginId, $data) {
     }
 
     $graph = $plugin->getOrCreateGraph('Auth Mode', false, 1, GraphType::Pie, true, 9011);
-    insertGraphDataScratch($graph, $pluginId, $fullName, $baseEpoch, $sum, $count, $avg, $max, $min, $variance, $stddev);
+    insertGraphData($graph, $pluginId, $fullName, $baseEpoch, $sum, $count, $avg, $max, $min, $variance, $stddev);
 }
 
 // Plugins

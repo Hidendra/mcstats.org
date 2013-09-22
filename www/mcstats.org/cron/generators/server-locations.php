@@ -38,7 +38,7 @@ function doGeneration($pluginId, $data) {
     $plugin->getOrCreateGraph('Map', false, 1, GraphType::Map, true, 9600);
 
     $graph = $plugin->getOrCreateGraph('Server Locations', false, 1, GraphType::Pie, true, 9000);
-    insertGraphDataScratch($graph, $pluginId, $fullName, $baseEpoch, $sum, $count, $avg, $max, $min, $variance, $stddev);
+    insertGraphData($graph, $pluginId, $fullName, $baseEpoch, $sum, $count, $avg, $max, $min, $variance, $stddev);
 }
 
 // Plugins

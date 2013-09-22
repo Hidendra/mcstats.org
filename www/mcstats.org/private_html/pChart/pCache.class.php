@@ -45,9 +45,8 @@ class pCache {
     function ClearCache() {
         if ($handle = opendir($this->CacheFolder)) {
             while (false !== ($file = readdir($handle))) {
-                if ($file != "." && $file != "..") {
+                if ($file != "." && $file != "..")
                     unlink($this->CacheFolder . $file);
-                }
             }
             closedir($handle);
         }
@@ -55,15 +54,13 @@ class pCache {
 
     /* This function is checking if we have an offline version of this chart */
     function IsInCache($ID, $Data, $Hash = "") {
-        if ($Hash == "") {
+        if ($Hash == "")
             $Hash = $this->GetHash($ID, $Data);
-        }
 
-        if (file_exists($this->CacheFolder . $Hash)) {
+        if (file_exists($this->CacheFolder . $Hash))
             return (true);
-        } else {
+        else
             return (false);
-        }
     }
 
     /* This function is making a copy of drawn chart in the cache folder */
@@ -79,9 +76,8 @@ class pCache {
         $Hash = $this->GetHash($ID, $Data);
         $FileName = $this->CacheFolder . $Hash;
 
-        if (file_exists($FileName)) {
+        if (file_exists($FileName))
             unlink($FileName);
-        }
     }
 
     /* This function is retrieving the cached picture if applicable */
@@ -101,9 +97,8 @@ class pCache {
         $mKey = "$ID";
         foreach ($Data as $key => $Values) {
             $tKey = "";
-            foreach ($Values as $Serie => $Value) {
+            foreach ($Values as $Serie => $Value)
                 $tKey = $tKey . $Serie . $Value;
-            }
             $mKey = $mKey . md5($tKey);
         }
         return (md5($mKey));

@@ -33,11 +33,77 @@ define('GLOBAL_PLUGIN_ID', -1);
 
 // Connect to the caching daemon
 $cache = new Cache();
-$cache->connect();
+
+/**
+ * Get the global cache key used, for the current username / script
+ * @param $aux array additional keys that are used to cache this page
+ * @return string
+ */
+function getGlobalCacheKey($aux = array()) {
+    $username = 'guest';
+
+    if (is_loggedin()) {
+        $username = $_SESSION['username'];
+    }
+
+    $cache_key = $username . '/' . basename($_SERVER["SCRIPT_NAME"]) . '/';
+
+    foreach ($_GET as $key => $value) {
+        $cache_key .= $key . '=' . $value . '/';
+    }
+
+    foreach ($aux as $key => $value) {
+        $cache_key .= $key . '=' . $value . '/';
+    }
+
+    return $cache_key;
+}
+
+/**
+ * Caches the current page. It gets the page from the cache if available and outputs that instead.
+ * @param $aux array additional keys that are used to cache this page
+ */
+function cacheCurrentPage($aux = array()) {
+    global $cache;
+
+    if (!empty($_POST)) {
+        return;
+    }
+
+    insert_cache_headers();
+
+    $result = $cache->get(getGlobalCacheKey($aux));
+
+    if ($result != null) {
+        header('X-MCStats-Cache: yes (redis)');
+        echo $result;
+        exit;
+    }
+
+    // turn on output buffering
+    ob_start();
+
+    register_shutdown_function('cacheFinalizePage');
+
+}
+
+/**
+ * Finalizes the caching of a page
+ */
+function cacheFinalizePage() {
+    global $cache;
+
+    $result = ob_get_clean();
+
+    $cache->set(getGlobalCacheKey(), $result, CACHE_UNTIL_NEXT_GRAPH);
+
+    echo $result;
+}
 
 /**
  * Utility function for generating graphs
  *
+ * @param $graph Graph
  * @param $plugin
  * @param $columnName
  * @param $epoch
@@ -49,8 +115,8 @@ $cache->connect();
  * @param $variance
  * @param $stddev
  */
-function insertGraphDataScratch($graph, $plugin, $columnName, $epoch, $sum, $count, $avg, $max, $min, $variance, $stddev) {
-    global $master_db_handle;
+function insertGraphData($graph, $plugin, $columnName, $epoch, $sum, $count, $avg, $max, $min, $variance, $stddev) {
+    global $m_graphdata;
 
     // these can be NULL IFF there is only one data point (e.g one server) in the sample
     // we're using sample functions NOT population so this should be fairly obvious why
@@ -60,6 +126,46 @@ function insertGraphDataScratch($graph, $plugin, $columnName, $epoch, $sum, $cou
         $stddev = 0;
     }
 
+    $columnId = $graph->getColumnID($columnName);
+
+    $toset = array();
+    if ($sum != 0) $toset['data.' . $columnId]['sum'] = intval($sum);
+    if ($count != 0) $toset['data.' . $columnId]['count'] = intval($count);
+    if ($avg != 0) $toset['data.' . $columnId]['avg'] = intval($avg);
+    if ($max != 0) $toset['data.' . $columnId]['max'] = intval($max);
+    if ($min != 0) $toset['data.' . $columnId]['min'] = intval($min);
+    if ($variance != 0) $toset['data.' . $columnId]['variance'] = intval($variance);
+    if ($stddev != 0) $toset['data.' . $columnId]['stddev'] = intval($stddev);
+
+    // For official pie/donut graphs only keep one set of data as for the time being historical data for them will not be viewable
+    if ($graph->isOfficial() && ($graph->getType() == GraphType::Pie || $graph->getType() == GraphType::Donut)) {
+        $toset['epoch'] = intval($epoch);
+
+        $m_graphdata->update(array(
+            'plugin' => intval($plugin),
+            'graph' => intval($graph->getID())
+        ), array(
+            '$set' => $toset
+        ), array(
+            'upsert' => true,
+            'multiple' => false,
+            'w' => 0
+        ));
+    } else {
+        $m_graphdata->update(array(
+            'epoch' => intval($epoch),
+            'plugin' => intval($plugin),
+            'graph' => intval($graph->getID())
+        ), array(
+            '$set' => $toset
+        ), array(
+            'upsert' => true,
+            'w' => 0
+        ));
+    }
+
+    /*
+     * Old SQL based graph data store
     $insert = $master_db_handle->prepare('INSERT INTO GraphDataScratch (Plugin, ColumnID, Sum, Count, Avg, Max, Min, Variance, StdDev, Epoch)
                                                     VALUES (:Plugin, :ColumnID, :Sum, :Count, :Avg, :Max, :Min, :Variance, :StdDev, :Epoch)');
     $insert->execute(array(
@@ -74,6 +180,7 @@ function insertGraphDataScratch($graph, $plugin, $columnName, $epoch, $sum, $cou
         ':Variance' => $variance,
         ':StdDev' => $stddev
     ));
+    */
 }
 
 /**
@@ -116,7 +223,7 @@ function outputGraphs($plugin) {
     $floated = false;
     foreach ($activeGraphs as $activeGraph) {
         // TODO not hardcoded ? heh
-        $activeGraph->setFeedURL(sprintf('https://mcstats.org/api/1.0/%s/graph/%s', urlencode(htmlentities($plugin->getName())), urlencode(htmlentities($activeGraph->getName()))));
+        $activeGraph->setFeedURL(sprintf('http://api.mcstats.org/1.0/%s/graph/%s', urlencode(htmlentities($plugin->getName())), urlencode(htmlentities($activeGraph->getName()))));
 
         $safeHTMLName = htmlentities($activeGraph->getDisplayName());
         $safeName = urlencode($safeHTMLName);
@@ -242,10 +349,8 @@ function getTimeLast() {
  * @return int
  */
 function getLastGraphEpoch() {
-    $statement = get_slave_db_handle()->prepare('SELECT MAX(Epoch) FROM GraphData');
-    $statement->execute();
-    $row = $statement->fetch();
-    return $row != null ? $row[0] : 0;
+    global $statistic;
+    return $statistic['max']['epoch'];
 }
 
 /**
@@ -304,6 +409,21 @@ function normalizeTime($time = -1) {
 
     // Round to the closest one
     return round(($time - ($denom / 2)) / $denom) * $denom;
+}
+
+/**
+ * Get the raw server row for a given guid
+ * @return array
+ */
+function getServerRowForGUID($guid) {
+    $statement = get_slave_db_handle()->prepare('select * from Server where GUID = ?');
+    $statement->execute(array($guid));
+
+    if ($row = $statement->fetch()) {
+        return $row;
+    }
+
+    return array();
 }
 
 /**
@@ -505,19 +625,19 @@ function countPlugins($order = PLUGIN_ORDER_POPULARITY) {
 
     switch ($order) {
         case PLUGIN_ORDER_ALPHABETICAL:
-            $query = 'SELECT * FROM Plugin WHERE Parent = -1';
+            $query = 'SELECT COUNT(*) FROM Plugin WHERE Parent = -1';
             break;
 
         case PLUGIN_ORDER_POPULARITY:
-            $query = 'SELECT * FROM Plugin WHERE Plugin.Parent = -1';
+            $query = 'SELECT COUNT(*) FROM Plugin WHERE Plugin.Parent = -1';
             break;
 
         case PLUGIN_ORDER_RANDOM:
-            $query = 'SELECT * FROM Plugin WHERE Parent = -1';
+            $query = 'SELECT COUNT(*) FROM Plugin WHERE Parent = -1';
             break;
 
         case PLUGIN_ORDER_RANDOM_TOP100:
-            $query = 'SELECT * FROM Plugin WHERE Parent = -1 AND Rank <= 100';
+            $query = 'SELECT COUNT(*) FROM Plugin WHERE Parent = -1 AND Rank <= 100';
             break;
 
         default:
@@ -528,11 +648,8 @@ function countPlugins($order = PLUGIN_ORDER_POPULARITY) {
     $statement = $db_handle->prepare($query);
     $statement->execute(array(normalizeTime() - SECONDS_IN_DAY));
 
-    $pluginCount = 0;
-    while ($row = $statement->fetch()) {
-        $pluginCount++;
-    }
-    return $pluginCount;
+    $row = $statement->fetch();
+    return $row ? $row[0] : 0;
 }
 
 /**
@@ -885,18 +1002,151 @@ function epochToHumanString($epoch, $outputSeconds = true) {
         $ret = 'less than a ' . ($outputSeconds ? 'second' : 'minute');
     }
 
-    return $ret;
+    return trim($ret);
 }
 
 function insert_cache_headers() {
     global $config;
-    header('Expires: ' . gmdate('D, d M Y H:i:s \G\M\T', getLastGraphEpoch() + (60 * $config['graph']['interval'])));
+    header('X-MCStats-Cache: no');
+    // if (true) return;
+    header("Cache-Control: must-revalidate");
+    // header('Expires: ' . gmdate('D, d M Y H:i:s \G\M\T', getLastGraphEpoch() + (60 * $config['graph']['interval'])));
+    header('Expires: -1');
     header('Last-Modified: ' . gmdate('D, d M Y H:i:s \G\M\T', getLastGraphEpoch()));
 
     if (isset($_SERVER['HTTP_IF_MODIFIED_SINCE'])) {
         if (strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']) >= getLastGraphEpoch() && graph_generator_percentage() === null) {
             header('HTTP/1.1 304 Not Modified');
+            header('X-MCStats-Cache: yes (not modified)');
             exit;
         }
+    }
+}
+
+/**
+ * Send an email
+ *
+ * @param $email
+ * @param $body
+ */
+function sendEmail($email, $subject, $body) {
+    global $config;
+    require_once 'Mail.php'; // pear-Mail
+    require_once 'Mail/mime.php';
+
+    $headers = array('From' => 'MCStats <noreply@mcstats.org>', 'To' => $email, 'Subject' => $subject);
+    $smtp = Mail::factory('smtp', array(
+        'host' => 'ssl://smtp.gmail.com',
+        'port' => '465',
+        'auth' => true,
+        'username' => $config['email']['username'],
+        'password' => $config['email']['password']
+    ));
+
+    // create the email
+    $mime = new Mail_mime("\n");
+
+    // set the bodies
+    $mime->setTXTBody(strip_tags($body));
+    $mime->setHTMLBody($body);
+
+    // send the email
+    $mail = $smtp->send($email, $mime->headers($headers), $mime->get());
+
+    if (PEAR::isError($mail)) {
+        error_log('SMTP error: ' . $mail->getMessage());
+    }
+}
+
+/**
+ * Send an email to the given email for the plugin request with approved or declined email.
+ *
+ * @param $plugin Plugin
+ * @param $approved Boolean
+ */
+function sendPluginRequestEmail($email, $plugin, $approved) {
+    if (!empty($email)) {
+        // email params
+        $pluginName = htmlentities($plugin->getName());
+        $subject = sprintf('Plugin approval for %s: %s', $pluginName, $approved ? 'Approved!' : 'Rejected');
+        if ($approved) {
+            $body = <<<END
+            <p style="margin:0 0 9px;font-size: 16px;">
+                Hello,
+            </p>
+            <p style="margin:0 0 9px;">
+                You recently submitted a plugin request for the plugin <b>$pluginName</b> which has been <b>approved</b>!
+            </p>
+            <p style="margin:0 0 9px;">
+                You will now be able to access administrative functions for your plugin immediately. To go there, please click <a href="http://mcstats.org/admin/plugin/$pluginName/view">here</a>.
+            </p>
+            <p style="margin:0 0 9px;">
+                If you have any questions at all or just want to relax please feel free to join us in IRC at <code style='padding:2px 4px;font-family:Menlo,Monaco,Consolas,"Courier New",monospace;font-size:12px;color:#d14;-webkit-border-radius:3px;-moz-border-radius:3px;border-radius:3px;background-color:#f7f7f9;border:1px solid #e1e1e8;'>irc.esper.net #metrics</code> anytime.
+            </p>
+            <p style="margin:0 0 9px;">
+                Thank you,
+            </p>
+            <p style="margin:0 0 9px;">
+                The MCStats.org Staff (currently 1 strong!)
+            </p>
+END;
+        } else // Rejected
+        {
+            $body = <<<END
+            <p style="margin:0 0 9px;font-size: 16px;">
+                Hello,
+            </p>
+            <p style="margin:0 0 9px;">
+                You recently submitted a plugin request for the plugin <b>$pluginName</b> which has been <b>rejected</b>.
+            </p>
+            <p style="margin:0 0 9px;">
+                To ensure smooth processing, please ensure you provide a url to a <a href="http://dev.bukkit.org" style="color:#366ddc;text-decoration:none;">dev.bukkit.org</a> submission or a forum post
+                (such as from <a href="http://forums.bukkit.org" style="color:#366ddc;text-decoration:none;">bukkit.org)</a> where this plugin's information/documentation can be found. This is done to help
+                identify your plugin as a real plugin and to mostly ensure we add the correct person.
+            </p>
+            <p style="margin:0 0 9px;">
+                When you are ready, please do <a href="/admin/add-plugin/" style="color:#366ddc;text-decoration:none;">resubmit</a> your plugin and hopefully we can get you added this time.
+            </p>
+            <p style="margin:0 0 9px;">
+                If you still experience issues or would like a better explanation of why your request was rejected please visit us in IRC at <code style='padding:2px 4px;font-family:Menlo,Monaco,Consolas,"Courier New",monospace;font-size:12px;color:#d14;-webkit-border-radius:3px;-moz-border-radius:3px;border-radius:3px;background-color:#f7f7f9;border:1px solid #e1e1e8;'>irc.esper.net #metrics</code>
+            </p>
+            <p style="margin:0 0 9px;">
+                Thank you,
+            </p>
+            <p style="margin:0 0 9px;">
+                The MCStats.org Staff (currently 1 strong!)
+            </p>
+END;
+        }
+
+        $full_body = <<<END
+<html>
+<head>
+	<meta charset="UTF-8" />
+	<base href="http://mcstats.org/" />
+	<title>MCStats</title>
+</head>
+<body style='margin:0;font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;font-size:13px;line-height:18px;color:#555555;background-color:#f3f3f3;'>
+
+<br><div class="container-fluid" style="padding-right:20px;padding-left:20px;*zoom:1;">
+
+    <div class="row-fluid" style="width:100%;">
+        <div class="span6 well" style="min-height:20px;padding:19px;margin-bottom:20px;background-color:#ffffff;border:none;-webkit-border-radius:4px;-moz-border-radius:4px;border-radius:4px;-webkit-box-shadow:0 1px 1px rgba(0, 0, 0, 0.3);-moz-box-shadow:0 1px 1px rgba(0, 0, 0, 0.3);box-shadow:0 1px 1px rgba(0, 0, 0, 0.3);">
+$body
+        </div>
+    </div>
+
+    <footer class="row-fluid" style="display:block;width:100%;*zoom:1;"><hr style="margin:18px 0;border:0;border-top:1px solid #eeeeee;border-bottom:1px solid #ffffff;">
+        <p style="margin:0 0 9px;"> MCStats backend created by Hidendra. Plugins are owned by their respective authors. </p>
+        <p style="margin:0 0 9px;">  <a href="/plugin-list/" style="color:#366ddc;text-decoration:none;">plugin list</a> | <a href="/status/" style="color:#366ddc;text-decoration:none;">backend status</a> | <a href="/admin/" style="color:#366ddc;text-decoration:none;">admin</a> | <a href="http://github.com/Hidendra/mcstats.org" style="color:#366ddc;text-decoration:none;">github</a> | irc.esper.net #metrics </p>
+    </footer>
+</div>
+
+</body>
+</html>
+END;
+
+
+        sendEmail($email, $subject, $full_body);
     }
 }

@@ -10,8 +10,6 @@ require_once ROOT . 'pChart/pCache.class.php';
 $pCache = new pCache('../cache/');
 $pCache->ClearCache();
 
-// memcached
-$cache->handle()->flush();
-
 // mysql
 $master_db_handle->exec('TRUNCATE CustomData');
+$master_db_handle->exec('TRUNCATE VersionHistory');

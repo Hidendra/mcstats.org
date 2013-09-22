@@ -8,6 +8,7 @@ require_once ROOT . '../private_html/includes/database.php';
 require_once ROOT . '../private_html/includes/func.php';
 
 ensure_loggedin();
+// cacheCurrentPage();
 
 $breadcrumbs = '<a href="/admin/">Administration</a> <a href="/admin/add-plugin/" class="current">Add Plugin</a>';
 
@@ -36,12 +37,19 @@ if (isset($_POST['submit'])) {
             }
         }
 
-        if ($hasPlugin && $plugin->getPendingAccess() !== true) {
+        // Check if it already has an acl
+        $statement = get_slave_db_handle()->prepare('SELECT Author FROM AuthorACL WHERE Plugin = ? AND Pending = 0 LIMIT 1');
+        $statement->execute(array($plugin->getID()));
+
+        if ($statement->fetch()) {
+            err('Someone already owns this plugin. It may be a duplicate plugin. If you are a secondary developer for this plugin email hidendra@mcstats.org or poke Hidendra in IRC.');
+            send_add_plugin(htmlentities($plugin->getName()), htmlentities($email), $dbo);
+        } else if ($hasPlugin && $plugin->getPendingAccess() !== true) {
             err(sprintf('You already own the plugin <b>%s</b>!', htmlentities($plugin->getName())));
             send_add_plugin(htmlentities($plugin->getName()), htmlentities($email), $dbo);
         } else {
             $uid = $_SESSION['uid'];
-            $statement = get_slave_db_handle()->prepare('SELECT Created FROM PluginRequest WHERE Author = ? AND Plugin = ?');
+            $statement = get_slave_db_handle()->prepare('SELECT Created FROM PluginRequest WHERE Author = ? AND Plugin = ? AND Complete = 0');
             $statement->execute(array($uid, $plugin->getID()));
 
             if ($row = $statement->fetch()) {
@@ -49,10 +57,39 @@ if (isset($_POST['submit'])) {
                 err(sprintf('Your ownership request for <b>%s</b> is still pending approval, which was submitted at <b>%s</b>', htmlentities($plugin->getName()), date('H:i T D, F d', $created)));
                 send_add_plugin(htmlentities($plugin->getName()), htmlentities($email), htmlentities($dbo));
             } else {
-                $statement = $master_db_handle->prepare('INSERT INTO PluginRequest (Author, Plugin, Email, DBO, Created) VALUES (?, ?, ?, ?, UNIX_TIMESTAMP())');
-                $statement->execute(array($uid, $plugin->getID(), $email, $dbo));
-                $statement = $master_db_handle->prepare('INSERT INTO AuthorACL (Author, Plugin, Pending) VALUES (?, ?, 1)');
-                $statement->execute(array($uid, $plugin->getID()));
+                // Consider auto approval
+
+                // Calculate the delta on the database so we can ignore timezones
+                $statement = get_slave_db_handle()->prepare('SELECT UNIX_TIMESTAMP() - Created AS delta FROM Plugin where ID = ?');
+                $statement->execute(array($plugin->getID()));
+                $delta = $statement->fetch()['delta'];
+
+                $auto_approved = false;
+
+                if ($delta < 86400) {
+                    $auto_approved = true;
+                }
+
+                // Auto deny if they have too many plugins
+                if (count($accessible) > 10) {
+                    $auto_approved = false;
+                }
+
+                if ($auto_approved) {
+                    $statement = $master_db_handle->prepare('INSERT INTO PluginRequest (Author, Plugin, Email, DBO, Created, Complete) VALUES (?, ?, ?, ?, UNIX_TIMESTAMP(), 1)');
+                    $statement->execute(array($uid, $plugin->getID(), $email, $dbo));
+                    $statement = $master_db_handle->prepare('INSERT INTO AuthorACL (Author, Plugin, Pending) VALUES (?, ?, 0)');
+                    $statement->execute(array($uid, $plugin->getID()));
+
+                    if (!empty($email)) {
+                        sendPluginRequestEmail($email, $plugin, true);
+                    }
+                } else {
+                    $statement = $master_db_handle->prepare('INSERT INTO PluginRequest (Author, Plugin, Email, DBO, Created, Complete) VALUES (?, ?, ?, ?, UNIX_TIMESTAMP(), 0)');
+                    $statement->execute(array($uid, $plugin->getID(), $email, $dbo));
+                    $statement = $master_db_handle->prepare('INSERT INTO AuthorACL (Author, Plugin, Pending) VALUES (?, ?, 1)');
+                    $statement->execute(array($uid, $plugin->getID()));
+                }
 
                 success(sprintf('Successfully requested ownership of the plugin <b>%s</b>!', htmlentities($plugin->getName())));
             }
@@ -147,7 +184,7 @@ CStats into your plugin.
                     </p>
 
                     <p style="font-size:18px; font-weight:200; line-height:27px; text-align: center;">
-                        <b>ALSO NOTE:</b> All admin plugin additions are manually processed. <br/> If you enter an email address you will be notified via email once it has been processed.
+                        <b>ALSO NOTE:</b> Most plugin additions are manually processed (some are automatic). <br/> If you enter an email address you will be notified via email once it has been processed.
                     </p>
 
                     <div class="well">

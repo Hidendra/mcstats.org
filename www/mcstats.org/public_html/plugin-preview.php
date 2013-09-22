@@ -24,15 +24,6 @@ define('IMAGE_WIDTH', 478);
 // We will be outputting a PNG image!
 header('Content-type: image/png');
 
-if (!isset($_GET['plugin'])) {
-    error_image('Error: No plugin provided');
-}
-
-// Required requirements
-require ROOT . '../private_html/pChart/pData.class.php';
-require ROOT . '../private_html/pChart/pChart.class.php';
-require ROOT . '../private_html/pChart/pCache.class.php';
-
 // image modifier
 $scale = isset($_GET['scale']) ? $_GET['scale'] : 1;
 
@@ -43,6 +34,10 @@ if ($scale > 10 || $scale <= 0) {
 } else {
     define('REAL_IMAGE_HEIGHT', IMAGE_HEIGHT * $scale);
     define('REAL_IMAGE_WIDTH', IMAGE_WIDTH * $scale);
+}
+
+if (!isset($_GET['plugin'])) {
+    error_image('Error: No plugin provided');
 }
 
 // The plugin we are graphing
@@ -61,58 +56,60 @@ if ($plugin == null) {
 // case-correct plugin name
 $pluginName = $plugin->getName();
 
-$pCache = new pCache('../cache/');
-
 // get the graph from cache
-$cacheKey = 'preview/' . $scale . '/' . $pluginName;
+$cacheKey = 'preview-' . $scale . '-' . $pluginName;
+$cacheFileLocation = '../cache/' . $cacheKey . '.png';
 
-// Create a new data set
-$dataSet = new pData();
+if (!file_exists($cacheFileLocation)) {
+    require ROOT . '../private_html/pChart/pData.class.php';
+    require ROOT . '../private_html/pChart/pChart.class.php';
+    require ROOT . '../private_html/pChart/pCache.class.php';
 
-// The servers plot
-$serversX = array();
+    // Create a new data set
+    $dataSet = new pData();
 
-// The players plot
-$playersX = array();
-$graph_data = array(); // epoch => [ "servers" => v, "players" => v ]
+    // The servers plot
+    $serversX = array();
 
-// load the plugin's stats graph
-$globalstatistics = $plugin->getOrCreateGraph('Global Statistics');
-// the player plot's column id
-$playersColumnID = $globalstatistics->getColumnID('Players');
-// server plot's column id
-$serversColumnID = $globalstatistics->getColumnID('Servers');
+    // The players plot
+    $playersX = array();
+    $graph_data = array(); // epoch => [ "servers" => v, "players" => v ]
 
-foreach (DataGenerator::generateCustomChartData($globalstatistics, $playersColumnID, HOURS) as $data) {
-    $epoch = $data[0];
-    $value = $data[1];
+    // load the plugin's stats graph
+    $globalstatistics = $plugin->getOrCreateGraph('Global Statistics');
+    // the player plot's column id
+    $playersColumnID = $globalstatistics->getColumnID('Players');
+    // server plot's column id
+    $serversColumnID = $globalstatistics->getColumnID('Servers');
 
-    $playersX[] = $value;
-}
+    foreach (DataGenerator::generateCustomChartData($globalstatistics, $playersColumnID, HOURS) as $data) {
+        $epoch = $data[0];
+        $value = $data[1];
 
-foreach (DataGenerator::generateCustomChartData($globalstatistics, $serversColumnID, HOURS) as $data) {
-    $epoch = $data[0];
-    $value = $data[1];
+        $playersX[] = $value;
+    }
 
-    $serversX[] = $value;
-}
+    foreach (DataGenerator::generateCustomChartData($globalstatistics, $serversColumnID, HOURS) as $data) {
+        $epoch = $data[0];
+        $value = $data[1];
 
-// Add the data to the graph
-$dataSet->AddPoint($playersX, 'Serie1');
-$dataSet->AddPoint($serversX, 'Serie2');
+        $serversX[] = $value;
+    }
 
-// Create the series
-$dataSet->AddSerie('Serie1');
-$dataSet->AddSerie('Serie2');
-$dataSet->SetSerieName('Players', 'Serie1');
-$dataSet->SetSerieName('Servers', 'Serie2');
-$dataSet->SetYAxisName('');
+    // Add the data to the graph
+    $dataSet->AddPoint($playersX, 'Serie1');
+    $dataSet->AddPoint($serversX, 'Serie2');
 
-// Add all of the series
-$dataSet->AddAllSeries();
+    // Create the series
+    $dataSet->AddSerie('Serie1');
+    $dataSet->AddSerie('Serie2');
+    $dataSet->SetSerieName('Players', 'Serie1');
+    $dataSet->SetSerieName('Servers', 'Serie2');
+    $dataSet->SetYAxisName('');
 
-// Check caches
-if ($pCache->IsInCache($cacheKey, $dataSet->GetData()) === false) {
+    // Add all of the series
+    $dataSet->AddAllSeries();
+
     // Set us up the bomb
     $graph = new pChart(REAL_IMAGE_WIDTH, REAL_IMAGE_HEIGHT);
     $graph->setFontProperties('tahoma.ttf', 8);
@@ -143,16 +140,18 @@ if ($pCache->IsInCache($cacheKey, $dataSet->GetData()) === false) {
     // Copy our graph into the image
     imagecopy($image, $graphImage, 0, 0, 0, 0, REAL_IMAGE_WIDTH, REAL_IMAGE_HEIGHT);
 
-    imagepng($image);
+    // Cache the image
+    imagepng($image, $cacheFileLocation);
 
     // Destroy it
     imagedestroy($image);
-
-    // Cache the image
-    $pCache->WriteToCache($cacheKey, $dataSet->GetData(), $graph);
+    header('X-MCStats-Cache: no');
 } else {
-    $pCache->GetFromCache($cacheKey, $dataSet->GetData());
+    header('X-MCStats-Cache: yes');
 }
+
+//header("Content-Length: " . filesize($cacheFileLocation));
+fpassthru(fopen($cacheFileLocation, 'rb'));
 
 /**
  * Create an error image, send it to the client, and then exit

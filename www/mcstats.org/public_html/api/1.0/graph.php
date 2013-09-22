@@ -2,12 +2,13 @@
 define('ROOT', '../../');
 header('Access-Control-Allow-Origin: *');
 header('Content-type: application/json');
+session_start();
 
 require_once ROOT . '../private_html/config.php';
 require_once ROOT . '../private_html/includes/database.php';
 require_once ROOT . '../private_html/includes/func.php';
 
-insert_cache_headers();
+cacheCurrentPage();
 
 // Fine-tune this or allow customizations?
 $hours = 744;
@@ -87,69 +88,62 @@ switch ($graphName) {
         }
 
         // if it's a pie chart, it's easier
-        if ($graph->getType() == GraphType::Pie) {
+        if ($graph->getType() == GraphType::Pie || $graph->getType() == GraphType::Donut) {
             $response['status'] = 'ok';
             $response['data'] = DataGenerator::generateCustomChartData($graph, -1, $hours);
             $response['name'] = htmlentities($graph->getName());
             $response['type'] = GraphType::toString($graph->getType());
         } else {
-            if ($graph->getType() == GraphType::Donut) {
+            if ($graph->getType() == GraphType::Map) {
                 $response['status'] = 'ok';
-                $response['data'] = DataGenerator::generateCustomChartData($graph, -1, $hours);
+                $response['data'] = DataGenerator::generateGeoChartData($plugin);
                 $response['name'] = htmlentities($graph->getName());
                 $response['type'] = GraphType::toString($graph->getType());
-            } else {
-                if ($graph->getType() == GraphType::Map) {
-                    $response['status'] = 'ok';
-                    $response['data'] = DataGenerator::generateGeoChartData($plugin);
-                    $response['name'] = htmlentities($graph->getName());
-                    $response['type'] = GraphType::toString($graph->getType());
-                } // otherwise we need to generate data for every column
-                else {
-                    foreach ($graph->getColumns() as $columnID => $columnName) {
-                        if (is_numeric($columnName) || is_double($columnName)) {
-                            $columnName = "\0" . $columnName;
-                        }
-
-                        $response['data'][utf8_encode($columnName)] = DataGenerator::generateCustomChartData($graph, $columnID, $hours);
+            } // otherwise we need to generate data for every column
+            else {
+                foreach ($graph->getColumns() as $columnID => $columnName) {
+                    if (is_numeric($columnName) || is_double($columnName)) {
+                        $columnName = "\0" . $columnName;
                     }
 
-                    // total the counts
-                    $total = 0;
+                    $response['data'][utf8_encode($columnName)] = DataGenerator::generateCustomChartData($graph, $columnID, $hours);
+                }
+
+                // total the counts
+                $total = 0;
+                foreach ($response['data'] as $name => $data) {
+                    $count = count($data);
+
+                    // evict the column if it has none (wasting space !)
+                    if ($count == 0) {
+                        unset($response['data'][$name]);
+                        continue;
+                    }
+
+                    $total += $data[$count - 1][1]; // [[0,5], [1,7]] the expression will return 7
+                }
+
+                // now evict more data if necessary
+                if ($total > 5000 && count($response['data']) > 20) // TODO better magic numbers
+                {
+                    $removed_total = 0;
+
                     foreach ($response['data'] as $name => $data) {
                         $count = count($data);
+                        $value = $data[$count - 1][1];
+                        $percent = ($value / $total) * 100;
 
-                        // evict the column if it has none (wasting space !)
-                        if ($count == 0) {
+                        // evict any data below 0.05%
+                        if ($percent <= 0.10) {
                             unset($response['data'][$name]);
-                            continue;
-                        }
-
-                        $total += $data[$count - 1][1]; // [[0,5], [1,7]] the expression will return 7
-                    }
-
-                    // now evict more data if necessary
-                    if ($total > 5000 && count($response['data']) > 20) // TODO better magic numbers
-                    {
-                        $removed_total = 0;
-
-                        foreach ($response['data'] as $name => $data) {
-                            $count = count($data);
-                            $value = $data[$count - 1][1];
-                            $percent = ($value / $total) * 100;
-
-                            // evict any data below 0.05%
-                            if ($percent <= 0.10) {
-                                unset($response['data'][$name]);
-                            }
                         }
                     }
-
-
-                    $response['status'] = 'ok';
-                    $response['name'] = htmlentities($graph->getName());
-                    $response['type'] = GraphType::toString($graph->getType());
                 }
+
+
+                $response['status'] = 'ok';
+                $response['name'] = htmlentities($graph->getName());
+                $response['type'] = GraphType::toString($graph->getType());
             }
         }
 

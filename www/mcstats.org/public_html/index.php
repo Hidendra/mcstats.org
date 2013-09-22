@@ -11,29 +11,18 @@ $page_title = 'MCStats :: Homepage';
 $container_class = 'container';
 send_header();
 
-$lastEpoch = getLastGraphEpoch();
-$statement = get_slave_db_handle()->prepare('SELECT Sum FROM GraphData where ColumnID = ? AND Epoch = ?');
+$plugin = loadPluginByID(GLOBAL_PLUGIN_ID);
+$graph = $plugin->getOrCreateGraph('Global Statistics');
 
-// vars used later on
-$pluginCount = 0;
+$serverCount = number_format($plugin->getTimelineCustomLast($graph->getColumnID('Servers'), $graph));
+$playerCount = number_format($plugin->getTimelineCustomLast($graph->getColumnID('Players'), $graph));
 
-$graph = loadPluginByID(GLOBAL_PLUGIN_ID)->getOrCreateGraph('Global Statistics');
-
-$statement->execute(array($graph->getColumnID('Servers'), $lastEpoch));
-$serverCount = number_format($statement->fetch()[0]);
-$statement->execute(array($graph->getColumnID('Players'), $lastEpoch));
-$playerCount = number_format($statement->fetch()[0]);
-
-$statement = get_slave_db_handle()->prepare('SELECT * FROM Plugin where LastUpdated >= ?');
+$statement = get_slave_db_handle()->prepare('SELECT COUNT(*) FROM Plugin where LastUpdated >= ?');
 $statement->execute(array(normalizeTime() - SECONDS_IN_DAY));
 
-$pluginCount = 0;
-while ($row = $statement->fetch()) {
-    $pluginCount++;
-}
+$row = $statement->fetch();
 
-// generally the time player count is is last 30-60 minutes, so get the real time for popover
-$realTimeUsed = floor((time() - strtotime('-30 minutes', normalizeTime())) / 60);
+$pluginCount = $row ? $row[0] : 0;
 
 echo <<<END
 
@@ -46,7 +35,7 @@ echo <<<END
 
 <div class="row-fluid">
     <div class="hero-unit">
-        <h1 style="margin-bottom:10px; font-size:57px;">Glorious plugin stats.</h1>
+        <h1 style="margin-bottom:10px; font-size:57px;">Glorious plugin stats!</h1>
         <p>MCStats / Plugin Metrics is the de facto statistical engine for Minecraft, actively used by over <b>$pluginCount</b> plugins.</p>
         <p>Across the world, over <b>$playerCount</b> players have been seen <b>in the last 30 minutes</b> on over <b>$serverCount</b> servers.</p>
         <p><a href="/learn-more/" class="btn btn-success"><i class="icon-white icon-star-empty"></i> Learn More</a>  <a class="btn btn-primary" href="/plugin-list/"><i class="icon-white icon-th-list"></i> Plugin List</a></p>
@@ -79,7 +68,7 @@ foreach (loadPlugins(PLUGIN_ORDER_RANDOM_TOP100, 4) as $plugin) {
                 <h5><a href="/plugin/$encodedName">$name</a></h5>
             </div>
             <div class="widget-content" style="text-align: center;">
-                <img src="/plugin-preview/1.5/$encodedName.png" alt="$name" />
+                <img src="http://api.mcstats.org/plugin-preview/1.5/$encodedName.png" alt="$name" />
             </div>
         </div>
     </div>

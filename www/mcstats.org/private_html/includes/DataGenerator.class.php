@@ -17,14 +17,14 @@ class DataGenerator {
         $_cacheid = 'CustomChart/' . $graph->getID() . '/' . $columnID . '/' . $graph->getType() . '/' . $hours;
 
         // Check the cache
-        if ($data = $graph->getPlugin()->cacheGet($_cacheid)) {
-            return $data;
-        }
+        // if ($data = $graph->getPlugin()->cacheGet($_cacheid)) {
+        //     return json_decode($data);
+        //}
 
         $generatedData = array();
 
         // calculate the minimum
-        $baseEpoch = normalizeTime();
+        $baseEpoch = getLastGraphEpoch();
         $minimum = strtotime('-' . $hours . ' hours', $baseEpoch);
         $maximum = $baseEpoch;
 
@@ -33,7 +33,7 @@ class DataGenerator {
             $columnAmounts = array();
 
             foreach ($graph->getColumns() as $id => $columnName) {
-                $columnAmounts[$columnName] = $graph->getPlugin()->getTimelineCustomLast($id);
+                $columnAmounts[$columnName] = $graph->getPlugin()->getTimelineCustomLast($id, $graph);
             }
 
             // Now begin our magic
@@ -100,7 +100,7 @@ class DataGenerator {
                 $columnAmounts = array();
 
                 foreach ($graph->getColumns() as $id => $columnName) {
-                    $columnAmounts[$columnName] = $graph->getPlugin()->getTimelineCustomLast($id);
+                    $columnAmounts[$columnName] = $graph->getPlugin()->getTimelineCustomLast($id, $graph);
                 }
 
                 // Now begin our magic
@@ -133,6 +133,7 @@ class DataGenerator {
                 }
 
                 // Now convert it to %
+                $amountsInner = array();
                 foreach ($columnAmounts as $columnName => $dataPoint) {
                     $percent = round(($dataPoint / $data_sum) * 100, 2);
 
@@ -147,12 +148,21 @@ class DataGenerator {
 
                     // explode the string on the delimiter
                     $expl = explode('~=~', $columnName);
+                    $innerName = $expl[0];
+                    $outerName = $expl[1];
 
-                    $generatedData[$expl[0]][] = array("name" => $expl[1] . ' (' . $dataPoint . ')', "y" => $percent);
+                    $amountsInner[$innerName] += $dataPoint;
+
+                    $generatedData[$innerName][] = array("name" => $outerName . ' (' . $dataPoint . ')', "y" => $percent);
+                }
+
+                foreach ($amountsInner as $innerName => $amount) {
+                    $generatedData[$innerName . '<br/>(' . $amount . ')'] = $generatedData[$innerName];
+                    unset($generatedData[$innerName]);
                 }
             } else {
                 // Get all of the custom data points
-                $dataPoints = $graph->getPlugin()->getTimelineCustom($columnID, $minimum, $maximum);
+                $dataPoints = $graph->getPlugin()->getTimelineCustom($columnID, $minimum, $graph);
 
                 // Add all of them to the array
                 foreach ($dataPoints as $epoch => $dataPoint) {
@@ -166,7 +176,7 @@ class DataGenerator {
         }
 
         // Cache it
-        $graph->getPlugin()->cacheSet($_cacheid, $generatedData);
+        // $graph->getPlugin()->cacheSet($_cacheid, json_encode($generatedData));
         return $generatedData;
     }
 
@@ -175,14 +185,14 @@ class DataGenerator {
      * @param $plugin Plugin
      * @return the data
      */
-    public function generateGeoChartData($plugin) {
+    public static function generateGeoChartData($plugin) {
         $data = array();
         $locations = $plugin->getGraphByName('Server Locations');
 
         $data[] = array('Country', 'Servers');
 
         foreach ($locations->getColumns() as $id => $country) {
-            $count = $plugin->getTimelineCustomLast($id);
+            $count = $plugin->getTimelineCustomLast($id, $locations);
 
             if ($count > 0) {
                 $data[] = array($country, $count);

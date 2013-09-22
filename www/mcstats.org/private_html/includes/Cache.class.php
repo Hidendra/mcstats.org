@@ -3,6 +3,10 @@
 /// Expire the set cached value at the next graph generation
 const CACHE_UNTIL_NEXT_GRAPH = -25;
 
+require ROOT . '../private_html/Predis/Autoloader.php';
+
+Predis\Autoloader::register();
+
 /**
  * Handles caching, by default with memcached
  */
@@ -10,17 +14,16 @@ class Cache {
 
     /**
      * The handle to the caching object
-     * @var Memcache
+     * @var Predis\Client
      */
     private $handle;
 
-    public function __construct($handle = null) {
-        if ($handle === null && $this->isEnabled()) {
-            $this->handle = new Memcache();
-            $this->handle->addServer('127.0.0.1', 11211);
-        } else {
-            $this->handle = $handle;
-        }
+    /**
+     * If we have attempted to connect to the cache store or not
+     */
+    private $attemptedConnection = false;
+
+    public function __construct() {
     }
 
     /**
@@ -39,18 +42,19 @@ class Cache {
     }
 
     /**
-     * @return the prefix for cache values
-     */
-    public function getPrefix() {
-        global $config;
-        return $config['cache']['prefix'];
-    }
-
-    /**
      * Connect to the caching engine
      */
     public function connect() {
-        // nothing needed for Memcache
+        global $config;
+        $this->attemptedConnection = true;
+
+        if ($this->isEnabled()) {
+            $this->handle = new Predis\Client(array(
+                'host' => $config['cache']['host'],
+                'port' => $config['cache']['port'],
+                'database' => $config['cache']['database']
+            ));
+        }
     }
 
     /**
@@ -63,7 +67,13 @@ class Cache {
             return null;
         }
 
-        return $this->handle->get($this->getPrefix() . $key);
+        if (!$this->attemptedConnection) {
+            $this->connect();
+        }
+
+        $result = $this->handle->get($key);
+
+        return $result != null ? gzdecode($result) : null;
     }
 
     /**
@@ -78,12 +88,22 @@ class Cache {
             return false;
         }
 
+        if (!$this->attemptedConnection) {
+            $this->connect();
+        }
+
         // Check for flags
         if ($expire == CACHE_UNTIL_NEXT_GRAPH) {
             $expire = strtotime('+30 minutes', getLastGraphEpoch());
         }
 
-        return $this->handle->set($this->getPrefix() . $key, $value, false, $expire);
+        $this->handle->set($key, gzencode($value));
+
+        if ($expire > 0) {
+            $this->handle->expireat($key, $expire);
+        }
+
+        return true;
     }
 
 }

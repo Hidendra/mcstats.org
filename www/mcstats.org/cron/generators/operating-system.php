@@ -35,7 +35,7 @@ function doGeneration($pluginId, $data) {
     }
 
     $graph = $plugin->getOrCreateGraph('Operating System', false, 1, GraphType::Donut, true, 9010, true);
-    insertGraphDataScratch($graph, $pluginId, $fullName, $baseEpoch, $sum, $count, $avg, $max, $min, $variance, $stddev);
+    insertGraphData($graph, $pluginId, $fullName, $baseEpoch, $sum, $count, $avg, $max, $min, $variance, $stddev);
 }
 
 // Plugins

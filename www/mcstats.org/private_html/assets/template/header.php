@@ -15,7 +15,8 @@ $fileName = strtolower(substr($fileNameWithExt, 0, strpos($fileNameWithExt, '.')
 
 <head>
     <meta charset="utf-8"/>
-    <title><?php global $page_title; echo (isset($page_title) ? $page_title : 'Metrics - Admin'); ?></title>
+    <title><?php global $page_title;
+        echo(isset($page_title) ? $page_title : 'Metrics - Admin'); ?></title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <meta name="description" content=""/>
     <meta name="author" content="Tyler Blair <hidendra@griefcraft.com>"/>
@@ -26,7 +27,7 @@ $fileName = strtolower(substr($fileNameWithExt, 0, strpos($fileNameWithExt, '.')
     <link href="https://d2jz01fyat1phn.cloudfront.net/css/combined.css" rel="stylesheet"/>
 
     <!-- jquery, main, bootstrap -->
-    <script src="https://d2jz01fyat1phn.cloudfront.net/javascript/full-2013-3-17.js" type="text/javascript"></script>
+    <script src="https://d2jz01fyat1phn.cloudfront.net/javascript/full-2013-06-08.js" type="text/javascript"></script>
 
     <script type='text/javascript' src='https://www.google.com/jsapi'></script>
 
@@ -58,7 +59,8 @@ $fileName = strtolower(substr($fileNameWithExt, 0, strpos($fileNameWithExt, '.')
 
 <div id="search">
     <form action="" method="post" onsubmit="window.location='/plugin/' + $('#goto').val(); return false;">
-        <input type="text" id="goto" placeholder="Plugin search" autocomplete="off"/><button type="submit" class="tip-right" title="Go to plugin"><i class="icon-share-alt icon-white"></i></button>
+        <input type="text" id="goto" placeholder="Plugin search" autocomplete="off"/>
+        <button type="submit" class="tip-right" title="Go to plugin"><i class="icon-share-alt icon-white"></i></button>
     </form>
 </div>
 
@@ -114,9 +116,10 @@ END;
         } ?>><a href="/plugin-list/"><i class="icon icon-list-alt"></i> <span>Plugin List</span></a></li>
         <li<?php if ($fileName == 'global-stats') {
             echo ' class="active"';
-        } ?>><a href="/global-stats.php"><i class="icon icon-signal"></i> <span>Global Statistics</span></a></li>
+        } ?>><a href="/global-stats/"><i class="icon icon-signal"></i> <span>Global Statistics</span></a></li>
         <li><a href="/status/"><i class="icon icon-retweet"></i> <span>Backend Status</span></a></li>
-        <?php global $sidebar_more; if (isset($sidebar_more)) {
+        <?php global $sidebar_more;
+        if (isset($sidebar_more)) {
             echo $sidebar_more;
         } ?>
         <li class="submenu<?php if ($is_in_admin_ui) {
@@ -160,10 +163,24 @@ END;
                echo ' current';
            } ?>"><i
                 class="icon-home"></i> Home</a>
-        <?php global $breadcrumbs; if (isset($breadcrumbs)) {
+        <?php global $breadcrumbs;
+        if (isset($breadcrumbs)) {
             echo $breadcrumbs;
         } ?>
     </div>
 
     <div class="container-fluid">
+        <div class="row-fluid" id="graph-generator" style="display: none">
+            <div>
+                <div class="alert alert-info span6"
+                     style="width: 50%; padding-bottom: 0; margin-left: 25%; text-align: center; float: left;">
+                    <p>
+                        <strong>INFO:</strong> Graphs are currently generating.
+                    </p>
+                </div>
 
+                <div class="progress progress-striped progress-success active" style="clear: left">
+                    <div class="bar" id="graph-generator-progress-bar" style="width: 0"></div>
+                </div>
+            </div>
+        </div>

@@ -17,7 +17,7 @@ if (!isset($_GET['plugin'])) {
     err('No plugin provided.');
 } else {
     // Load the provided plugin
-    $plugin = loadPlugin($_GET['plugin']);
+    $plugin = loadPlugin(urldecode($_GET['plugin']));
 
     if ($plugin === null) {
         err('Invalid plugin.');

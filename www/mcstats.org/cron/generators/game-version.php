@@ -27,7 +27,7 @@ function doGeneration($pluginId, $data) {
     }
 
     $graph = $plugin->getOrCreateGraph('Game Version', false, 1, GraphType::Pie, true, 9001, true);
-    insertGraphDataScratch($graph, $pluginId, $version, $baseEpoch, $sum, $count, $avg, $max, $min, $variance, $stddev);
+    insertGraphData($graph, $pluginId, $version, $baseEpoch, $sum, $count, $avg, $max, $min, $variance, $stddev);
 }
 
 // Plugins

@@ -53,19 +53,5 @@ while ($data = $statement->fetch()) {
         $stddev = 0;
     }
 
-    // insert it into the database
-    $insert = $master_db_handle->prepare('INSERT INTO GraphDataScratch (Plugin, ColumnID, Sum, Count, Avg, Max, Min, Variance, StdDev, Epoch)
-                                                    VALUES (:Plugin, :ColumnID, :Sum, :Count, :Avg, :Max, :Min, :Variance, :StdDev, :Epoch)');
-    $insert->execute(array(
-        ':Plugin' => $pluginId,
-        ':ColumnID' => $columnID,
-        ':Epoch' => $baseEpoch,
-        ':Sum' => $sum,
-        ':Count' => $count,
-        ':Avg' => $avg,
-        ':Max' => $max,
-        ':Min' => $min,
-        ':Variance' => $variance,
-        ':StdDev' => $stddev
-    ));
+    insertGraphData($graph, $pluginId, $version, $baseEpoch, $sum, $count, $avg, $max, $min, $variance, $stddev);
 }

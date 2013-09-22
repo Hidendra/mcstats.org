@@ -7,7 +7,7 @@ require_once ROOT . '../private_html/config.php';
 require_once ROOT . '../private_html/includes/database.php';
 require_once ROOT . '../private_html/includes/func.php';
 
-insert_cache_headers();
+cacheCurrentPage(array('api' => 1));
 
 // Our json encoded response
 $response = array();

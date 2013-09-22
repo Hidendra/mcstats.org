@@ -5,6 +5,7 @@ session_start();
 require_once ROOT . '../private_html/config.php';
 require_once ROOT . '../private_html/includes/database.php';
 require_once ROOT . '../private_html/includes/func.php';
+cacheCurrentPage();
 
 /// Templating
 $page_title = 'MCStats :: Donate to MCStats';
@@ -54,7 +55,7 @@ if (is_loggedin() && ($pluginCount = count($plugins = get_accessible_plugins()))
 <div class="row-fluid">
     <div style="text-align: center;">
         <p>
-            <img src="/signature/1.5/' . urlencode(htmlentities($plugin->getName())) . '.png" />
+            <img src="http://api.mcstats.org/signature/1.5/' . urlencode(htmlentities($plugin->getName())) . '.png" />
         </p>
 ';
 } else {
@@ -69,7 +70,7 @@ if (is_loggedin() && ($pluginCount = count($plugins = get_accessible_plugins()))
 <div class="row">
     <div style="text-align: center;">
         <p>
-            <img src="/signature/1.5/all+servers.png" />
+            <img src="http://api.mcstats.org/signature/1.5/all+servers.png" />
         </p>
 ';
 }

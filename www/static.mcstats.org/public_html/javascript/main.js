@@ -46,7 +46,7 @@ function loadPluginListPage(page) {
     $("#plugin-list-go").addClass("disabled");
 
     // load the json data
-    $.getJSON("/api/1.0/list/" + page, function (data) {
+    $.getJSON("http://api.mcstats.org/1.0/list/" + page, function (data) {
         // var to the store the html in
         var html = "";
 

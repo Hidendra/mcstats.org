@@ -12,6 +12,8 @@ if (is_loggedin()) {
     exit;
 }
 
+cacheCurrentPage();
+
 admin_header();
 
 if (isset($_POST['submit'])) {

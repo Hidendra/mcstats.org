@@ -7,7 +7,7 @@ require_once ROOT . '../private_html/config.php';
 require_once ROOT . '../private_html/includes/database.php';
 require_once ROOT . '../private_html/includes/func.php';
 
-insert_cache_headers();
+cacheCurrentPage();
 
 // Our json encoded response
 $response = array();
@@ -30,10 +30,19 @@ if ($plugin === null) {
 $response['name'] = $plugin->getName(); // resend them the name so it is case-correct
 $response['author'] = $plugin->getAuthors();
 $response['starts'] = $plugin->getGlobalHits();
+$response['rank'] = $plugin->getRank();
 
 // Server data
 $response['servers'][24] = $plugin->getServerCount();
 
+try {
+    $globalGraph = $plugin->getOrCreateGraph('Global Statistics');
+
+    $response['servers']['last'] = $plugin->getTimelineCustomLast($globalGraph->getColumnID('Servers'), $globalGraph);
+    $response['players']['last'] = $plugin->getTimelineCustomLast($globalGraph->getColumnID('Players'), $globalGraph);
+} catch (Exception $e) {
+    //
+}
 
 $response['status'] = 'ok';
 echo json_encode($response);

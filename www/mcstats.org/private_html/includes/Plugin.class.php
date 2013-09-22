@@ -87,6 +87,12 @@ class Plugin {
     private $serverCount = -1;
 
     /**
+     * Cache of graph objects
+     * @var Graph[]
+     */
+    private $graphCache = array();
+
+    /**
      * Order the plugin's active graphs to have linear position arrangements. For example,
      * [ 1, 2, 5, 1543, 9000, 90001 ]
      * Where [ 1, 9000, 9001 ] are enforced graphs, it will become
@@ -132,12 +138,17 @@ class Plugin {
     public function getOrCreateGraph($name, $attemptedToCreate = false, $active = 0, $type = GraphType::Line, $readonly = false, $position = 2, $halfwidth = false) {
         global $master_db_handle;
 
+        if (isset($this->graphCache[$name])) {
+            return $this->graphCache[$name];
+        }
+
         // Try to get it from the database
         $statement = $master_db_handle->prepare('SELECT ID, Plugin, Type, Active, Readonly, Name, DisplayName, Scale, Halfwidth, Position FROM Graph WHERE Plugin = ? AND Name = ?');
         $statement->execute(array($this->id, $name));
 
         if ($row = $statement->fetch()) {
-            return new Graph($row['ID'], $this, $row['Type'], $row['Name'], $row['DisplayName'], $row['Active'], $row['Readonly'], $row['Position'], $row['Scale'], $row['Halfwidth'] == 1);
+            $this->graphCache[$name] = new Graph($row['ID'], $this, $row['Type'], $row['Name'], $row['DisplayName'], $row['Active'], $row['Readonly'], $row['Position'], $row['Scale'], $row['Halfwidth'] == 1);
+            return $this->graphCache[$name];
         }
 
         if ($attemptedToCreate) {
@@ -170,12 +181,17 @@ class Plugin {
     public function getGraphByName($name) {
         global $master_db_handle;
 
+        if (isset($this->graphCache[$name])) {
+            return $this->graphCache[$name];
+        }
+
         // Try to get it from the database
         $statement = $master_db_handle->prepare('SELECT ID, Plugin, Type, Active, Readonly, Name, DisplayName, Scale, Halfwidth, Position FROM Graph WHERE Plugin = ? AND Name = ?');
         $statement->execute(array($this->id, $name));
 
         if ($row = $statement->fetch()) {
-            return new Graph($row['ID'], $this, $row['Type'], $row['Name'], $row['DisplayName'], $row['Active'], $row['Readonly'], $row['Position'], $row['Scale'], $row['Halfwidth'] == 1);
+            $this->graphCache[$name] = new Graph($row['ID'], $this, $row['Type'], $row['Name'], $row['DisplayName'], $row['Active'], $row['Readonly'], $row['Position'], $row['Scale'], $row['Halfwidth'] == 1);
+            return $this->graphCache[$name];
         }
 
         return null;
@@ -189,11 +205,19 @@ class Plugin {
     public function getGraph($id) {
         global $master_db_handle;
 
+        foreach ($this->graphCache as $graphName => $graph) {
+            if ($graph->getID() == $id) {
+                return $graph;
+            }
+        }
+
         $statement = $master_db_handle->prepare('SELECT ID, Plugin, Type, Active, Readonly, Name, DisplayName, Scale, Halfwidth, Position FROM Graph WHERE ID = ?');
         $statement->execute(array($id));
 
         if ($row = $statement->fetch()) {
-            return new Graph($row['ID'], $this, $row['Type'], $row['Name'], $row['DisplayName'], $row['Active'], $row['Readonly'], $row['Position'], $row['Scale'], $row['Halfwidth'] == 1);
+            $graph = new Graph($row['ID'], $this, $row['Type'], $row['Name'], $row['DisplayName'], $row['Active'], $row['Readonly'], $row['Position'], $row['Scale'], $row['Halfwidth'] == 1);
+            $this->graphCache[$graph->getName()] = $graph;
+            return $graph;
         }
 
         return null;
@@ -392,41 +416,99 @@ class Plugin {
     }
 
     /**
+     * Cached custom data
+     */
+    private $customData = array();
+
+    /**
+     * Cached custom data
+     */
+    private $fullCustomData = array();
+
+    /**
      * Get the custom timeline data for all times between the two epochs
-     * @param $minEpoch int
-     * @param $maxEpoch int
+     * @param $columnID int
+     * @param $graph Graph
      * @return array keyed by the epoch
      */
-    function getTimelineCustom($columnID, $minEpoch) {
-        $db_handle = get_slave_db_handle();
-
-        $ret = array();
-        $statement = $db_handle->prepare('SELECT Sum, Epoch FROM GraphData WHERE Plugin = ? AND ColumnID = ? AND Epoch >= ?');
-        $statement->execute(array($this->id, $columnID, $minEpoch));
-
-        while ($row = $statement->fetch()) {
-            $ret[$row['Epoch']] = $row['Sum'];
+    function getTimelineCustom($columnID, $minEpoch, $graph) {
+        if (isset($this->fullCustomData[$minEpoch][$columnID])) {
+            return $this->fullCustomData[$minEpoch][$columnID];
         }
 
-        return $ret;
+        global $m_graphdata;
+
+        $last = getLastGraphEpoch();
+
+        // generate list of epoches to select from
+        $epochPoints = array();
+        $epoch = $minEpoch;
+
+        while ($epoch < $last) {
+            $epochPoints[] = intval($epoch);
+            $epoch += 1800; // 30 mins
+        }
+
+        // generate list of columns to get
+        $columnIds = array();
+
+        foreach ($graph->getColumns() as $id => $name) {
+            $columnIds[] = intval($id);
+        }
+
+        $cursor = $m_graphdata->find(array(
+            'epoch' => array(
+                '$gte' => $minEpoch
+            ),
+            'plugin' => intval($this->id),
+            'graph' => intval($graph->getID())
+        ));
+
+        foreach ($columnIds as $id) {
+            $this->fullCustomData[$minEpoch][$id] = array();
+        }
+
+        foreach ($cursor as $doc) {
+            foreach ($doc['data'] as $column => $data) {
+                $this->fullCustomData[$minEpoch][$column][$doc['epoch']] = $data['sum'];
+            }
+        }
+
+        foreach ($columnIds as $id) {
+            ksort($this->fullCustomData[$minEpoch][$id]);
+        }
+
+        return $this->fullCustomData[$minEpoch][$columnID];
     }
 
     /**
      * Get the custom timeline data for the last graph that was generated
-     * @param $minEpoch int
-     * @param $maxEpoch int
+     * @param $columnID int
+     * @param $graph Graph
      * @return array keyed by the epoch
      */
-    function getTimelineCustomLast($columnID) {
-        $db_handle = get_slave_db_handle();
-
+    function getTimelineCustomLast($columnID, $graph) {
         $epoch = getLastGraphEpoch();
-        $ret = array();
-        $statement = $db_handle->prepare('SELECT Sum FROM GraphData WHERE ColumnID = ? AND Plugin = ? AND Epoch = ?');
-        $statement->execute(array($columnID, $this->id, $epoch));
 
-        $row = $statement->fetch();
-        return $row != null ? $row['Sum'] : 0;
+        if (isset($this->customData[$epoch])) {
+            return isset($this->customData[$epoch][$columnID]) ? $this->customData[$epoch][$columnID] : 0;
+        }
+
+        global $m_graphdata;
+
+        $doc = $m_graphdata->findOne(array(
+            'epoch' => intval($epoch),
+            'plugin' => intval($this->id),
+            'graph' => intval($graph->getID())
+        ));
+
+        $this->customData[$epoch] = array();
+
+        foreach ($doc['data'] as $column => $data) {
+            $this->customData[$epoch][$column] = $data['sum'];
+        }
+
+        return isset($this->customData[$epoch][$columnID]) ? $this->customData[$epoch][$columnID] : 0;
     }
 
     /**
@@ -490,8 +572,13 @@ class Plugin {
     public function countServersLastUpdated($min) {
         $db_handle = get_slave_db_handle();
 
-        $statement = $db_handle->prepare('SELECT COUNT(*) FROM ServerPlugin WHERE Plugin = ? AND Updated >= ?');
-        $statement->execute(array($this->id, $min));
+        if ($this->id == GLOBAL_PLUGIN_ID) {
+            $statement = $db_handle->prepare('SELECT COUNT(distinct Server) FROM ServerPlugin WHERE Updated >= ?');
+            $statement->execute(array($min));
+        } else {
+            $statement = $db_handle->prepare('SELECT COUNT(*) FROM ServerPlugin WHERE Plugin = ? AND Updated >= ?');
+            $statement->execute(array($this->id, $min));
+        }
 
         $row = $statement->fetch();
         return $row != null ? $row[0] : 0;
