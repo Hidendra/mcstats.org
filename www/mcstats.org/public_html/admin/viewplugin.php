@@ -48,7 +48,7 @@ if (!isset($_GET['plugin'])) {
         }
         ?>
 
-        <div class="col-xs-3">
+        <div class="col-xs-4">
 
             <form action="/admin/plugin/<?php echo $plugin->getName(); ?>/update" method="post" class="form-horizontal">
                 <legend>
@@ -59,7 +59,7 @@ if (!isset($_GET['plugin'])) {
                     <label class="control-label" for="name">Plugin name</label>
 
                     <div class="controls">
-                        <input class="form-control" type="text" name="name" value="<?php echo $plugin->getName(); ?>" id="name" disabled/>
+                        <input class="form-control" type="text" name="name" value="<?php echo $plugin->getName(); ?>" id="name" style="min-width: 200px" disabled/>
                     </div>
                 </div>
 
@@ -67,7 +67,7 @@ if (!isset($_GET['plugin'])) {
                     <label class="control-label" for="authors">Authors</label>
 
                     <div class="controls">
-                        <input class="form-control" type="text" name="authors" value="<?php echo $plugin->getAuthors(); ?>" id="authors"/>
+                        <input class="form-control" type="text" name="authors" value="<?php echo $plugin->getAuthors(); ?>" id="authors" style="min-width: 200px"/>
                     </div>
                 </div>
                 <?php
@@ -92,13 +92,13 @@ if (!isset($_GET['plugin'])) {
                             </legend>
 
                             <!-- Register this graph -->
-                            <input class="form-control" type="hidden" name="graph[' . $id . ']" value="1" />
+                            <input class="form-control" type="hidden" name="graph[' . $id . ']" value="1" style="min-width: 200px" />
 
                             <div class="form-group">
                                 <label class="control-label" for="' . $id . '-name">Internal Name</label>
 
                                 <div class="controls">
-                                    <input class="form-control" type="text" id="' . $id . '-name" value="' . $name . '" disabled />
+                                    <input class="form-control" type="text" id="' . $id . '-name" value="' . $name . '" style="min-width: 200px" disabled />
                                 </div>
                             </div>
 
@@ -106,7 +106,7 @@ if (!isset($_GET['plugin'])) {
                                 <label class="control-label" for="' . $id . '-displayname">Display Name</label>
 
                                 <div class="controls">
-                                    <input class="form-control" type="text" name="displayName[' . $id . ']" id="' . $id . '-displayname" value="' . $displayName . '"' . ($disabled ? ' disabled' : '') . ' />
+                                    <input class="form-control" type="text" name="displayName[' . $id . ']" id="' . $id . '-displayname" style="min-width: 200px" value="' . $displayName . '"' . ($disabled ? ' disabled' : '') . ' />
                                 </div>
                             </div>
 
@@ -114,7 +114,7 @@ if (!isset($_GET['plugin'])) {
                                 <label class="control-label" for="' . $id . '-position">Position</label>
 
                                 <div class="controls">
-                                    <input class="form-control" type="text" name="position[' . $id . ']" id="' . $id . '-position" value="' . $position . '"' . ($disabled ? ' disabled' : '') . ' />
+                                    <input class="form-control" type="text" name="position[' . $id . ']" id="' . $id . '-position" style="min-width: 200px" value="' . $position . '"' . ($disabled ? ' disabled' : '') . ' />
                                 </div>
                             </div>
 
@@ -122,7 +122,7 @@ if (!isset($_GET['plugin'])) {
                                 <label class="control-label" for="' . $id . '-type">Type</label>
 
                                 <div class="controls">
-                                    <select class="form-control" name="type[' . $id . ']" id="' . $id . '-type"' . ($disabled ? ' disabled' : '') . '>
+                                    <select class="form-control" name="type[' . $id . ']" style="min-width: 200px" id="' . $id . '-type"' . ($disabled ? ' disabled' : '') . '>
                                         <option value="' . GraphType::Line . '"' . ($type == GraphType::Line ? ' selected' : '') . '>Line</option>
                                         <option value="' . GraphType::Area . '"' . ($type == GraphType::Area ? ' selected' : '') . '>Area</option>
                                         <option value="' . GraphType::Column . '"' . ($type == GraphType::Column ? ' selected' : '') . '>Column</option>
