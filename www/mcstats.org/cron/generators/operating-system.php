@@ -11,8 +11,8 @@ $countries = loadCountries();
 $baseEpoch = normalizeTime();
 $minimum = strtotime('-30 minutes', $baseEpoch);
 
-function doGeneration($pluginId, $data) {
-    global $countries, $baseEpoch;
+function generateOperatingSystems($pluginId, $data) {
+    global $baseEpoch;
     $plugin = loadPluginByID($pluginId);
     $osname = $data['osname'];
     $osversion = $data['osversion'];
@@ -58,7 +58,7 @@ $statement = get_slave_db_handle()->prepare('
 $statement->execute(array($minimum));
 
 while ($row = $statement->fetch()) {
-    doGeneration($row['Plugin'], $row);
+    generateOperatingSystems($row['Plugin'], $row);
 }
 
 // global plugin
@@ -83,5 +83,5 @@ $statement = get_slave_db_handle()->prepare('
 $statement->execute(array($minimum));
 
 while ($row = $statement->fetch()) {
-    doGeneration(GLOBAL_PLUGIN_ID, $row);
+    generateOperatingSystems(GLOBAL_PLUGIN_ID, $row);
 }

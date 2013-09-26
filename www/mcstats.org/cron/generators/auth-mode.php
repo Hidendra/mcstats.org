@@ -11,7 +11,7 @@ $countries = loadCountries();
 $baseEpoch = normalizeTime();
 $minimum = strtotime('-30 minutes', $baseEpoch);
 
-function doGeneration($pluginId, $data) {
+function generateAuthModes($pluginId, $data) {
     global $countries, $baseEpoch;
     $plugin = loadPluginByID($pluginId);
     $auth_mode = $data['online_mode'];
@@ -57,7 +57,7 @@ $statement = get_slave_db_handle()->prepare('
 $statement->execute(array($minimum));
 
 while ($row = $statement->fetch()) {
-    doGeneration($row['Plugin'], $row);
+    generateAuthModes($row['Plugin'], $row);
 }
 
 // global plugin
@@ -81,5 +81,5 @@ $statement = get_slave_db_handle()->prepare('
 $statement->execute(array($minimum));
 
 while ($row = $statement->fetch()) {
-    doGeneration(GLOBAL_PLUGIN_ID, $row);
+    generateAuthModes(GLOBAL_PLUGIN_ID, $row);
 }

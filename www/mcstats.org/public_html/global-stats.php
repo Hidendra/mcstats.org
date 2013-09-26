@@ -66,10 +66,10 @@ foreach ($cursor as $doc) {
 $servers_count = count($servers_graph);
 
 if ($servers_count > 2) {
-    $servers_class = $servers_graph[0] > $servers_graph[1] ? 'peity_line_good' : 'peity_line_bad';
+    $servers_class = $servers_graph[0] > $servers_graph[1] ? 'sparkline_line_good' : 'sparkline_line_bad';
     $servers_diff = $servers_graph[0] - $servers_graph[1];
     $players_count = count($players_graph);
-    $players_class = $players_graph[0] > $players_graph[1] ? 'peity_line_good' : 'peity_line_bad';
+    $players_class = $players_graph[0] > $players_graph[1] ? 'sparkline_line_good' : 'sparkline_line_bad';
     $players_diff = $players_graph[0] - $players_graph[1];
 
     if ($servers_diff > 0) {

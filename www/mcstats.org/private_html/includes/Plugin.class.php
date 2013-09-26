@@ -129,6 +129,28 @@ class Plugin {
     }
 
     /**
+     * Loads all active graphs from the database into the cache
+     */
+    public function preloadGraphs() {
+        global $master_db_handle;
+
+        $statement = $master_db_handle->prepare('SELECT Graph.ID, Graph.Type, Graph.Active, Graph.Readonly, Graph.Name, Graph.DisplayName, Graph.Scale, Graph.Halfwidth, Graph.Position, CustomColumn.ID as ColumnID, CustomColumn.Name as ColumnName FROM Graph LEFT OUTER JOIN CustomColumn ON Graph.ID = CustomColumn.Graph WHERE Graph.Plugin = ? AND Graph.Active = 1');
+        $statement->execute(array($this->id));
+
+        while ($row = $statement->fetch()) {
+            if (!isset($this->graphCache[$row['Name']])) {
+                $this->graphCache[$row['Name']] = new Graph($row['ID'], $this, $row['Type'], $row['Name'], $row['DisplayName'], $row['Active'], $row['Readonly'], $row['Position'], $row['Scale'], $row['Halfwidth'] == 1, false);
+            }
+
+            $graph = $this->graphCache[$row['Name']];
+
+            if (isset($row['ColumnName']) && $row['ColumnName'] != null) {
+                $graph->addLocalColumn($row['ColumnID'], $row['ColumnName']);
+            }
+        }
+    }
+
+    /**
      * Loads a graph from the database and if it does not exist, initialize an empty graph in the
      * database and return it
      *
@@ -470,7 +492,9 @@ class Plugin {
 
         foreach ($cursor as $doc) {
             foreach ($doc['data'] as $column => $data) {
-                $this->fullCustomData[$minEpoch][$column][$doc['epoch']] = $data['sum'];
+                if (isset($data['sum'])) {
+                    $this->fullCustomData[$minEpoch][$column][$doc['epoch']] = $data['sum'];
+                }
             }
         }
 

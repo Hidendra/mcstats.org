@@ -6,13 +6,10 @@ require_once ROOT . 'config.php';
 require_once ROOT . 'includes/database.php';
 require_once ROOT . 'includes/func.php';
 
-// the current number of running forks
-$running_processes = 0;
-
 $baseEpoch = normalizeTime();
 $minimum = strtotime('-30 minutes', $baseEpoch);
 
-function doGeneration($pluginId, $data) {
+function generateGlobalStats($pluginId, $data) {
     global $baseEpoch;
     $plugin = loadPluginByID($pluginId);
     $sum = $data['Sum'];
@@ -23,7 +20,7 @@ function doGeneration($pluginId, $data) {
     $variance = $data['Variance'];
     $stddev = $data['StdDev'];
 
-    if ($count == 0 || $sum == 0) {
+    if ($count == 0 && $sum == 0) {
         return;
     }
 
@@ -54,7 +51,7 @@ $statement = get_slave_db_handle()->prepare('
 $statement->execute(array($minimum));
 
 while ($row = $statement->fetch()) {
-    doGeneration($row['Plugin'], $row);
+    generateGlobalStats($row['Plugin'], $row);
 }
 
 // global plugin
@@ -76,5 +73,5 @@ $statement = get_slave_db_handle()->prepare('
 $statement->execute(array($minimum));
 
 while ($row = $statement->fetch()) {
-    doGeneration(GLOBAL_PLUGIN_ID, $row);
+    generateGlobalStats(GLOBAL_PLUGIN_ID, $row);
 }

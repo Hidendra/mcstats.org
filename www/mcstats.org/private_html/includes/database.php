@@ -54,7 +54,7 @@ $mongo = $mongo_handle->selectDB('mcstats');
 $m_graphdata = new MongoCollection($mongo, 'graphdata');
 $m_statistic = new MongoCollection($mongo, 'statistic');
 
-$cursor = $m_statistic->find();
+$cursor = $m_statistic->find(array('_id' => 1));
 $statistic = $cursor->getNext();
 
 // Attempt to connect to the master database

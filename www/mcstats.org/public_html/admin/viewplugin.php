@@ -48,26 +48,26 @@ if (!isset($_GET['plugin'])) {
         }
         ?>
 
-        <div class="span6 offset3">
+        <div class="col-xs-3">
 
             <form action="/admin/plugin/<?php echo $plugin->getName(); ?>/update" method="post" class="form-horizontal">
                 <legend>
                     Basic information
                 </legend>
 
-                <div class="control-group">
+                <div class="form-group">
                     <label class="control-label" for="name">Plugin name</label>
 
                     <div class="controls">
-                        <input type="text" name="name" value="<?php echo $plugin->getName(); ?>" id="name" disabled/>
+                        <input class="form-control" type="text" name="name" value="<?php echo $plugin->getName(); ?>" id="name" disabled/>
                     </div>
                 </div>
 
-                <div class="control-group">
+                <div class="form-group">
                     <label class="control-label" for="authors">Authors</label>
 
                     <div class="controls">
-                        <input type="text" name="authors" value="<?php echo $plugin->getAuthors(); ?>" id="authors"/>
+                        <input class="form-control" type="text" name="authors" value="<?php echo $plugin->getAuthors(); ?>" id="authors"/>
                     </div>
                 </div>
                 <?php
@@ -92,37 +92,37 @@ if (!isset($_GET['plugin'])) {
                             </legend>
 
                             <!-- Register this graph -->
-                            <input type="hidden" name="graph[' . $id . ']" value="1" />
+                            <input class="form-control" type="hidden" name="graph[' . $id . ']" value="1" />
 
-                            <div class="control-group">
+                            <div class="form-group">
                                 <label class="control-label" for="' . $id . '-name">Internal Name</label>
 
                                 <div class="controls">
-                                    <input type="text" id="' . $id . '-name" value="' . $name . '" disabled />
+                                    <input class="form-control" type="text" id="' . $id . '-name" value="' . $name . '" disabled />
                                 </div>
                             </div>
 
-                            <div class="control-group">
+                            <div class="form-group">
                                 <label class="control-label" for="' . $id . '-displayname">Display Name</label>
 
                                 <div class="controls">
-                                    <input type="text" name="displayName[' . $id . ']" id="' . $id . '-displayname" value="' . $displayName . '"' . ($disabled ? ' disabled' : '') . ' />
+                                    <input class="form-control" type="text" name="displayName[' . $id . ']" id="' . $id . '-displayname" value="' . $displayName . '"' . ($disabled ? ' disabled' : '') . ' />
                                 </div>
                             </div>
 
-                            <div class="control-group">
+                            <div class="form-group">
                                 <label class="control-label" for="' . $id . '-position">Position</label>
 
                                 <div class="controls">
-                                    <input type="text" name="position[' . $id . ']" id="' . $id . '-position" value="' . $position . '"' . ($disabled ? ' disabled' : '') . ' />
+                                    <input class="form-control" type="text" name="position[' . $id . ']" id="' . $id . '-position" value="' . $position . '"' . ($disabled ? ' disabled' : '') . ' />
                                 </div>
                             </div>
 
-                            <div class="control-group">
+                            <div class="form-group">
                                 <label class="control-label" for="' . $id . '-type">Type</label>
 
                                 <div class="controls">
-                                    <select name="type[' . $id . ']" id="' . $id . '-type"' . ($disabled ? ' disabled' : '') . '>
+                                    <select class="form-control" name="type[' . $id . ']" id="' . $id . '-type"' . ($disabled ? ' disabled' : '') . '>
                                         <option value="' . GraphType::Line . '"' . ($type == GraphType::Line ? ' selected' : '') . '>Line</option>
                                         <option value="' . GraphType::Area . '"' . ($type == GraphType::Area ? ' selected' : '') . '>Area</option>
                                         <option value="' . GraphType::Column . '"' . ($type == GraphType::Column ? ' selected' : '') . '>Column</option>
@@ -134,7 +134,7 @@ if (!isset($_GET['plugin'])) {
                                 </div>
                             </div>
 
-                            <div class="control-group">
+                            <div class="form-group">
                                 <label class="control-label" for="' . $id . '-active">Active</label>
 
                                 <div class="controls">
@@ -144,7 +144,7 @@ if (!isset($_GET['plugin'])) {
                                 </div>
                             </div>
 
-                            <div class="control-group">
+                            <div class="form-group">
                                 <label class="control-label" for="' . $id . '-halfwidth">Half-width</label>
 
                                 <div class="controls">
@@ -154,7 +154,7 @@ if (!isset($_GET['plugin'])) {
                                 </div>
                             </div>
 
-                            <div class="control-group">
+                            <div class="form-group">
                                 <label class="control-label" for="' . $id . '-scale">Scale</label>
 
                                 <div class="controls">
@@ -178,6 +178,7 @@ if (!isset($_GET['plugin'])) {
             </form>
 
         </div>
+        <div class="clearfix"></div>
 
         <?php
         if (!$ajax) {

@@ -104,6 +104,7 @@ foreach ($queue as $k => $gdata) {
         $toset['data.' . $g_column] = $g_data;
     }
 
+    global $m_graphdata;
     $m_graphdata->update(array(
         'epoch' => intval($gdata['epoch']),
         'plugin' => intval($gdata['plugin']),

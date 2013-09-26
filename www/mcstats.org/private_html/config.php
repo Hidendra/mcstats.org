@@ -13,6 +13,14 @@ $config['graph']['separator'] = '~~';
 $config['email']['username'] = 'noreply@mcstats.org';
 $config['email']['password'] = '';
 
+$config['twitter'] = array(
+    'enabled' => false,
+    'consumerkey' => '',
+    'consumersecret' => '',
+    'accesstoken' => '',
+    'accesstokensecret' => ''
+);
+
 // Master database configuration
 $config['database']['master'] = array(
     'hostname' => '127.0.0.1',

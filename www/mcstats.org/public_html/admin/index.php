@@ -14,7 +14,7 @@ $breadcrumbs = '<a href="/admin/" class="current">Administration</a>';
 send_header();
 ?>
 
-    <div class="hero-unit">
+    <div class="col-xs-12">
         <h1 style="margin-bottom:10px; font-size:57px;">Welcome!</h1>
 
         <p>

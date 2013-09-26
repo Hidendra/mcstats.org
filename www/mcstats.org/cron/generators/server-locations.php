@@ -11,7 +11,7 @@ $countries = loadCountries();
 $baseEpoch = normalizeTime();
 $minimum = strtotime('-30 minutes', $baseEpoch);
 
-function doGeneration($pluginId, $data) {
+function generateServerLocations($pluginId, $data) {
     global $countries, $baseEpoch;
     $plugin = loadPluginByID($pluginId);
     $sum = $data['Sum'];
@@ -60,7 +60,7 @@ $statement = get_slave_db_handle()->prepare('
 $statement->execute(array($minimum));
 
 while ($row = $statement->fetch()) {
-    doGeneration($row['Plugin'], $row);
+    generateServerLocations($row['Plugin'], $row);
 }
 
 // global plugin
@@ -84,5 +84,5 @@ $statement = get_slave_db_handle()->prepare('
 $statement->execute(array($minimum));
 
 while ($row = $statement->fetch()) {
-    doGeneration(GLOBAL_PLUGIN_ID, $row);
+    generateServerLocations(GLOBAL_PLUGIN_ID, $row);
 }

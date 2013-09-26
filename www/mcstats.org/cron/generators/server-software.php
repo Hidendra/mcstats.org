@@ -10,7 +10,7 @@ require_once ROOT . 'includes/func.php';
 $baseEpoch = normalizeTime();
 $minimum = strtotime('-30 minutes', $baseEpoch);
 
-function doGeneration($pluginId, $data) {
+function generateServerSoftware($pluginId, $data) {
     global $baseEpoch;
     $plugin = loadPluginByID($pluginId);
     $sum = $data['Sum'];
@@ -49,7 +49,7 @@ $statement = get_slave_db_handle()->prepare('
 $statement->execute(array($minimum));
 
 while ($row = $statement->fetch()) {
-    doGeneration($row['Plugin'], $row);
+    generateServerSoftware($row['Plugin'], $row);
 }
 
 // global plugin
@@ -73,5 +73,5 @@ $statement = get_slave_db_handle()->prepare('
 $statement->execute(array($minimum));
 
 while ($row = $statement->fetch()) {
-    doGeneration(GLOBAL_PLUGIN_ID, $row);
+    generateServerSoftware(GLOBAL_PLUGIN_ID, $row);
 }

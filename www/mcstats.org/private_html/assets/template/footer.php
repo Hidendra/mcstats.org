@@ -1,19 +1,14 @@
-<div class="row-fluid">
-    <div id="footer" class="span12">
+</div>
+</div>
+
+<div class="row">
+    <div id="footer" class="col-xs-12">
         <p> MCStats service created & maintained by <a href="mailto:hidendra@mcstats.org">Hidendra</a>. Plugins are
             owned by their respective authors. </p>
 
-        <p><a href="/donate/"><i class="icon-heart"></i> Donate</a> | <a href="http://blog.mcstats.org/">blog</a> | <a
-                href="http://github.com/Hidendra/mcstats.org">github</a>
-            | <a href="irc://irc.esper.net/metrics">irc.esper.net #metrics</a></p>
+        <p><a href="http://github.com/Hidendra/mcstats.org"><i class="icon-github"></i> github</a> | <a href="irc://irc.esper.net/metrics"><i class="icon-comments"></i> irc.esper.net #metrics</a></p>
     </div>
 </div>
-</div>
-</div>
-
-<!-- charting scripts -->
-<script src="https://d2jz01fyat1phn.cloudfront.net/javascript/highcharts/highcharts-combined.js"
-        type="text/javascript"></script>
 
 </body>
 

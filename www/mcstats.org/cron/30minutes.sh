@@ -11,10 +11,9 @@ function run_script {
     /usr/local/bin/php -q "$1"
 }
 
-# prepare
-echo 1 > "$GENERATOR_FILE"
-run_script prepare-graph-generators.php
-echo 8 > "$GENERATOR_FILE"
+#echo 8 > "$GENERATOR_FILE"
+#run_script buffered-generator.php
+#echo 99 > "$GENERATOR_FILE"
 
 run_script generators/global-statistics.php
 echo 12 > "$GENERATOR_FILE"
@@ -43,6 +42,7 @@ echo 88 > "$GENERATOR_FILE"
 run_script generators/server-locations.php
 echo 99 > "$GENERATOR_FILE"
 run_script generators/rank.php
+
 run_script server-counts.php
 run_script clear-cache.php
 

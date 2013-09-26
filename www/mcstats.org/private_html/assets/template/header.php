@@ -23,11 +23,33 @@ $fileName = strtolower(substr($fileNameWithExt, 0, strpos($fileNameWithExt, '.')
 
     <meta name="viewport" content="width=device-width">
 
-    <!-- contains all .css files minified -->
-    <link href="https://d2jz01fyat1phn.cloudfront.net/css/combined.css" rel="stylesheet"/>
+    <!-- css -->
+    <link href="http://static.mcstats.org/css/libraries/bootstrap/bootstrap.min.css" rel="stylesheet"/>
+    <link href="http://static.mcstats.org/css/libraries/font-awesome/font-awesome.min.css" rel="stylesheet"/>
+    <link href="http://static.mcstats.org/css/libraries/template/template.min.css" rel="stylesheet"/>
+    <link href="http://static.mcstats.org/css/libraries/template/template.blue.min.css" rel="stylesheet"/>
+    <link href="http://static.mcstats.org/css/libraries/jquery/jquery.jscrollpane.css" rel="stylesheet"/>
+    <link href="http://static.mcstats.org/css/libraries/jquery/typeahead.js-bootstrap.css" rel="stylesheet"/>
+    <link href="http://static.mcstats.org/css/libraries/famfamfam/fam-icons.css" rel="stylesheet"/>
 
-    <!-- jquery, main, bootstrap -->
-    <script src="https://d2jz01fyat1phn.cloudfront.net/javascript/full-2013-06-08.js" type="text/javascript"></script>
+    <!-- core libs -->
+    <script src="http://static.mcstats.org/javascript/libraries/jquery/jquery.min.js" type="text/javascript"></script>
+    <script src="http://static.mcstats.org/javascript/libraries/jquery/jquery.pjax.js" type="text/javascript"></script>
+    <script src="http://static.mcstats.org/javascript/libraries/jquery/jquery.jpanelmenu.min.js" type="text/javascript"></script>
+    <script src="http://static.mcstats.org/javascript/libraries/jquery/jquery.nicescroll.min.js" type="text/javascript"></script>
+    <script src="http://static.mcstats.org/javascript/libraries/jquery/jquery.sparkline.min.js" type="text/javascript"></script>
+    <script src="http://static.mcstats.org/javascript/libraries/bootstrap/bootstrap.min.js" type="text/javascript"></script>
+    <script src="http://static.mcstats.org/javascript/libraries/bootstrap/tooltip.js" type="text/javascript"></script>
+    <script src="http://static.mcstats.org/javascript/libraries/bootstrap/typeahead.min.js" type="text/javascript"></script>
+    <script src="http://static.mcstats.org/javascript/libraries/template/template.min.js" type="text/javascript"></script>
+
+    <!-- charting -->
+    <script src="http://static.mcstats.org/javascript/libraries/highcharts/highstock.js" type="text/javascript"></script>
+    <script src="http://static.mcstats.org/javascript/libraries/highcharts/themes/simplex.js" type="text/javascript"></script>
+    <script src="http://static.mcstats.org/javascript/libraries/highcharts/exporting.js" type="text/javascript"></script>
+
+    <!-- mcstats -->
+    <script src="http://static.mcstats.org/javascript/mcstats.js" type="text/javascript"></script>
 
     <script type='text/javascript' src='https://www.google.com/jsapi'></script>
 
@@ -59,12 +81,11 @@ $fileName = strtolower(substr($fileNameWithExt, 0, strpos($fileNameWithExt, '.')
 
 <div id="search">
     <form action="" method="post" onsubmit="window.location='/plugin/' + $('#goto').val(); return false;">
-        <input type="text" id="goto" placeholder="Plugin search" autocomplete="off"/>
-        <button type="submit" class="tip-right" title="Go to plugin"><i class="icon-share-alt icon-white"></i></button>
+        <input type="text" id="goto" placeholder="Go to Plugin" autocomplete="off"/><button type="submit" class="tip-right" title="Go"><i class="icon-search"></i></button>
     </form>
 </div>
 
-<div id="user-nav" class="navbar navbar-inverse">
+<div id="user-nav">
     <?php
 
     if (is_loggedin()) {
@@ -81,21 +102,21 @@ $fileName = strtolower(substr($fileNameWithExt, 0, strpos($fileNameWithExt, '.')
         }
 
         echo <<<END
-            <ul class="nav btn-group">
-                <li class="btn btn-inverse dropdown" id="menu-messages"><a href="#" data-toggle="dropdown" data-target="#menu-messages" class="dropdown-toggle"><i class="icon icon-envelope"></i> <span class="text">Plugins</span> <span class="label label-important">$plugin_count</span> <b class="caret"></b></a>
+            <ul class="btn-group">
+                <li class="btn dropdown" id="menu-messages"><a href="#" data-toggle="dropdown" data-target="#menu-messages" class="dropdown-toggle"><i class="icon icon-envelope"></i> <span class="text">Plugins</span> <span class="label label-important">$plugin_count</span> <b class="caret"></b></a>
                     <ul class="dropdown-menu">
                         $plugins_html
                     </ul>
                 </li>
-                <li class="btn btn-inverse"><a title="" href="/admin/logout.php"><span class="text">Logout</span> <i class="icon icon-share-alt"></i></a></li>
+                <li class="btn"><a title="" href="/admin/logout.php"><span class="text">Logout</span> <i class="icon icon-share-alt"></i></a></li>
             </ul>
 END;
 
     } else {
 
         echo <<<END
-            <ul class="nav btn-group">
-                <li class="btn btn-inverse"><a title="" href="/admin/login.php"><i class="icon icon-share-alt"></i> <span class="text">Login</span></a></li>
+            <ul class="btn-group">
+                <li class="btn"><a title="" href="/admin/login.php"><i class="icon icon-share-alt"></i> <span class="text">Login</span></a></li>
             </ul>
 END;
 
@@ -116,7 +137,7 @@ END;
         } ?>><a href="/plugin-list/"><i class="icon icon-list-alt"></i> <span>Plugin List</span></a></li>
         <li<?php if ($fileName == 'global-stats') {
             echo ' class="active"';
-        } ?>><a href="/global-stats/"><i class="icon icon-signal"></i> <span>Global Statistics</span></a></li>
+        } ?>><a href="/global/"><i class="icon icon-signal"></i> <span>Global Statistics</span></a></li>
         <li><a href="/status/"><i class="icon icon-retweet"></i> <span>Backend Status</span></a></li>
         <?php global $sidebar_more;
         if (isset($sidebar_more)) {
@@ -125,7 +146,7 @@ END;
         <li class="submenu<?php if ($is_in_admin_ui) {
             echo ' active open';
         } ?>">
-            <a href="#"><i class="icon icon-wrench"></i> <span>Administration</span> <span class="label">2</span></a>
+            <a href="#"><i class="icon icon-wrench"></i> <span>Plugin Admin</span> <span class="label">2</span></a>
             <ul>
                 <li<?php if ($is_in_admin_ui && $fileName == 'index') {
                     echo ' class="active"';
@@ -135,18 +156,15 @@ END;
                 } ?>><a href="/admin/add-plugin/">Add a plugin</a></li>
             </ul>
         </li>
-        <li class="submenu<?php if ($fileName == 'reports') {
-            echo ' active open';
-        } ?>">
-            <a href="#"><i class="icon icon-book"></i> <span>Reports</span> <span class="label">2</span></a>
-            <ul>
-                <li<?php if (isset($_GET['period']) && $_GET['period'] == 'december-2012') {
-                    echo ' class="active"';
-                } ?>><a href="/reports/january-2013/">January 2013</a></li>
-                <li<?php if (isset($_GET['period']) && $_GET['period'] == 'december-2012') {
-                    echo ' class="active"';
-                } ?>><a href="/reports/december-2012/">December 2012</a></li>
-            </ul>
+
+        <li>
+            <a><span>A very special thanks to the MCStats sponsors:</span></a>
+
+            <ol style="padding: 0; margin: 0;" class="sponsors">
+                <li><a href="http://buycraft.net" target="_blank"><img src="http://static.mcstats.org/img/sponsors/buycraft.png" width="210px" style="padding-left: 10px" /></a></li>
+                <li><a href="http://avnk.net" target="_blank"><img src="http://static.mcstats.org/img/sponsors/Avalanche-Network-v5.png" width="210px" /></a></li>
+                <li><a href="https://twitter.com/VladToBeHere" target="_blank"><span style="margin-left: 15px; font-size: 24px; color: #428BCA">@VladToBeHere</span></a></li>
+            </ol>
         </li>
     </ul>
 
@@ -172,7 +190,7 @@ END;
     <div class="container-fluid">
         <div class="row-fluid" id="graph-generator" style="display: none">
             <div>
-                <div class="alert alert-info span6"
+                <div class="alert alert-info col-xs-6"
                      style="width: 50%; padding-bottom: 0; margin-left: 25%; text-align: center; float: left;">
                     <p>
                         <strong>INFO:</strong> Graphs are currently generating.

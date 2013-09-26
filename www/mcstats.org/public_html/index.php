@@ -34,7 +34,7 @@ echo <<<END
 
 
 <div class="row-fluid">
-    <div class="hero-unit">
+    <div class="col-xs-12">
         <h1 style="margin-bottom:10px; font-size:57px;">Glorious plugin stats!</h1>
         <p>MCStats / Plugin Metrics is the de facto statistical engine for Minecraft, actively used by over <b>$pluginCount</b> plugins.</p>
         <p>Across the world, over <b>$playerCount</b> players have been seen <b>in the last 30 minutes</b> on over <b>$serverCount</b> servers.</p>
@@ -58,7 +58,7 @@ foreach (loadPlugins(PLUGIN_ORDER_RANDOM_TOP100, 4) as $plugin) {
     }
 
     echo <<<END
-    <div class="span6">
+    <div class="col-xs-6">
         <div class="widget-box">
             <div class="widget-title">
                                 <span class="icon">
@@ -81,5 +81,10 @@ END;
         $first = false;
     }
 }
+
+if (!$first) {
+    echo '</div>';
+}
+echo '<div class="clearfix"></div>';
 
 send_footer();

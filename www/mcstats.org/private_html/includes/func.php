@@ -34,6 +34,9 @@ define('GLOBAL_PLUGIN_ID', -1);
 // Connect to the caching daemon
 $cache = new Cache();
 
+// cached plugin objects
+$cachedPlugins = array();
+
 /**
  * Get the global cache key used, for the current username / script
  * @param $aux array additional keys that are used to cache this page
@@ -116,7 +119,7 @@ function cacheFinalizePage() {
  * @param $stddev
  */
 function insertGraphData($graph, $plugin, $columnName, $epoch, $sum, $count, $avg, $max, $min, $variance, $stddev) {
-    global $m_graphdata;
+    global $m_graphdata, $bufferedGeneration;
 
     // these can be NULL IFF there is only one data point (e.g one server) in the sample
     // we're using sample functions NOT population so this should be fairly obvious why
@@ -128,14 +131,29 @@ function insertGraphData($graph, $plugin, $columnName, $epoch, $sum, $count, $av
 
     $columnId = $graph->getColumnID($columnName);
 
+    if (is_array($bufferedGeneration)) {
+
+        //
+        $bufferedGeneration[] = array(
+            'graph' => $graph,
+            'column' => $columnId,
+            'epoch' => $epoch,
+            'sum' => $sum,
+            'count' => $count,
+            'avg' => $avg,
+            'max' => $max,
+            'min' => $min
+        );
+
+        return;
+    }
+
     $toset = array();
     if ($sum != 0) $toset['data.' . $columnId]['sum'] = intval($sum);
     if ($count != 0) $toset['data.' . $columnId]['count'] = intval($count);
     if ($avg != 0) $toset['data.' . $columnId]['avg'] = intval($avg);
     if ($max != 0) $toset['data.' . $columnId]['max'] = intval($max);
     if ($min != 0) $toset['data.' . $columnId]['min'] = intval($min);
-    if ($variance != 0) $toset['data.' . $columnId]['variance'] = intval($variance);
-    if ($stddev != 0) $toset['data.' . $columnId]['stddev'] = intval($stddev);
 
     // For official pie/donut graphs only keep one set of data as for the time being historical data for them will not be viewable
     if ($graph->isOfficial() && ($graph->getType() == GraphType::Pie || $graph->getType() == GraphType::Donut)) {
@@ -247,7 +265,7 @@ function outputGraphs($plugin) {
                 $reset = true;
             }
             echo <<<END
-                        <div class="span6">
+                        <div class="col-xs-6">
                             <div class="widget-box">
                                 <a id="$safeName"></a>
                                 <div class="widget-title"><span class="icon"><i class="icon-signal"></i></span><h5><a href="#$safeName">$safeHTMLName</a></h5><div class="buttons"><a href="javascript:void;" class="btn btn-mini" onclick='$jsLoader'><i class="icon-refresh"></i> Update stats</a></div></div>
@@ -268,13 +286,15 @@ END;
             }
 
             echo <<<END
-                        <div class="row-fluid widget-box">
+                    <div class="row-fluid col-xs-12">
+                        <div class="widget-box">
                             <a id="$safeName"></a>
                             <div class="widget-title"><span class="icon"><i class="icon-signal"></i></span><h5><a href="#$safeName">$safeHTMLName</a></h5><div class="buttons"><a href="javascript:void;" class="btn btn-mini" onclick='$jsLoader'><i class="icon-refresh"></i> Update stats</a></div></div>
                             <div class="widget-content">
                                 <div id="CustomChart$index" style="height: $height;"></div>
                             </div>
                         </div>
+                     </div>
 
 END;
 
@@ -658,8 +678,10 @@ function countPlugins($order = PLUGIN_ORDER_POPULARITY) {
  * @return Plugin[]
  */
 function loadPlugins($order = PLUGIN_ORDER_POPULARITY, $limit = -1, $start = -1) {
+    global $cachedPlugins;
+
     $db_handle = get_slave_db_handle();
-    $plugins = array();
+    $ret = array();
 
     switch ($order) {
         case PLUGIN_ORDER_ALPHABETICAL:
@@ -695,10 +717,12 @@ function loadPlugins($order = PLUGIN_ORDER_POPULARITY, $limit = -1, $start = -1)
     $statement->execute(array(normalizeTime() - SECONDS_IN_DAY));
 
     while ($row = $statement->fetch()) {
-        $plugins[] = resolvePlugin($row);
+        $plugin = resolvePlugin($row);
+        $cachedPlugins[$plugin->getID()] = $plugin;
+        $ret[] = $plugin;
     }
 
-    return $plugins;
+    return $ret;
 }
 
 /**
@@ -729,9 +753,6 @@ function loadPlugin($plugin) {
     return null;
 }
 
-// array of plugin objects
-$plugins = array();
-
 /**
  * Load a plugin using its internal ID
  *
@@ -739,18 +760,18 @@ $plugins = array();
  * @return Plugin if it exists otherwise NULL
  */
 function loadPluginByID($id) {
-    global $plugins;
+    global $cachedPlugins;
 
-    if (isset($plugins[$id])) {
-        return $plugins[$id];
+    if (isset($cachedPlugins[$id])) {
+        return $cachedPlugins[$id];
     }
 
     $statement = get_slave_db_handle()->prepare('SELECT ID, Parent, Name, Author, Hidden, GlobalHits, Created, Rank, LastRank, LastRankChange, LastUpdated, ServerCount30 FROM Plugin WHERE ID = :ID');
     $statement->execute(array(':ID' => $id));
 
     if ($row = $statement->fetch()) {
-        $plugins[$id] = resolvePlugin($row);
-        return $plugins[$id];
+        $cachedPlugins[$id] = resolvePlugin($row);
+        return $cachedPlugins[$id];
     }
 
     return null;

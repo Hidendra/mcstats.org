@@ -11,7 +11,7 @@ $countries = loadCountries();
 $baseEpoch = normalizeTime();
 $minimum = strtotime('-30 minutes', $baseEpoch);
 
-function doGeneration($pluginId, $data) {
+function generateSystemArch($pluginId, $data) {
     global $countries, $baseEpoch;
     $plugin = loadPluginByID($pluginId);
     $osarch = $data['osarch'];
@@ -56,7 +56,7 @@ $statement = get_slave_db_handle()->prepare('
 $statement->execute(array($minimum));
 
 while ($row = $statement->fetch()) {
-    doGeneration($row['Plugin'], $row);
+    generateSystemArch($row['Plugin'], $row);
 }
 
 // global plugin
@@ -80,5 +80,5 @@ $statement = get_slave_db_handle()->prepare('
 $statement->execute(array($minimum));
 
 while ($row = $statement->fetch()) {
-    doGeneration(GLOBAL_PLUGIN_ID, $row);
+    generateSystemArch(GLOBAL_PLUGIN_ID, $row);
 }

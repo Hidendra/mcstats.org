@@ -17,7 +17,7 @@ send_header();
 echo <<<END
 
 <div class="row-fluid" style="margin-left: 20%; text-align: center;">
-    <div class="span6" style="width: 60%;">
+    <div class="col-xs-6" style="width: 60%;">
         <h1 style="margin-bottom:30px; font-size:40px;">
             MCStats is a unique service that is entirely open.
         </h1>
@@ -25,7 +25,7 @@ echo <<<END
 </div>
 
 <div class="row-fluid">
-    <div class="span10 offset1">
+    <div class="col-xs-10 col-md-offset-1">
         <div class="widget-box">
             <div class="widget-content">
                 <div class="row-fluid">
@@ -60,7 +60,7 @@ echo <<<END
 </div>
 
 <div class="row-fluid">
-    <div class="span5 offset1">
+    <div class="col-xs-5 col-md-offset-1">
         <div class="widget-box">
             <div class="widget-title"><span><i></i></span><h4 style="float: left; margin-left: 40%;">Plugin Authors</h4></div>
             <div class="widget-content">
@@ -80,7 +80,7 @@ echo <<<END
         </div>
     </div>
 
-    <div class="span5">
+    <div class="col-xs-5">
         <div class="widget-box">
             <div class="widget-title"><span><i></i></span><h4 style="float: left; margin-left: 40%;">Server Owners</h4></div>
             <div class="widget-content">
@@ -104,6 +104,8 @@ echo <<<END
         </div>
     </div>
 </div>
+
+<div class="clearfix"></div>
 
 END;
 

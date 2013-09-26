@@ -36,3 +36,14 @@ foreach (explode(';', $queries) as $query) {
 
     $statement = $master_db_handle->exec($query);
 }
+
+// update latest epoch
+$m_statistic->update(array(
+    '_id' => 1
+), array(
+    '$set' => array(
+        'max.epoch' => intval(normalizeTime())
+    )
+), array(
+    'upsert' => true
+));

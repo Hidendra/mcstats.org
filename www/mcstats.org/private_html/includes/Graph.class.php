@@ -180,7 +180,7 @@ class Graph {
      */
     private $feedURL = '';
 
-    public function __construct($id = -1, $plugin = null, $type = GraphType::Line, $name = '', $displayName = '', $active = 0, $readonly = false, $position = 1, $scale = 'linear', $halfwidth = false) {
+    public function __construct($id = -1, $plugin = null, $type = GraphType::Line, $name = '', $displayName = '', $active = 0, $readonly = false, $position = 1, $scale = 'linear', $halfwidth = false, $preloadGraphs = true) {
         $this->id = $id;
         $this->plugin = $plugin;
         $this->type = $type;
@@ -197,7 +197,7 @@ class Graph {
             $this->displayName = $name;
         }
 
-        if ($this->id >= 0) {
+        if ($this->id >= 0 && $preloadGraphs) {
             // Load the columns present in the graph
             $this->loadColumns();
         }
@@ -533,6 +533,16 @@ class Graph {
             $name = $row['Name'];
             $this->columns[$id] = $name;
         }
+    }
+
+    /**
+     * Adds a local column (presumed saved)
+     *
+     * @param $id
+     * @param $name
+     */
+    public function addLocalColumn($id, $name) {
+        $this->columns[$id] = $name;
     }
 
     /**

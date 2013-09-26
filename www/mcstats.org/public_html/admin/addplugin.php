@@ -190,32 +190,32 @@ CStats into your plugin.
                     <div class="well">
                         <div style="margin-left: 25%;">
                             <form action="" method="post" class="form-horizontal">
-                                <div class="control-group">
+                                <div class="form-group">
                                     <label class="control-label" for="pluginName">Plugin Name</label>
                                     <div class="controls">
-                                        <div class="input-prepend">
-                                            <span class="add-on"><i class="fam-cancel" id="pluginName-icon"></i></span><input type="text" name="pluginName" id="pluginName" value="' . $plugin . '" />
+                                        <div class="input-group">
+                                            <span class="input-group-addon"><i class="fam-cancel" id="pluginName-icon"></i></span><input class="form-control" type="text" name="pluginName" id="pluginName" value="' . $plugin . '" />
                                         </div>
                                     </div>
                                 </div>
 
-                                <div class="control-group">
+                                <div class="form-group">
                                     <label class="control-label" for="dbo">dev.bukkit.org entry or forum post (optional)</label>
                                     <div class="controls">
-                                        <input type="text" name="dbo" value="' . $dbo . '" />
+                                        <input class="form-control" type="text" name="dbo" value="' . $dbo . '" />
                                     </div>
                                 </div>
 
-                                <div class="control-group">
+                                <div class="form-group">
                                     <label class="control-label" for="email">Email address (optional)</label>
                                     <div class="controls">
-                                        <input type="text" name="email" value="' . $email . '" />
+                                        <input class="form-control" type="text" name="email" value="' . $email . '" />
                                     </div>
                                 </div>
 
-                                <div class="control-group">
+                                <div class="form-group">
                                     <div class="controls">
-                                        <input type="submit" name="submit" value="Submit" id="submit" class="btn btn-success btn-large" style="width: 100px;" disabled />
+                                        <input class="form-control" type="submit" name="submit" value="Submit" id="submit" class="btn btn-success btn-large" style="width: 100px;" disabled />
                                     </div>
                                 </div>
                             </form>

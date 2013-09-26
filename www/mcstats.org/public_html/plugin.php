@@ -49,7 +49,7 @@ if (is_loggedin() && in_array($plugin, get_accessible_plugins(false))) {
 
 /// Template hook
 $page_title = 'MCStats :: ' . $pluginName;
-$breadcrumbs = '<a href="/plugin/' . $encodedName . '" class="current">Plugin: ' . $pluginName . '</a>';
+$breadcrumbs = '<a href="/plugin/' . $encodedName . '" class="current">Plugin: ' . $pluginName . ' by '  . htmlentities($plugin->getAuthors()) . '</a>';
 $sidebar_more = '
                 <li class="submenu active open">
                     <a href="#"><i class="icon icon-star"></i> <span>Plugin: <strong>' . $pluginName . '</strong></span></a>
@@ -80,17 +80,17 @@ if ($rank == '') {
 
     // increase
     if ($plugin->getRank() < $plugin->getLastRank()) {
-        $rank_class = 'peity_bar_good';
+        $rank_class = 'sparkline_bar_good';
         $rank_change = '+' . ($plugin->getLastRank() - $plugin->getRank());
         $rank_graph = '1,2,3,4,5,6,7,8';
     } // decrease
     elseif ($plugin->getRank() > $plugin->getLastRank()) {
-        $rank_class = 'peity_bar_bad';
+        $rank_class = 'sparkline_bar_bad';
         $rank_change = '-' . ($plugin->getRank() - $plugin->getLastRank());
         $rank_graph = '8,7,6,5,4,3,2,1';
     } // no change
     else {
-        $rank_class = 'peity_line_neutral';
+        $rank_class = 'sparkline_line_neutral';
         $rank_change = '&plusmn;0';
         $rank_graph = '4,4,4,4,4,4,4,4';
     }
@@ -132,10 +132,10 @@ foreach ($cursor as $doc) {
 $servers_count = count($servers_graph);
 
 if ($servers_count > 2) {
-    $servers_class = $servers_graph[0] > $servers_graph[1] ? 'peity_line_good' : 'peity_line_bad';
+    $servers_class = $servers_graph[0] > $servers_graph[1] ? 'sparkline_line_good' : 'sparkline_line_bad';
     $servers_diff = $servers_graph[0] - $servers_graph[1];
     $players_count = count($players_graph);
-    $players_class = $players_graph[0] > $players_graph[1] ? 'peity_line_good' : 'peity_line_bad';
+    $players_class = $players_graph[0] > $players_graph[1] ? 'sparkline_line_good' : 'sparkline_line_bad';
     $players_diff = $players_graph[0] - $players_graph[1];
 
     if ($servers_diff > 0) {
@@ -171,7 +171,7 @@ echo '
             </script>
 
 				<div class="row-fluid">
-					<div class="span12 center" style="text-align: center; padding-bottom: 0;">
+					<div class="col-xs-12 center" style="text-align: center; padding-bottom: 0;">
 						<ul class="stat-boxes">
 							<li>
 								<div class="left ' . $rank_class . '" title="Not currently real data, it just shows the direction :-)"><span>' . $rank_graph . '</span>' . $rank_change . '</div>
