@@ -16,7 +16,7 @@ $fileName = strtolower(substr($fileNameWithExt, 0, strpos($fileNameWithExt, '.')
 <head>
     <meta charset="utf-8"/>
     <title><?php global $page_title;
-        echo(isset($page_title) ? $page_title : 'Metrics - Admin'); ?></title>
+        echo(isset($page_title) ? $page_title : 'Metrics - Admin'); ?></title>scroll
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <meta name="description" content=""/>
     <meta name="author" content="Tyler Blair <hidendra@griefcraft.com>"/>
@@ -28,7 +28,6 @@ $fileName = strtolower(substr($fileNameWithExt, 0, strpos($fileNameWithExt, '.')
     <link href="http://static.mcstats.org/css/libraries/font-awesome/font-awesome.min.css" rel="stylesheet"/>
     <link href="http://static.mcstats.org/css/libraries/template/template.min.css" rel="stylesheet"/>
     <link href="http://static.mcstats.org/css/libraries/template/template.blue.min.css" rel="stylesheet"/>
-    <link href="http://static.mcstats.org/css/libraries/jquery/jquery.jscrollpane.css" rel="stylesheet"/>
     <link href="http://static.mcstats.org/css/libraries/jquery/typeahead.js-bootstrap.css" rel="stylesheet"/>
     <link href="http://static.mcstats.org/css/libraries/famfamfam/fam-icons.css" rel="stylesheet"/>
 
@@ -36,7 +35,6 @@ $fileName = strtolower(substr($fileNameWithExt, 0, strpos($fileNameWithExt, '.')
     <script src="http://static.mcstats.org/javascript/libraries/jquery/jquery.min.js" type="text/javascript"></script>
     <script src="http://static.mcstats.org/javascript/libraries/jquery/jquery.pjax.js" type="text/javascript"></script>
     <script src="http://static.mcstats.org/javascript/libraries/jquery/jquery.jpanelmenu.min.js" type="text/javascript"></script>
-    <script src="http://static.mcstats.org/javascript/libraries/jquery/jquery.nicescroll.min.js" type="text/javascript"></script>
     <script src="http://static.mcstats.org/javascript/libraries/jquery/jquery.sparkline.min.js" type="text/javascript"></script>
     <script src="http://static.mcstats.org/javascript/libraries/bootstrap/bootstrap.min.js" type="text/javascript"></script>
     <script src="http://static.mcstats.org/javascript/libraries/bootstrap/tooltip.js" type="text/javascript"></script>
