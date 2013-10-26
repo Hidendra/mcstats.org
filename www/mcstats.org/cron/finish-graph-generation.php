@@ -13,7 +13,7 @@ UPDATE Graph SET Type = 1, Active = 1, Readonly = 1, Halfwidth = 0, Position = 1
 UPDATE Graph SET Type = 3, Active = 1, Readonly = 1, Halfwidth = 0, Position = 9000 WHERE Name = 'Server Locations';
 UPDATE Graph SET Type = 3, Active = 1, Readonly = 1, Halfwidth = 1, Position = 9001 WHERE Name = 'Game Version';
 UPDATE Graph SET Type = 3, Active = 1, Readonly = 1, Halfwidth = 1, Position = 9002 WHERE Name = 'Server Software';
-UPDATE Graph SET Type = 1, Active = 1, Readonly = 1, Halfwidth = 0, Position = 9003 WHERE Name = 'Version Trends';
+UPDATE Graph SET Type = 1, Active = 1, Readonly = 1, Halfwidth = 0, Position = 9003, DisplayName = 'Version Changes' WHERE Name = 'Version Trends';
 UPDATE Graph SET Type = 4, Active = 1, Readonly = 1, Halfwidth = 0, Position = 9004 WHERE Name = 'Version Demographics';
 
 UPDATE Graph SET Type = 6, Active = 1, Readonly = 1, Halfwidth = 1, Position = 8500 WHERE Name = 'Operating System';
@@ -36,14 +36,3 @@ foreach (explode(';', $queries) as $query) {
 
     $statement = $master_db_handle->exec($query);
 }
-
-// update latest epoch
-$m_statistic->update(array(
-    '_id' => 1
-), array(
-    '$set' => array(
-        'max.epoch' => intval(normalizeTime())
-    )
-), array(
-    'upsert' => true
-));
