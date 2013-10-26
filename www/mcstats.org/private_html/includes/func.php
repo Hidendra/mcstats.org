@@ -260,7 +260,7 @@ function outputGraphs($plugin) {
             $reset = false;
             if (!$floated) {
                 $floated = true;
-                echo '<div class="row-fluid">';
+                echo '<div class="row">';
             } else {
                 $reset = true;
             }
@@ -286,7 +286,7 @@ END;
             }
 
             echo <<<END
-                    <div class="row-fluid col-xs-12">
+                    <div class="row col-xs-12">
                         <div class="widget-box">
                             <a id="$safeName"></a>
                             <div class="widget-title"><span class="icon"><i class="icon-signal"></i></span><h5><a href="#$safeName">$safeHTMLName</a></h5><div class="buttons"><a href="javascript:void;" class="btn btn-mini" onclick='$jsLoader'><i class="icon-refresh"></i> Update stats</a></div></div>
