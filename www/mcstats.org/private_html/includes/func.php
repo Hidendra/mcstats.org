@@ -635,6 +635,7 @@ define ('PLUGIN_ORDER_ALPHABETICAL', 1);
 define ('PLUGIN_ORDER_POPULARITY', 2);
 define ('PLUGIN_ORDER_RANDOM', 3);
 define ('PLUGIN_ORDER_RANDOM_TOP100', 4);
+define ('PLUGIN_ORDER_SERVERCOUNT30', 5);
 
 /**
  * Count the number of plugins in the database
@@ -658,6 +659,10 @@ function countPlugins($order = PLUGIN_ORDER_POPULARITY) {
 
         case PLUGIN_ORDER_RANDOM_TOP100:
             $query = 'SELECT COUNT(*) FROM Plugin WHERE Parent = -1 AND Rank > 0 AND Rank <= 100';
+            break;
+
+        case PLUGIN_ORDER_SERVERCOUNT30:
+            $query = 'SELECT COUNT(*) FROM Plugin WHERE Parent = -1';
             break;
 
         default:
@@ -698,6 +703,10 @@ function loadPlugins($order = PLUGIN_ORDER_POPULARITY, $limit = -1, $start = -1)
 
         case PLUGIN_ORDER_RANDOM_TOP100:
             $query = 'SELECT ID, Parent, Name, Author, Hidden, GlobalHits, Created, Rank, LastRank, LastRankChange, LastUpdated, ServerCount30 FROM Plugin WHERE Parent = -1 AND Rank > 0 AND Rank <= 100 ORDER BY RAND()';
+            break;
+
+        case PLUGIN_ORDER_SERVERCOUNT30:
+            $query = 'SELECT ID, Parent, Name, Author, Hidden, GlobalHits, Created, Rank, LastRank, LastRankChange, LastUpdated, ServerCount30 FROM Plugin WHERE Parent = -1 ORDER BY ServerCount30 ASC';
             break;
 
         default:

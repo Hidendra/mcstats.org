@@ -13,15 +13,13 @@ $plugins = array();
 $counts = array();
 
 // count servers
-foreach (loadPlugins(PLUGIN_ORDER_ALPHABETICAL) as $plugin) {
+foreach (loadPlugins(PLUGIN_ORDER_SERVERCOUNT30) as $plugin) {
     if ($plugin->isHidden()) {
         continue;
     }
 
-    $count = $plugin->countServersLastUpdated(normalizeTime() - SECONDS_IN_DAY);
     $plugins[$plugin->getID()] = $plugin;
-    $counts[$plugin->getID()] = $count;
-    $plugin->setServerCount($count);
+    $counts[$plugin->getID()] = $plugin->getServerCount();
 }
 
 // sort the plugins
