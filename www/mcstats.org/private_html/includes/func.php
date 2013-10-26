@@ -649,7 +649,7 @@ function countPlugins($order = PLUGIN_ORDER_POPULARITY) {
             break;
 
         case PLUGIN_ORDER_POPULARITY:
-            $query = 'SELECT COUNT(*) FROM Plugin WHERE Plugin.Parent = -1';
+            $query = 'SELECT COUNT(*) FROM Plugin WHERE Plugin.Parent = -1 AND Rank > 0';
             break;
 
         case PLUGIN_ORDER_RANDOM:
@@ -657,7 +657,7 @@ function countPlugins($order = PLUGIN_ORDER_POPULARITY) {
             break;
 
         case PLUGIN_ORDER_RANDOM_TOP100:
-            $query = 'SELECT COUNT(*) FROM Plugin WHERE Parent = -1 AND Rank <= 100';
+            $query = 'SELECT COUNT(*) FROM Plugin WHERE Parent = -1 AND Rank > 0 AND Rank <= 100';
             break;
 
         default:
@@ -689,7 +689,7 @@ function loadPlugins($order = PLUGIN_ORDER_POPULARITY, $limit = -1, $start = -1)
             break;
 
         case PLUGIN_ORDER_POPULARITY:
-            $query = 'SELECT Plugin.ID, Parent, Name, Author, Hidden, GlobalHits, Created, Rank, LastRank, LastRankChange, LastUpdated, ServerCount30 FROM Plugin WHERE LastUpdated >= ? AND Plugin.Parent = -1 AND Rank IS NOT NULL ORDER BY Rank ASC';
+            $query = 'SELECT Plugin.ID, Parent, Name, Author, Hidden, GlobalHits, Created, Rank, LastRank, LastRankChange, LastUpdated, ServerCount30 FROM Plugin WHERE LastUpdated >= ? AND Plugin.Parent = -1 AND Rank > 0 ORDER BY Rank ASC';
             break;
 
         case PLUGIN_ORDER_RANDOM:
@@ -697,7 +697,7 @@ function loadPlugins($order = PLUGIN_ORDER_POPULARITY, $limit = -1, $start = -1)
             break;
 
         case PLUGIN_ORDER_RANDOM_TOP100:
-            $query = 'SELECT ID, Parent, Name, Author, Hidden, GlobalHits, Created, Rank, LastRank, LastRankChange, LastUpdated, ServerCount30 FROM Plugin WHERE Parent = -1 AND Rank <= 100 ORDER BY RAND()';
+            $query = 'SELECT ID, Parent, Name, Author, Hidden, GlobalHits, Created, Rank, LastRank, LastRankChange, LastUpdated, ServerCount30 FROM Plugin WHERE Parent = -1 AND Rank > 0 AND Rank <= 100 ORDER BY RAND()';
             break;
 
         default:
