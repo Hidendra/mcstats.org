@@ -68,7 +68,7 @@ foreach (loadPlugins(PLUGIN_ORDER_RANDOM_TOP100, 4) as $plugin) {
                 <h5><a href="/plugin/$encodedName">$name</a></h5>
             </div>
             <div class="widget-content" style="text-align: center;">
-                <img src="http://api.mcstats.org/plugin-preview/1.5/$encodedName.png" alt="$name" />
+                <img src="http://api.mcstats.org/plugin-preview/2.0/$encodedName.png" alt="$name" width="100%" />
             </div>
         </div>
     </div>
