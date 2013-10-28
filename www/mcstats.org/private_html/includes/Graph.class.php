@@ -204,7 +204,7 @@ class Graph {
     }
 
     public function isOfficial() {
-        return $this->position == 1 || $this->position < 1000;
+        return $this->position == 1 || $this->position > 1000;
     }
 
     /**
