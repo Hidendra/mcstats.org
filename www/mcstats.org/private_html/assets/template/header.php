@@ -106,7 +106,12 @@ $fileName = strtolower(substr($fileNameWithExt, 0, strpos($fileNameWithExt, '.')
                         $plugins_html
                     </ul>
                 </li>
-                <li class="btn"><a title="" href="/admin/logout.php"><span class="text">Logout</span> <i class="icon icon-share-alt"></i></a></li>
+                <li class="btn dropdown" id="menu-account"><a href="#" data-toggle="dropdown" data-target="#menu-account" class="dropdown-toggle"> <span class="text">Account</span> <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="/admin/changepassword.php"><span class="text">Change Password</span> <i class="icon icon-envelope"></a></li>
+                        <li><a href="/admin/logout.php"><span class="text">Logout</span> <i class="icon icon-share-alt"></i></a></li>
+                    </ul>
+                </li>
             </ul>
 END;
 
